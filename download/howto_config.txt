@@ -1,0 +1,15 @@
+
+##### NFS SERVER 
+
+# /etc/exports 
+/input_data ip/16(ro)
+
+exportfs -a
+service ntpd restart
+service portmap restart
+
+##### NFS CLIENT
+
+# /etc/fstab
+
+ip:/input_data /state/partition1/RocksCluster/main/input_data  nfs  defaults 0 0
