@@ -48,36 +48,37 @@ def download(name, dnld_year, dnld_month):
                 'BROWSE' not in file and '.xml' not in file:
                     urls_files.append(url+file)
 
-
-
-    urls_files = [
-        'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.06/MOD09A1.A2000097.h09v02.005.2008198085600.hdf',
-        'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.14/MOD09A1.A2000105.h09v02.005.2006266185153.hdf',
-    ]
-
+    #urls_files = [
+    #    'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.06/MOD09A1.A2000097.h09v02.005.2008198085600.hdf',
+    #    'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.14/MOD09A1.A2000105.h09v02.005.2006266185153.hdf',
+    #]
 
     #==============================================================================
     # download files
 
-    # create instance of DownloadManager class
-    dnld_manager = DownloadManager(num_workers=1)
-    dnld_manager.dnld_name = name
-    dnld_manager.dnld_date = dnld_date
+    for scene in scenes:
+        scene_files = [x for x in urls_files if scene in x]
+        # create instance of DownloadManager class
+        dnld_manager = DownloadManager(num_workers=3)
+        dnld_manager.dnld_name = name+'_'+scene
+        dnld_manager.dnld_date = dnld_date
 
-    # defined destination directory
-    dest_dir = os.path.join("/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp", name)
+        # define destination directory
+        dest_dir = os.path.join("/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp", name, scene)
 
-    # download in parallel
-    dnld_manager.main(urls_files, dest_dir)
+        # download in parallel
+        dnld_manager.main(scene_files, dest_dir)
 
-    # TODO: clean before run
-    # delete old directory older than 3 days
-    #dnld_manager.clean_old_files(2)
+        # TODO: clean before run
+        # delete old directory older than 3 days
+        #dnld_manager.clean_old_files(2)
 
-    #==============================================================================
-    # print download status when finished
+        #==============================================================================
+        # print download status when finished
 
-    dnld_manager.download_status()
+        dnld_manager.download_status()
+
+        del dnld_manager
 
 
 download('MOD09A1', 2014, 1)

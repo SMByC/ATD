@@ -78,11 +78,13 @@ class DownloadManager:
     """
 
     # attempts for download it again if has any error
-    NUM_ATTEMPT = 10
+    NUM_ATTEMPT = 2
     # wait time for the next attempt
-    WAIT_TIME_ATTEMPT = 120
+    WAIT_TIME_ATTEMPT = 1
+    # attempts for daemond download
+    NUM_ATTEMPT_DAEMON = 4
     # wait time for the daemon sleep for check if exist files for start download
-    WAIT_TIME_DAEMON = 30
+    WAIT_TIME_DAEMON = 1
 
     # Default wget options to use for downloading each file
     WGET = ["wget", "-q", "-nd", "-np", "-c"]  # "r" for recursive
@@ -122,9 +124,9 @@ class DownloadManager:
 
         # save log
         if self.DEST:
-            self.log = open(os.path.join(self.DEST, self.dnld_name + '.log'), 'w')
+            self.log = open(os.path.join(self.DEST, self.dnld_name + '.log'), 'a')
         else:
-            self.log = open(self.dnld_name + '.log', 'w')
+            self.log = open(self.dnld_name + '.log', 'a')
 
         # is destination was defined
         if self.DEST:
@@ -227,7 +229,7 @@ class DownloadManager:
         else:
             file_dnld_status =  os.path.join(self.dnld_name + "_status.csv")
 
-        open_dnld_status = open(file_dnld_status, 'w')
+        open_dnld_status = open(file_dnld_status, 'a')
         csv_dnld_status = csv.writer(open_dnld_status, delimiter=';')
 
         self.end_dnld_datetime = datetime.today()
