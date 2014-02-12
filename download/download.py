@@ -5,6 +5,7 @@ import __init__
 import csv
 import os
 import shutil
+from random import randint
 from threading import Thread
 from Queue import Queue
 from subprocess import call
@@ -121,9 +122,9 @@ class DownloadManager:
 
         # save log
         if self.DEST:
-            self.log = open(os.path.join(self.DEST, 'download.log'), 'w')
+            self.log = open(os.path.join(self.DEST, self.dnld_name + '.log'), 'w')
         else:
-            self.log = open('download.log', 'w')
+            self.log = open(self.dnld_name + '.log', 'w')
 
         # is destination was defined
         if self.DEST:
@@ -163,6 +164,7 @@ class DownloadManager:
 
             for attempt in range(self.NUM_ATTEMPT):
                 self.log.write('download started:  ' + file.url + ' (' + datetime_format(datetime.today())+')\n')
+                self.log.flush()
                 # download with wget
                 wget_status =  call(self.wget_cmd + [file.url], shell=False)
                 # TODO: check time for wget process
@@ -172,19 +174,21 @@ class DownloadManager:
                     check_status, check_msg = file.check(self)
                     if check_status in [0,1]:
                         self.log.write('download finished: ' + file.url + ' (' + datetime_format(datetime.today())+') - '+check_msg+'\n')
+                        self.log.flush()
                         file_download_ok = True
                         Q.put(('OK ('+check_msg+')', file))
                         break
                     else:
-                        self.log.write(str(attempt) + ' error downloading, '+check_msg+ ', try again: ' + file.url + ' (' + datetime_format(datetime.today())+')\n')
+                        self.log.write('error downloading, attempt '+str(attempt)+', '+check_msg+', try again: ' +file.url+' ('+datetime_format(datetime.today())+')\n')
                         sleep(self.WAIT_TIME_ATTEMPT)
                 else:
                     # if wget_status != 0 is due a some error
-                    self.log.write(str(attempt) + ' error downloading, try again: ' + file.url + ' (' + datetime_format(datetime.today())+')\n')
+                    self.log.write('error downloading, attempt '+str(attempt)+', '+file.url+' ('+datetime_format(datetime.today())+')\n')
+                    self.log.flush()
                     sleep(self.WAIT_TIME_ATTEMPT)
 
             if not file_download_ok:
-                Q.put(('error', file))
+                Q.put(('ERROR', file))
 
     def daemon_request(self, urls_files):
 
@@ -199,24 +203,29 @@ class DownloadManager:
             except:
                 return False
 
-        url_file_to_test = urls_files[-1] # take the last file
-
-        while True:
+        for attempt in range(self.NUM_ATTEMPT_DAEMON):
+            url_file_to_test = urls_files[randint(0,len(urls_files)-1)] # take a random file
             if file_exists(url_file_to_test):
                 self.log.write('ready to download ' + datetime_format(datetime.today()) + '\n')
                 self.log.flush()
                 return True
             else:
-                self.log.write('waiting for available files ' + datetime_format(datetime.today()) + '\n')
+                self.log.write('waiting for available files, attempt ' + str(attempt) + ', '+ datetime_format(datetime.today()) + '\n')
                 self.log.flush()
-                sleep(self.WAIT_TIME_DAEMON) #TODO check waiting time
+                sleep(self.WAIT_TIME_DAEMON)
+
+        # impossible request files to download... exit
+        self.log.write('maximum of attempt for daemon, impossible request files to download, exiting ' + datetime_format(datetime.today()) + '\n')
+        self.log.flush()
+        #TODO: sendmail error
+        exit()
 
     def download_status(self):
 
         if self.DEST:
-            file_dnld_status =  os.path.join(self.DEST, "download_status.csv")
+            file_dnld_status =  os.path.join(self.DEST, self.dnld_name + "_status.csv")
         else:
-            file_dnld_status =  os.path.join("download_status.csv")
+            file_dnld_status =  os.path.join(self.dnld_name + "_status.csv")
 
         open_dnld_status = open(file_dnld_status, 'w')
         csv_dnld_status = csv.writer(open_dnld_status, delimiter=';')
@@ -238,9 +247,9 @@ class DownloadManager:
 
         # save log
         if self.DEST:
-            self.log = open(os.path.join(self.DEST, 'download.log'), 'a')
+            self.log = open(os.path.join(self.DEST, self.dnld_name + '.log'), 'a')
         else:
-            self.log = open('download.log', 'a')
+            self.log = open(self.dnld_name + '.log', 'a')
 
         base_path = os.path.dirname(os.path.dirname(self.DEST))
 
