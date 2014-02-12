@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 
 def datetime_format(dt):
@@ -144,6 +145,10 @@ def cksum(file_to_check):
 ###############################################################################
 
 def dirs_and_files_in_url(url):
+    '''
+    Return all files and directories in specific URL
+    '''
+
     import urllib
     import re
 
@@ -168,4 +173,24 @@ def dirs_and_files_in_url(url):
             files.append(name)
     return dirs, files
 
+
 ###############################################################################
+
+def get_all_start_n_days_of_month(year, month, num_days=8):
+    reference_date = date(year,01,01)
+
+    #if reference_date.year > year:
+    #    raise Exception("The date is bigger than reference date")
+
+    tmp_date = reference_date
+    while year != tmp_date.year:
+        tmp_date += relativedelta(days=num_days)
+    while month != tmp_date.month:
+        tmp_date += relativedelta(days=num_days)
+
+    list_days = []
+    while month == tmp_date.month:
+        list_days.append(tmp_date.day)
+        tmp_date += relativedelta(days=num_days)
+
+    return list_days

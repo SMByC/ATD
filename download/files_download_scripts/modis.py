@@ -3,12 +3,10 @@
 
 import __init__
 import os
-import sys
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 from ATD.download.download import DownloadManager
-from ATD.lib import enumeration, fix_zeros_in_datetime, send_mail, dirs_and_files_in_url
+from ATD.lib import fix_zeros_in_datetime, dirs_and_files_in_url, get_all_start_n_days_of_month
 
 
 scenes = [
@@ -19,25 +17,6 @@ scenes = [
     'h11v08',
     'h11v09',
 ]
-
-def get_all_start_days_of_month(year, month):
-    reference_date = date(2014,01,01)
-
-    if reference_date.year > year:
-        raise Exception("The date is bigger than reference date")
-
-    tmp_date = reference_date
-    while year != tmp_date.year:
-        tmp_date += relativedelta(days=8)
-    while month != tmp_date.month:
-        tmp_date += relativedelta(days=8)
-
-    list_days = []
-    while month == tmp_date.month:
-        list_days.append(tmp_date.day)
-        tmp_date += relativedelta(days=8)
-
-    return list_days
 
 
 def download(name, dnld_year, dnld_month):
@@ -56,7 +35,7 @@ def download(name, dnld_year, dnld_month):
     # defined files to download
 
     urls_files = []
-    days = get_all_start_days_of_month(dnld_year, dnld_month)
+    days = get_all_start_n_days_of_month(dnld_year, dnld_month)
     for day in days:
         url = 'http://e4ftl01.cr.usgs.gov/MOLT/{name}.005/{year}.{month}.{day}/'\
             .format(name=name, year=dnld_year, month=fix_zeros_in_datetime(dnld_month), day=fix_zeros_in_datetime(day))
