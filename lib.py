@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import ConfigParser
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -28,6 +29,7 @@ def enumeration(start, stop, step):
 
 def send_mail(sender, receiver, subject, body, file_attached=None):
     import smtplib
+    import base64
     from email.mime.text import MIMEText
     from email.mime.application import MIMEApplication
     from email.mime.multipart import MIMEMultipart
@@ -51,11 +53,11 @@ def send_mail(sender, receiver, subject, body, file_attached=None):
     # Send the message via our own SMTP server
     server = smtplib.SMTP("mail.ideam.gov.co", 587)
     #Next, log in to the server
-    server.login("xcorredorl@ideam.gov.co", "Xcorredor2010")
+    server.login("xcorredorl@ideam.gov.co", base64.b64decode("WGNvcnJlZG9yMjAxMA=="))
     server.sendmail(sender, receiver, msg.as_string())
     server.quit()
 
-
+## example:
 #send_mail('xcorredorl@ideam.gov.co', 'xavier.corredor.llano@gmail.com', 'test subject', 'bodyy test\nnew lineee', 'howto_config.txt')
 
 
@@ -194,3 +196,79 @@ def get_all_start_n_days_of_month(year, month, num_days=8):
         tmp_date += relativedelta(days=num_days)
 
     return list_days
+
+###############################################################################
+
+class ConfigRun():
+
+    def __init__(self, path_to_run):
+        self.path_to_run = path_to_run
+        self.config_file = os.path.join(path_to_run, 'process_status.cfg')
+        self.year_to_run = None  # año de corrida
+        self.months_to_run = None  # meses a correr (periodo)
+        self.months_made = None  # meses realizados
+        self.month_to_process = None  # mes de proceso
+
+    def create(self, year_to_run=None, months_to_run=None, months_made=None, month_to_process=None):
+        #### values by default
+        _months_to_run = 6 # meses a correr (periodo)
+        _months_made = 0  # meses realizados (al crearse el archivo de configuracion)
+
+        from datetime import datetime
+        from math import floor
+
+        if year_to_run is not None:
+            self.year_to_run = int(year_to_run)
+        else:
+            self.year_to_run = datetime.today().year
+
+        if months_to_run is not None:
+            self.months_to_run = int(months_to_run)
+        else:
+            self.months_to_run = _months_to_run
+
+        if months_made is not None:
+            self.months_made = int(months_made)
+        else:
+            self.months_made = _months_made
+
+        if month_to_process is not None:
+            self.month_to_process = int(month_to_process)
+        else:
+            self.month_to_process = int((floor((datetime.today().month-1)/self.months_to_run))*self.months_to_run+1)  # mes de proceso
+
+        self.save()
+
+    def load(self):
+        config = ConfigParser.RawConfigParser()
+        if not os.path.isfile(self.config_file):
+            self.create()
+            return
+        config.read(self.config_file)
+        
+        self.year_to_run = config.getint('General', 'year_to_run')
+        self.months_to_run = config.getint('General', 'months_to_run')
+        self.months_made = config.getint('General', 'months_made')
+        self.month_to_process = config.getint('General', 'month_to_process')
+
+    def save(self):
+        config = ConfigParser.RawConfigParser()
+        config.add_section('General')
+        config.set('General', 'path_to_run', self.path_to_run)
+        config.set('General', 'year_to_run', self.year_to_run)
+        config.set('General', 'months_to_run', self.months_to_run)
+        config.set('General', 'months_made', self.months_made)
+        config.set('General', 'month_to_process', self.month_to_process)
+
+        # Writing our configuration file to 'example.cfg'
+        with open(self.config_file, 'wb') as configfile:
+            config.write(configfile)
+
+## example
+#config_run = ConfigRun('/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/')
+#config_run.load()
+#print config_run.month_to_process
+#print config_run.months_made
+#### do something
+#config_run.months_made = 3
+#config_run.save()
