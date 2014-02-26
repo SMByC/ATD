@@ -19,7 +19,9 @@ scenes = [
 ]
 
 
-def download(name, dnld_year, dnld_month):
+def download(name, path, dnld_year, dnld_month):
+    # save any error occur
+    errors = []
 
     #==============================================================================
     # name and datetime
@@ -34,24 +36,39 @@ def download(name, dnld_year, dnld_month):
     #==============================================================================
     # defined files to download
 
+    # # test
+    # urls_files = [
+    #     'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.06/MOD09A1.A2000097.h09v02.005.2008198085600.hdf',
+    #     'http://eftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.14/MOD09A1.A2000105.h09v02.005.2006266185153.hdf',
+    # ]
+    # dnld_manager = DownloadManager(num_workers=3)
+    # dnld_manager.dnld_name = name
+    # dnld_manager.dnld_date = dnld_date
+    # #dnld_manager.logs_path = path
+    # dnld_manager.errors = errors
+    # dest_dir = os.path.join(path, name)
+    # dnld_manager.main(urls_files, dest_dir)
+    # dnld_manager.download_status()
+    # del dnld_manager
+    # return DownloadManager.DNLD_ERRORS, os.path.join(dest_dir, name+'_'+dnld_date+"_status.csv")
+
     urls_files = []
     days = get_all_start_n_days_of_month(dnld_year, dnld_month)
     for day in days:
         url = 'http://e4ftl01.cr.usgs.gov/MOLT/{name}.005/{year}.{month}.{day}/'\
             .format(name=name, year=dnld_year, month=fix_zeros_in_datetime(dnld_month), day=fix_zeros_in_datetime(day))
 
-        dirs, files = dirs_and_files_in_url(url)
+        dirs, files, status = dirs_and_files_in_url(url)
+        if status != 'ok':
+            print status
+            errors.append(status)
+            continue
 
         for scene in scenes:
             for file in files:
                 if name in file and scene in file and \
                 'BROWSE' not in file and '.xml' not in file:
                     urls_files.append(url+file)
-
-    #urls_files = [
-    #    'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.06/MOD09A1.A2000097.h09v02.005.2008198085600.hdf',
-    #    'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.14/MOD09A1.A2000105.h09v02.005.2006266185153.hdf',
-    #]
 
     #==============================================================================
     # download files
@@ -62,9 +79,12 @@ def download(name, dnld_year, dnld_month):
         dnld_manager = DownloadManager(num_workers=3)
         dnld_manager.dnld_name = name+'_'+scene
         dnld_manager.dnld_date = dnld_date
+        dnld_manager.logs_path = os.path.join(path, name)
+        dnld_manager.logs_name = name
+        dnld_manager.errors = errors
 
         # define destination directory
-        dest_dir = os.path.join("/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp", name, scene)
+        dest_dir = os.path.join(path, name, scene)
 
         # download in parallel
         dnld_manager.main(scene_files, dest_dir)
@@ -80,5 +100,7 @@ def download(name, dnld_year, dnld_month):
 
         del dnld_manager
 
+    # return number of errors, status file
+    return DownloadManager.DNLD_ERRORS, os.path.join(path, name, name+'_'+dnld_date+"_status.csv")
 
-download('MOD09A1', 2014, 1)
+#download('MOD09A1', "/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp", 2014, 1)

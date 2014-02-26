@@ -27,7 +27,7 @@ def enumeration(start, stop, step):
 
 ###############################################################################
 
-def send_mail(sender, receiver, subject, body, file_attached=None):
+def send_mail(sender, receiver, subject, body, files_attached=None):
     import smtplib
     import base64
     from email.mime.text import MIMEText
@@ -41,14 +41,15 @@ def send_mail(sender, receiver, subject, body, file_attached=None):
     msg['To'] = receiver
 
     # This is the textual part:
-    part = MIMEText(body)
+    part = MIMEText(body, _charset="utf-8")
     msg.attach(part)
 
     # This is the binary part(The Attachment) if is not None:
-    if file_attached is not None:
-        part = MIMEApplication(open(file_attached, "rb").read())
-        part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file_attached))
-        msg.attach(part)
+    if files_attached is not None:
+        for file_attached in files_attached:
+            part = MIMEApplication(open(file_attached, "rb").read())
+            part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file_attached))
+            msg.attach(part)
 
     # Send the message via our own SMTP server
     server = smtplib.SMTP("mail.ideam.gov.co", 587)
@@ -158,8 +159,9 @@ def dirs_and_files_in_url(url):
     try:
         html = urllib.urlopen(url).read()
     except IOError, e:
-        print 'error fetching %s: %s' % (url, e)
-        return None
+        status = 'error fetching %s: %s' % (url, e)
+        return None, None, status
+
     if not url.endswith('/'):
         url += '/'
     items = parse_re.findall(html)
@@ -173,8 +175,9 @@ def dirs_and_files_in_url(url):
             dirs.append(name)
         else:
             files.append(name)
-    return dirs, files
+    return dirs, files, 'ok'
 
+#print dirs_and_files_in_url("http://aa.com123")
 
 ###############################################################################
 

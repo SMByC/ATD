@@ -79,11 +79,11 @@ class DownloadManager:
 
     # attempts for download it again if has any error
     NUM_ATTEMPT = 2
-    # wait time for the next attempt
+    # wait time for the next attempt (seconds)
     WAIT_TIME_ATTEMPT = 1
     # attempts for daemond download
     NUM_ATTEMPT_DAEMON = 4
-    # wait time for the daemon sleep for check if exist files for start download
+    # wait time for the daemon sleep for check if exist files for start download (seconds)
     WAIT_TIME_DAEMON = 1
 
     # Default wget options to use for downloading each file
@@ -91,6 +91,8 @@ class DownloadManager:
     # path to save files, if is None then download in the same run directory
     DEST = None
 
+    # save if there are any error
+    DNLD_ERRORS = 0
 
     ## download with urllib2  ----------------------------
     # import shutil
@@ -107,6 +109,8 @@ class DownloadManager:
     def __init__(self, num_workers):
         self.Q = Queue()
         self.check_files = True
+        self.logs_path = None
+        self.logs_name = None
         for i in range(num_workers):
             t = Thread(target=self.worker)
             t.setDaemon(True)
@@ -122,11 +126,16 @@ class DownloadManager:
             if not os.path.isdir(self.DEST):
                 os.makedirs(self.DEST)
 
+        # logs name and path
+        if self.DEST and self.logs_path is None:
+            self.logs_path = self.DEST
+        if self.logs_name is None:
+            self.logs_name = self.dnld_name
+
         # save log
-        if self.DEST:
-            self.log = open(os.path.join(self.DEST, self.dnld_name + '.log'), 'a')
-        else:
-            self.log = open(self.dnld_name + '.log', 'a')
+        self.log = open(os.path.join(self.logs_path, self.logs_name+'_'+self.dnld_date+'.log'), 'a')
+
+        self.log.write('\n########### START LOG FOR: '+self.dnld_name+' - '+self.dnld_date+' - ('+datetime_format(datetime.today())+')\n')
 
         # is destination was defined
         if self.DEST:
@@ -153,7 +162,12 @@ class DownloadManager:
             dnld_status.append([file.name, file.getsize(), status])
 
         self.dnld_status = dnld_status
-        #return dnld_status
+        # save errors produced in the download
+        for status in self.dnld_status:
+            if status[2] == 'ERROR':
+                self.errors.append('error downloading file '+status[0])
+
+        DownloadManager.DNLD_ERRORS = len(self.errors)
 
         # close log file
         self.log.close()
@@ -193,6 +207,19 @@ class DownloadManager:
                 Q.put(('ERROR', file))
 
     def daemon_request(self, urls_files):
+        self.log.write('Errors reported before download:\n')
+        if len(urls_files) == 0 or len(self.errors) != 0:
+            for error in self.errors:
+                self.log.write('   '+error+'\n')
+                self.log.flush()
+            if len(urls_files) == 0:
+                self.log.write('   no files to download!!, '+ datetime_format(datetime.today()) + '\n')
+                self.log.flush()
+                return False
+        else:
+            self.log.write('   no error reported, '+ datetime_format(datetime.today()) + '\n')
+            self.log.flush()
+        self.log.write('\n')
 
         import urllib2
 
@@ -224,16 +251,15 @@ class DownloadManager:
 
     def download_status(self):
 
-        if self.DEST:
-            file_dnld_status =  os.path.join(self.DEST, self.dnld_name + "_status.csv")
-        else:
-            file_dnld_status =  os.path.join(self.dnld_name + "_status.csv")
+        file_dnld_status = os.path.join(self.logs_path, self.logs_name+'_'+self.dnld_date+"_status.csv")
 
         open_dnld_status = open(file_dnld_status, 'a')
         csv_dnld_status = csv.writer(open_dnld_status, delimiter=';')
 
         self.end_dnld_datetime = datetime.today()
 
+        csv_dnld_status.writerow([])
+        csv_dnld_status.writerow(['########### START LOG STATUS FOR: '+self.dnld_name+' - '+self.dnld_date])
         csv_dnld_status.writerow([self.dnld_name, self.dnld_date])
 
         csv_dnld_status.writerow(['started: ' + datetime_format(self.start_dnld_datetime),
@@ -241,6 +267,15 @@ class DownloadManager:
 
         for status in self.dnld_status:
             csv_dnld_status.writerow(status)
+
+        # report errors
+        csv_dnld_status.writerow([])
+        if len(self.errors) != 0:
+            csv_dnld_status.writerow(['Errors:'])
+            for error in self.errors:
+                csv_dnld_status.writerow([error])
+        else:
+            csv_dnld_status.writerow(['No errors reported'])
 
         # close log file
         open_dnld_status.close()
