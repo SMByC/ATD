@@ -36,9 +36,9 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
 
     # Create a text/plain message
     msg = MIMEMultipart()
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = receiver
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = receiver
 
     # This is the textual part:
     part = MIMEText(body, _charset="utf-8")
@@ -48,14 +48,14 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
     if files_attached is not None:
         for file_attached in files_attached:
             part = MIMEApplication(open(file_attached, "rb").read())
-            part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file_attached))
+            part.add_header("Content-Disposition", "attachment", filename=os.path.basename(file_attached))
             msg.attach(part)
 
     # Send the message via our own SMTP server
     server = smtplib.SMTP("mail.ideam.gov.co", 587)
     #Next, log in to the server
     server.login("xcorredorl@ideam.gov.co", base64.b64decode("WGNvcnJlZG9yMjAxMA=="))
-    server.sendmail(sender, receiver, msg.as_string())
+    server.sendmail(msg["From"], msg["To"].split(","), msg.as_string())
     server.quit()
 
 ## example:

@@ -72,7 +72,7 @@ mail_body += '\nAdjunto se envían los logs del reporte de descarga\n' \
              'para éste mes, por favor reviselos.'
 
 send_mail('xcorredorl@ideam.gov.co',
-          'xcorredorl@ideam.gov.co',
+          'xcorredorl@ideam.gov.co, juanramirez85@gmail.com, liseth.rodriguez@gmail.com',
           mail_subject,
           mail_body,
           [status_file_A1,status_file_Q1 ])

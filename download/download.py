@@ -78,13 +78,13 @@ class DownloadManager:
     """
 
     # attempts for download it again if has any error
-    NUM_ATTEMPT = 2
+    NUM_ATTEMPT = 4
     # wait time for the next attempt (seconds)
-    WAIT_TIME_ATTEMPT = 1
+    WAIT_TIME_ATTEMPT = 300
     # attempts for daemond download
-    NUM_ATTEMPT_DAEMON = 4
+    NUM_ATTEMPT_DAEMON = 20
     # wait time for the daemon sleep for check if exist files for start download (seconds)
-    WAIT_TIME_DAEMON = 1
+    WAIT_TIME_DAEMON = 300
 
     # Default wget options to use for downloading each file
     WGET = ["wget", "-q", "-nd", "-np", "-c"]  # "r" for recursive
