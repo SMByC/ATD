@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2014 IDEAM
+# Copyright © 2014 IDEAM and Patrimonio Natural
 # Author: Xavier Corredor <xcorredorl@ideam.gov.co>
 
 import __init__
@@ -56,11 +56,14 @@ mail_body = \
     '\n{0}\n\nEste es el reporte automático de la descarga de las\n' \
     'Alertas Tempranas de Deforestación\n\n' \
     'Archivos modis MOD09A1 y MOD09Q1 para el {1}-{2}\n\n' \
-    'Realizados {3} meses de {4}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                                         config_run.year_to_run,
-                                         config_run.month_to_process,
-                                         config_run.months_made,
-                                         config_run.months_to_run)
+    'Realizados {3} mes(es) de {4}\n\n' \
+    'La ruta de almacenamiento de los resultados:\n' \
+    '   (SAN): {5}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+                         config_run.year_to_run,
+                         config_run.month_to_process,
+                         config_run.months_made,
+                         config_run.months_to_run,
+                         path_to_run)
 
 if config_run.months_made == config_run.months_to_run:
     mail_body += '\nLa descarga se ha completado!.\n'
@@ -68,8 +71,7 @@ if config_run.months_made == config_run.months_to_run:
 if dnld_errors_A1 > 0 or dnld_errors_Q1 > 0:
     mail_body += '\nEl log de descarga reporto algun(os) problema(s)\n'
 
-mail_body += '\nAdjunto se envían los logs del reporte de descarga\n' \
-             'para éste mes, por favor reviselos.'
+mail_body += '\nAdjunto se envían los logs del reporte de descarga.\n'
 
 send_mail('xcorredorl@ideam.gov.co',
           'xcorredorl@ideam.gov.co, juanramirez85@gmail.com, liseth.rodriguez@gmail.com',
