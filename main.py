@@ -5,23 +5,47 @@
 # Author: Xavier Corredor <xcorredorl@ideam.gov.co>
 
 import __init__
-from datetime import datetime
+import os
+from datetime import datetime, date
+from math import floor
+
 from ATD.lib import ConfigRun, send_mail
 from ATD.download.files_download_scripts import modis
 
 
-path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
+## pre download
+#global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
+global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
 
-config_run = ConfigRun(path_to_run)
+config_run = ConfigRun(global_path_to_run)
 config_run.load()
 
 if config_run.months_made == config_run.months_to_run:
     print 'Months made is equal to months to process, maybe the download is finished.'
+    print 'Starting new period to process...'
+
+    config_run.months_made = 0
+    if config_run.month_to_process == 12:
+        config_run.year_to_run += 1
+        config_run.month_to_process = 1
+## check if the period to process not is bigger than now
+if date(config_run.year_to_run, config_run.month_to_process,1) > date.today():
+    print "Error the date to download is bigger than the current date"
     exit()
 
+## added the directory period
+init_period = int((floor((config_run.month_to_process-1)/config_run.months_to_run))*config_run.months_to_run+1)
+end_period = init_period + config_run.months_to_run - 1
+dir_process = "{0}_({1}-{2})".format(config_run.year_to_run, init_period, end_period)
+print dir_process
+
+path_to_run = os.path.join(global_path_to_run, dir_process)
+
+## download
 dnld_errors_A1, status_file_A1 = modis.download('MOD09A1', path_to_run, config_run.year_to_run, config_run.month_to_process)
 dnld_errors_Q1, status_file_Q1 = modis.download('MOD09Q1', path_to_run, config_run.year_to_run, config_run.month_to_process)
 
+## post download
 config_run.months_made += 1
 
 mail_subject = "Reporte de la descarga de Aler.Temp.Defor. para {0}-{1} ({2}/{3})".format(config_run.year_to_run,
