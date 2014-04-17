@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2014 IDEAM and Patrimonio Natural
-# Author: Xavier Corredor <xcorredorl@ideam.gov.co>
+# Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
 import __init__
 import os
@@ -13,7 +13,8 @@ from ATD.lib import ConfigRun, send_mail
 from ATD.download.files_download_scripts import modis
 
 
-## pre download
+######################################## pre download ########################################
+
 #global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
 global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
 
@@ -41,11 +42,12 @@ print dir_process
 
 path_to_run = os.path.join(global_path_to_run, dir_process)
 
-## download
+########################################## download ##########################################
+
 dnld_errors_A1, status_file_A1 = modis.download('MOD09A1', path_to_run, config_run.year_to_run, config_run.month_to_process)
 dnld_errors_Q1, status_file_Q1 = modis.download('MOD09Q1', path_to_run, config_run.year_to_run, config_run.month_to_process)
 
-## post download
+######################################## post download #######################################
 config_run.months_made += 1
 
 mail_subject = "Reporte de la descarga de Aler.Temp.Defor. para {0}-{1} ({2}/{3})".format(config_run.year_to_run,
@@ -81,4 +83,16 @@ send_mail('xcorredorl@ideam.gov.co',
 
 config_run.month_to_process += 1
 config_run.save()
+
+######################################## TiSeg process ########################################
+#
+
+
+######################################### MRT process #########################################
+#
+
+
+
+
+
 exit()
