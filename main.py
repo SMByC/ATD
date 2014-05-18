@@ -4,95 +4,78 @@
 # Copyright © 2014 IDEAM and Patrimonio Natural
 # Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
-import __init__
 import os
-from datetime import datetime, date
-from math import floor
+import sys
+import argparse
+import time
 
-from ATD.lib import ConfigRun, send_mail
-from ATD.download.files_download_scripts import modis
+from download import main as download_main
+import settings
 
 
-######################################## pre download ########################################
+# set encoding to utf-8
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
-#global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
-global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
+########################################## arguments ##########################################
 
-config_run = ConfigRun(global_path_to_run)
-config_run.load()
 
-if config_run.months_made == config_run.months_to_run:
-    print 'Months made is equal to months to process, maybe the download is finished.'
-    print 'Starting new period to process...'
+def mkdate(datestr):
+    return time.strptime(datestr, '%Y-%m-%d')
 
-    config_run.months_made = 0
-    if config_run.month_to_process == 12:
-        config_run.year_to_run += 1
-        config_run.month_to_process = 1
-## check if the period to process not is bigger than now
-if date(config_run.year_to_run, config_run.month_to_process,1) > date.today():
-    print "Error the date to download is bigger than the current date"
-    exit()
+class readable_dir(argparse.Action):
+    def __call__(self,parser, namespace, values, option_string=None):
+        prospective_dir=values
+        if not os.path.isdir(prospective_dir):
+            raise argparse.ArgumentTypeError("readable_dir:{0} is not a valid path".format(prospective_dir))
+        if os.access(prospective_dir, os.R_OK):
+            setattr(namespace,self.dest,prospective_dir)
+        else:
+            raise argparse.ArgumentTypeError("readable_dir:{0} is not a readable dir".format(prospective_dir))
 
-## added the directory period
-init_period = int((floor((config_run.month_to_process-1)/config_run.months_to_run))*config_run.months_to_run+1)
-end_period = init_period + config_run.months_to_run - 1
-dir_process = "{0}_({1}-{2})".format(config_run.year_to_run, init_period, end_period)
-print dir_process
+# Create parser arguments
+parser = argparse.ArgumentParser(
+                 prog='atd',
+                 description="Alertas Tempranas de Deforestacion",
+                 formatter_class=argparse.RawTextHelpFormatter)
 
-path_to_run = os.path.join(global_path_to_run, dir_process)
+subparsers = parser.add_subparsers(dest='make', help='operation to be performed')
+# download
+group_download = subparsers.add_parser('download', help='download modis files')
+group_download.add_argument('--from',type=str, dest='from_date', help='date from download modis files, format: y-m-d') # else None
+group_download.add_argument('--to',type=str, dest='to_date', help='date to download modis files, format: y-m-d') # else None
+group_download.add_argument('--type',type=str, dest='download_type', choices=set(('steps','full')), help='type of download, steps or full') # else None
+group_download.add_argument('path', help='path to download modis files', action=readable_dir, nargs='?', default=os.getcwd())
+group_download.add_argument('--email', type=str, help='send email when finnish')
+# process
+list_of_process = set(('modis','abc'))
+group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
+group_process.add_argument('process', type=str, choices=list_of_process, help='process {0}'.format(','.join(list_of_process)))
+group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
+group_process.add_argument('--email', type=str, help='send email when finnish')
 
-########################################## download ##########################################
+args = parser.parse_args()
 
-dnld_errors_A1, status_file_A1 = modis.download('MOD09A1', path_to_run, config_run.year_to_run, config_run.month_to_process)
-dnld_errors_Q1, status_file_Q1 = modis.download('MOD09Q1', path_to_run, config_run.year_to_run, config_run.month_to_process)
+####################################### set/get settings ######################################
 
-######################################## post download #######################################
-config_run.months_made += 1
+config_run = settings.get(args)
 
-mail_subject = "Reporte de la descarga de Aler.Temp.Defor. para {0}-{1} ({2}/{3})".format(config_run.year_to_run,
-                                                                                      config_run.month_to_process,
-                                                                                      config_run.months_made,
-                                                                                      config_run.months_to_run)
-mail_body = \
-    '\n{0}\n\nEste es el reporte automático de la descarga de las\n' \
-    'Alertas Tempranas de Deforestación\n\n' \
-    'Archivos modis MOD09A1 y MOD09Q1 para el {1}-{2}\n\n' \
-    'Realizados {3} mes(es) de {4}\n\n' \
-    'La ruta de almacenamiento de los resultados:\n' \
-    '   (SAN): {5}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                         config_run.year_to_run,
-                         config_run.month_to_process,
-                         config_run.months_made,
-                         config_run.months_to_run,
-                         path_to_run)
+########################################## download ###########################################
 
-if config_run.months_made == config_run.months_to_run:
-    mail_body += '\nLa descarga se ha completado!.\n'
+if args.make == 'download':
+    download_main.run(config_run)
 
-if dnld_errors_A1 > 0 or dnld_errors_Q1 > 0:
-    mail_body += '\nEl log de descarga reporto algun(os) problema(s)\n'
 
-mail_body += '\nAdjunto se envían los logs del reporte de descarga.\n'
-
-send_mail('xcorredorl@ideam.gov.co',
-          'xcorredorl@ideam.gov.co, juanramirez85@gmail.com, liseth.rodriguez@gmail.com',
-          mail_subject,
-          mail_body,
-          [status_file_A1,status_file_Q1 ])
-
-config_run.month_to_process += 1
-config_run.save()
-
+if args.make == 'process':
 ######################################## TiSeg process ########################################
-#
+    pass
 
 
 ######################################### MRT process #########################################
-#
 
 
 
 
+print '\nFinish'
 
 exit()

@@ -3,8 +3,10 @@
 
 import os
 import ConfigParser
-from datetime import date
+from copy import deepcopy
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 
 
 def datetime_format(dt):
@@ -45,7 +47,7 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
     msg.attach(part)
 
     # This is the binary part(The Attachment) if is not None:
-    if files_attached is not None:
+    if files_attached is not None and len(files_attached) != 0:
         for file_attached in files_attached:
             part = MIMEApplication(open(file_attached, "rb").read())
             part.add_header("Content-Disposition", "attachment", filename=os.path.basename(file_attached))
@@ -60,6 +62,41 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
 
 ## example:
 #send_mail('xcorredorl@ideam.gov.co', 'xavier.corredor.llano@gmail.com', 'test subject', 'bodyy test\nnew lineee', 'howto_config.txt')
+
+def email_download_complete(config_run, files_attached=[]):
+    mail_subject = "Reporte de la descarga de Aler.Temp.Defor. para {0}-{1} ({2}/{3})".format(config_run.year_to_run,
+                                                                                          config_run.month_to_process,
+                                                                                          config_run.months_made,
+                                                                                          config_run.months_to_run)
+    mail_body = \
+        '\n{0}\n\nEste es el reporte automático de la descarga de las\n' \
+        'Alertas Tempranas de Deforestación\n\n' \
+        'Archivos modis MOD09A1 y MOD09Q1 para el {1}-{2}\n\n' \
+        'Realizados {3} mes(es) de {4}\n\n' \
+        'La ruta de almacenamiento de los resultados:\n' \
+        '   (SAN): {5}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+                             config_run.year_to_run,
+                             config_run.month_to_process,
+                             config_run.months_made,
+                             config_run.months_to_run,
+                             config_run.path_to_run)
+
+    mail_body += '\nLa descarga se ha completado!.\n'
+
+    if config_run.dnld_errors[0] == 'None':
+        mail_body += '\nLos log de descarga no reportaron problemas\n'
+    else:
+        mail_body += '\nEl log de descarga reporto algun(os) problema(s)' \
+                     'para las siguientes fechas: {0}\n'.format(','.join(config_run.dnld_errors))
+
+    if len(files_attached) != 0:
+        mail_body += '\nAdjunto se envían los logs del reporte de descarga.\n'
+
+    send_mail('xcorredorl@ideam.gov.co',
+              config_run.email,
+              mail_subject,
+              mail_body,
+              files_attached)
 
 
 ###############################################################################
@@ -202,7 +239,7 @@ def get_all_start_n_days_of_month(year, month, num_days=8):
 
 ###############################################################################
 
-class ConfigRun():
+class ConfigRun_old():
 
     def __init__(self, path_to_run):
         self.path_to_run = path_to_run
@@ -262,6 +299,215 @@ class ConfigRun():
         config.set('General', 'months_to_run', self.months_to_run)
         config.set('General', 'months_made', self.months_made)
         config.set('General', 'month_to_process', self.month_to_process)
+
+        # Writing our configuration file to 'example.cfg'
+        with open(self.config_file, 'wb') as configfile:
+            config.write(configfile)
+
+###############################################################################
+
+class DateATD():
+    """
+    self.date_orig: original date
+    self.date: date adjusted to interval N days
+    self.is_start_month: True if nd_date start inside interval N days for this month
+    self.is_end_month: True if nd_date end inside interval N days for this month
+    """
+    def __init__(self, date_str, type=None):
+        self.set(date_str, type)
+
+    def __str__(self):
+        return str(self.date)
+
+    def set(self, date_str, type=None):
+        if len(date_str.split('-')) == 3:
+            self.date_orig = parse(date_str).date()
+        elif len(date_str.split('-')) == 2:
+            days_list = get_all_start_n_days_of_month(int(date_str.split('-')[0]), int(date_str.split('-')[1]))
+            if type == "start":
+                self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[0]))
+            if type == "end":
+                self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[-1]))
+            if type is None:
+                print "For date {0} with only year and month, you must set the type date ('start' or 'end').".format(date_str)
+                exit()
+        else:
+            print "Date {0} is not a valid date format, e.g. 2009-01-20 or 2009-01".format(date_str)
+            exit()
+        days_list = get_all_start_n_days_of_month(self.date_orig.year, self.date_orig.month)
+        for idx, day in enumerate(days_list):
+            if day >= self.date_orig.day:
+                self.date = date(self.date_orig.year, self.date_orig.month, day)
+                break
+        if self.date_orig.day > days_list[-1]:
+            date_plus1 = self.date_orig + relativedelta(months=1)
+            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month)
+            self.date = date(date_plus1.year, date_plus1.month, days_list_plus1[0])
+
+        if type == "start":
+            if self.date_orig < self.date:
+                self.back()
+
+        self.start_end_month()
+
+    def start_end_month(self):
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        if self.date.day == days_list[0]:
+            self.is_start_month = True
+            self.is_end_month = False
+        elif self.date.day == days_list[-1]:
+            self.is_start_month = False
+            self.is_end_month = True
+        else:
+            self.is_start_month = False
+            self.is_end_month = False
+
+    def next(self):
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        if self.date.day == days_list[-1]:
+            date_plus1 = self.date + relativedelta(months=1)
+            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month)
+            self.date = date(date_plus1.year, date_plus1.month, days_list_plus1[0])
+        else:
+            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day)+1])
+        self.start_end_month()
+
+    def back(self):
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        if self.date.day == days_list[0]:
+            date_minus1 = self.date + relativedelta(months=-1)
+            days_list_minus1 = get_all_start_n_days_of_month(date_minus1.year, date_minus1.month)
+            self.date = date(date_minus1.year, date_minus1.month, days_list_minus1[-1])
+        else:
+            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day)-1])
+        self.start_end_month()
+
+###############################################################################
+
+def dir_date_name(start, end):
+    """
+    start and end must be instances of DateATD class
+    """
+    def parse_date(self):
+        self.year = int(self.current_working_dir.split('_')[0])
+        self.start_month = self.current_working_dir.split('_')[1].split('-')[0]
+        self.end_month = self.current_working_dir.split('_')[1].split('-')[1]
+
+    if start.date.year == end.date.year:
+        year = start.date.year
+    else:
+        year = "{0}|{1}".format(start.date.year,str(end.date.year)[2::])
+    #
+    if start.is_start_month:
+        month1 = "{0}".format(start.date.month)
+    else:
+        month1 = "{0}p".format(start.date.month)
+    #
+    if end.is_end_month:
+        month2 = "{0}".format(end.date.month)
+    else:
+        month2 = "{0}p".format(end.date.month)
+    return "{0}_({1}-{2})".format(year, month1, month2)
+
+def update_folder_name(config_run):
+    """
+    Move/rename working directory with the last date of download made
+    """
+    if config_run.current_working_dir == dir_date_name(config_run.start_date, config_run.target_date):
+        return
+
+    # close log file
+    config_run.dnld_logfile.close()
+    # rename directory
+    os.rename(config_run.abs_path_dir,
+              os.path.join(config_run.path_to_run, dir_date_name(config_run.start_date, config_run.target_date)))
+    # update config variables
+    config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
+    config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run, config_run.current_working_dir))
+    config_run.download_path = os.path.join(config_run.abs_path_dir, '0_download')
+    # re-open log file
+    config_run.dnld_logfile = open(os.path.join(config_run.download_path,'download.log'), 'a')
+
+    config_run.save()
+
+###############################################################################
+
+class ConfigRun():
+
+    def __init__(self, path_to_run):
+        ## [General]
+        self.current_working_dir = None
+        self.start_date = None
+        self.target_date = None
+        self.end_date = None
+        ## [Download]
+        self.download_type = None
+        self.dnld_errors = None
+        self.dnld_finished = False
+        ## [Process]
+
+        ## variables that not save into settings
+        self.path_to_run = path_to_run
+        self.config_file = os.path.abspath(os.path.join(path_to_run, 'settings.cfg'))
+        self.abs_path_dir = None  # (path_to_run + current_working_dir)
+        self.email = None
+        self.download_path = None  # complete path to download (abs_path_dir + '0_download')
+
+    def create(self, current_working_dir=None, start_date=None, target_date=None,
+               end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
+        #### values by default
+        _months_to_run = 6 # meses a correr (periodo)
+
+        self.current_working_dir = current_working_dir
+
+        if start_date is not None:
+            self.start_date = parse(start_date).date()
+        else:
+            self.start_date = None
+
+        if target_date is not None:
+            self.target_date = parse(target_date).date()
+        else:
+            self.target_date = deepcopy(self.start_date)
+
+        if end_date is not None:
+            self.end_date = parse(end_date).date()
+        else:
+            self.end_date = None
+
+        self.download_type = download_type
+        self.dnld_errors = dnld_errors
+        self.dnld_finished = dnld_finished
+
+        self.save()
+
+    def load(self):
+        config = ConfigParser.RawConfigParser()
+        if not os.path.isfile(self.config_file):
+            self.create()
+            return
+        config.read(self.config_file)
+        ## [General]
+        self.current_working_dir = config.get('General', 'current_working_dir')
+        self.start_date = config.get('General', 'start_date')
+        self.target_date = config.get('General', 'target_date')
+        self.end_date = config.get('General', 'end_date')
+        ## [Download]
+        self.download_type = config.get('Download', 'download_type')
+        self.dnld_errors = config.get('Download', 'dnld_errors')
+        self.dnld_finished = config.get('Download', 'dnld_finished')
+
+    def save(self):
+        config = ConfigParser.RawConfigParser()
+        config.add_section('General')
+        config.set('General', 'current_working_dir', self.current_working_dir)
+        config.set('General', 'start_date', self.start_date)
+        config.set('General', 'target_date', self.target_date)
+        config.set('General', 'end_date', self.end_date)
+        config.add_section('Download')
+        config.set('Download', 'download_type', self.download_type)
+        config.set('Download', 'dnld_errors', ','.join(self.dnld_errors) if self.dnld_errors else 'None')
+        config.set('Download', 'dnld_finished', self.dnld_finished)
 
         # Writing our configuration file to 'example.cfg'
         with open(self.config_file, 'wb') as configfile:
