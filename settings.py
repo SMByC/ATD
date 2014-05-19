@@ -17,12 +17,12 @@ def get(args):
     #global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
     #global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
 
-    config_run = ConfigRun(args.path)
-    config_run.load()
-
-    print vars(config_run)
-
     if args.make == 'download':
+
+        config_run = ConfigRun(args.path)
+        config_run.load()
+
+        print vars(config_run)
 
         #########################
         ## loads all arguments and settings.cfg into config_run
@@ -132,7 +132,15 @@ def get(args):
         #config_run.target_date.next()
 
     if args.make == 'process':
-        pass
+
+        config_run = ConfigRun(args.folder)
+        config_run.load()
+
+        config_run.abs_path_dir = os.path.abspath(config_run.path_to_run)
+
+        print vars(config_run)
+
+
 
 
     #print config_run.current_working_dir

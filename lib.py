@@ -237,6 +237,7 @@ def get_all_start_n_days_of_month(year, month, num_days=8):
 
     return list_days
 
+
 ###############################################################################
 
 class DateATD():
@@ -357,7 +358,7 @@ def update_folder_name(config_run):
     # update config variables
     config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
     config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run, config_run.current_working_dir))
-    config_run.download_path = os.path.join(config_run.abs_path_dir, '0_download')
+    config_run.download_path = os.path.join(config_run.abs_path_dir, 'p0_download')
     # re-open log file
     config_run.dnld_logfile = open(os.path.join(config_run.download_path,'download.log'), 'a')
 
@@ -366,6 +367,7 @@ def update_folder_name(config_run):
 ###############################################################################
 
 class ConfigRun():
+    list_of_process = ['p1_tiseg','p2_mrt','p3_erdas','p4_nodato_r']
 
     def __init__(self, path_to_run):
         ## [General]
@@ -384,7 +386,7 @@ class ConfigRun():
         self.config_file = os.path.abspath(os.path.join(path_to_run, 'settings.cfg'))
         self.abs_path_dir = None  # (path_to_run + current_working_dir)
         self.email = None
-        self.download_path = None  # complete path to download (abs_path_dir + '0_download')
+        self.download_path = None  # complete path to download (abs_path_dir + 'p0_download')
 
     def create(self, current_working_dir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
@@ -412,6 +414,9 @@ class ConfigRun():
         self.dnld_errors = dnld_errors
         self.dnld_finished = dnld_finished
 
+        for p in ConfigRun.list_of_process:
+            exec('self.'+p+' = None')
+
         self.save()
 
     def load(self):
@@ -429,6 +434,9 @@ class ConfigRun():
         self.download_type = config.get('Download', 'download_type')
         self.dnld_errors = config.get('Download', 'dnld_errors')
         self.dnld_finished = config.get('Download', 'dnld_finished')
+        ## [Process]
+        for p in ConfigRun.list_of_process:
+            exec("self."+p+" = config.get('Process', '"+p+"')")
 
     def save(self):
         config = ConfigParser.RawConfigParser()
@@ -441,6 +449,9 @@ class ConfigRun():
         config.set('Download', 'download_type', self.download_type)
         config.set('Download', 'dnld_errors', ','.join(self.dnld_errors) if self.dnld_errors else 'None')
         config.set('Download', 'dnld_finished', self.dnld_finished)
+        config.add_section('Process')
+        for p in ConfigRun.list_of_process:
+            exec("config.set('Process', '"+p+"', self."+p+")")
 
         # Writing our configuration file to 'example.cfg'
         with open(self.config_file, 'wb') as configfile:
