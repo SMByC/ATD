@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 from download import main as download_main
-from process import p1_tiseg
+from process import p1_tiseg, p2_mrt
 from lib import datetime_format
 import settings
 
@@ -83,14 +83,12 @@ if args.make == 'process':
 
 ######################################## TiSeg process ########################################
     if args.process == 'p1_tiseg':
-
         p1_tiseg.run(config_run)
 
 
-
-
-
 ######################################### MRT process #########################################
+    if args.process == 'p2_mrt':
+        p2_mrt.run(config_run)
 
 
 

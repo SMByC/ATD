@@ -447,7 +447,7 @@ class ConfigRun():
         config.set('General', 'end_date', self.end_date)
         config.add_section('Download')
         config.set('Download', 'download_type', self.download_type)
-        config.set('Download', 'dnld_errors', ','.join(self.dnld_errors) if self.dnld_errors else 'None')
+        config.set('Download', 'dnld_errors', ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
         config.set('Download', 'dnld_finished', self.dnld_finished)
         config.add_section('Process')
         for p in ConfigRun.list_of_process:
