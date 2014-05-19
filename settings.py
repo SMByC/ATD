@@ -138,14 +138,10 @@ def get(args):
 
         config_run.abs_path_dir = os.path.abspath(config_run.path_to_run)
 
-        print vars(config_run)
-
-
-
 
     #print config_run.current_working_dir
     #print config_run.start_date
-    print vars(config_run)
+    #print vars(config_run)
     #print config_run.end_date
 
 

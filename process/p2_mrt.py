@@ -38,6 +38,7 @@ def run(config_run):
                 config_run.process_logfile.write(msg+'\n')
                 print msg
 
+    # finishing the process
     msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
     config_run.process_logfile.write(msg+'\n')
     print msg
