@@ -48,6 +48,7 @@ def run(config_run):
         #dnld_errors_Q1, status_file_Q1 = modis.download('MOD09Q1', config_run.path_to_run, config_run.year_to_run, config_run.month_to_process)
         dnld_errors_Q1, status_file_Q1 = 0, 'ff'
 
+        msg_error = None
         ## check errors from download
         if dnld_errors_A1 != 0 or dnld_errors_Q1 != 0:
             dnld_errors.append(config_run.target_date.date)

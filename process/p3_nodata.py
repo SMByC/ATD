@@ -10,7 +10,7 @@ from lib import datetime_format
 
 def run(config_run):
 
-    if config_run.p3_erdas not in [None, 'None']:
+    if config_run.p3_nodata not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg+'\n')
         print msg
@@ -36,5 +36,5 @@ def run(config_run):
     config_run.process_logfile.write(msg+'\n')
     print msg
     # save in setting
-    config_run.p3_erdas = 'done - '+datetime_format(datetime.today())
+    config_run.p3_nodata = 'done - '+datetime_format(datetime.today())
     config_run.save()

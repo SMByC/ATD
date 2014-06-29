@@ -11,14 +11,14 @@ from lib import datetime_format
 
 def run(config_run):
 
-    if config_run.p4_nodato_r not in [None, 'None']:
+    if config_run.p4_stats not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg+'\n')
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
 
-    source_path = os.path.join(config_run.abs_path_dir, 'p3_erdas')
+    source_path = os.path.join(config_run.abs_path_dir, 'p3_nodata')
 
     if os.path.isdir(dir_process):
         shutil.rmtree(dir_process)
@@ -49,7 +49,7 @@ def run(config_run):
     config_run.process_logfile.write(msg+'\n')
     print msg
     # save in setting
-    config_run.p4_nodato_r = 'done - '+datetime_format(datetime.today())
+    config_run.p4_stats = 'done - '+datetime_format(datetime.today())
     config_run.save()
 
 

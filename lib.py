@@ -367,7 +367,7 @@ def update_folder_name(config_run):
 ###############################################################################
 
 class ConfigRun():
-    list_of_process = ['p1_tiseg','p2_mrt','p3_erdas','p4_nodato_r']
+    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats']
 
     def __init__(self, path_to_run):
         ## [General]

@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 from download import main as download_main
-from process import p1_tiseg, p2_mrt, p3_erdas, p4_nodato_r
+from process import p1_tiseg, p2_mrt, p3_nodata, p4_stats
 from lib import datetime_format
 import settings
 
@@ -51,7 +51,7 @@ group_download.add_argument('--type',type=str, dest='download_type', choices=set
 group_download.add_argument('path', help='path to download modis files', action=readable_dir, nargs='?', default=os.getcwd())
 group_download.add_argument('--email', type=str, help='send email when finnish')
 # process
-list_of_process = ['p1_tiseg','p2_mrt','p3_erdas','p4_nodato_r']
+list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process, help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
@@ -89,13 +89,13 @@ if args.make == 'process':
     if args.process == 'p2_mrt':
         p2_mrt.run(config_run)
 
-######################################## Erdas process ########################################
-    if args.process == 'p3_erdas':
-        p3_erdas.run(config_run)
+######################################## no data process ########################################
+    if args.process == 'p3_nodata':
+        p3_nodata.run(config_run)
 
-####################################### nodato R process #######################################
-    if args.process == 'p4_nodato_r':
-        p4_nodato_r.run(config_run)
+####################################### statistics R process #######################################
+    if args.process == 'p4_stats':
+        p4_stats.run(config_run)
 
 
 print '\nFinish'
