@@ -19,6 +19,16 @@ def run(config_run):
 
     source_path = os.path.join(config_run.abs_path_dir, 'p1_tiseg')
 
+    if not os.path.isdir(source_path):
+        msg = '\nError: The directory of previous process: {0}\n' \
+              'not exist, please run the previous process before it.'.format(source_path)
+        config_run.process_logfile.write(msg+'\n')
+        print msg
+        # save in setting
+        config_run.p2_mrt = 'with errors! - '+datetime_format(datetime.today())
+        config_run.save()
+        return
+
     # process file by file
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import os
-from pymodis import convertmodis, parsemodis
 
 import shutil
 from subprocess import call
@@ -19,6 +18,16 @@ def run(config_run):
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
 
     source_path = os.path.join(config_run.abs_path_dir, 'p3_nodata')
+
+    if not os.path.isdir(source_path):
+        msg = '\nError: The directory of previous process: {0}\n' \
+              'not exist, please run the previous process before it.'.format(source_path)
+        config_run.process_logfile.write(msg+'\n')
+        print msg
+        # save in setting
+        config_run.p4_stats = 'with errors! - '+datetime_format(datetime.today())
+        config_run.save()
+        return
 
     if os.path.isdir(dir_process):
         shutil.rmtree(dir_process)

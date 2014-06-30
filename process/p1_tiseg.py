@@ -16,13 +16,28 @@ def run(config_run):
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
 
+    source_path = os.path.join(config_run.abs_path_dir, 'p0_download')
+
+    if not os.path.isdir(source_path):
+        msg = '\nError: The directory of previous process: {0}\n' \
+              'not exist, please run the previous process before it.'.format(source_path)
+        config_run.process_logfile.write(msg+'\n')
+        print msg
+        # save in setting
+        config_run.p1_tiseg = 'with errors! - '+datetime_format(datetime.today())
+        config_run.save()
+        return
+
     # copying the directory
     try:
-        shutil.copytree(os.path.join(config_run.abs_path_dir, 'p0_download'), dir_process)
+        shutil.copytree(source_path, dir_process)
     except OSError as error:
         msg = '\nError copying directory:\n' + str(error)
         config_run.process_logfile.write(msg+'\n')
         print msg
+        # save in setting
+        config_run.p1_tiseg = 'with errors! - '+datetime_format(datetime.today())
+        config_run.save()
         return
 
     # clear some log files

@@ -30,6 +30,16 @@ def run(config_run, name_process):
     before_name_process = ConfigRun.list_of_process[ConfigRun.list_of_process.index(name_process)-1]
     source_path = os.path.join(config_run.abs_path_dir, before_name_process)
 
+    if not os.path.isdir(source_path):
+        msg = '\nError: The directory of previous process: {0}\n' \
+              'not exist, please run the previous process before it.'.format(source_path)
+        config_run.process_logfile.write(msg+'\n')
+        print msg
+        # save in setting
+        config_run.process_[name_process] = 'with errors! - '+datetime_format(datetime.today())
+        config_run.save()
+        return
+
     if os.path.isdir(dir_process):
         shutil.rmtree(dir_process)
 
