@@ -367,7 +367,7 @@ def update_folder_name(config_run):
 ###############################################################################
 
 class ConfigRun():
-    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats']
+    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata']
 
     def __init__(self, path_to_run):
         ## [General]
@@ -387,6 +387,14 @@ class ConfigRun():
         self.abs_path_dir = None  # (path_to_run + current_working_dir)
         self.email = None
         self.download_path = None  # complete path to download (abs_path_dir + 'p0_download')
+
+        ## init process list
+        for p in ConfigRun.list_of_process:
+            exec('self.'+p+' = None')
+        # create the dictionary access process
+        self.process_ = {'p1_tiseg':self.p1_tiseg, 'p2_mrt':self.p2_mrt,
+                         'p3_nodata':self.p3_nodata, 'p4_stats':self.p4_stats,
+                         'p5_nodata':self.p5_nodata}
 
     def create(self, current_working_dir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
@@ -413,9 +421,6 @@ class ConfigRun():
         self.download_type = download_type
         self.dnld_errors = dnld_errors
         self.dnld_finished = dnld_finished
-
-        for p in ConfigRun.list_of_process:
-            exec('self.'+p+' = None')
 
         self.save()
 

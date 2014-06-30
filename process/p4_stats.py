@@ -27,6 +27,7 @@ def run(config_run):
     # process file by file
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
+            files = [x for x in files if x[-4::] == '.tif']
             for file in files:
                 file_process = os.path.join(root, file)
                 list_files.append(file_process)
@@ -51,8 +52,8 @@ def run(config_run):
     print msg
 
     # finishing the process
-    msg = '\nThe process {0} completed {1} - ({2})'.format(config_run.process_name,
-                                                           'with errors!' if return_code != 0 else '',
+    msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
+                                                           'with errors! ' if return_code != 0 else '',
                                                            datetime_format(datetime.today()))
 
     config_run.process_logfile.write(msg+'\n')
