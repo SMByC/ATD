@@ -38,14 +38,23 @@ def run(config_run):
 
     file_R = script_R(list_files, dir_process)
 
-    #call(["Rscript", file_R])
+    return_code = call(["Rscript", file_R])
 
-    #msg = 'was converted successfully'
-    #config_run.process_logfile.write(msg+'\n')
-    #print msg
+    if return_code == 0:  # successfully
+        msg = 'was converted successfully'
+    else:
+        msg = '\nError: The R script return a error, please check\n' \
+              'error message above, likely the files not were\n' \
+              'processed successfully.'
+
+    config_run.process_logfile.write(msg+'\n')
+    print msg
 
     # finishing the process
-    msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
+    msg = '\nThe process {0} completed {1} - ({2})'.format(config_run.process_name,
+                                                           'with errors!' if return_code != 0 else '',
+                                                           datetime_format(datetime.today()))
+
     config_run.process_logfile.write(msg+'\n')
     print msg
     # save in setting
