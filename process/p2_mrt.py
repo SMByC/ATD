@@ -67,6 +67,8 @@ def modis_convert(hdf_file, dest):
     if not os.path.isdir(mrt_dir_process):
         os.makedirs(mrt_dir_process)
 
+    out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf','.tif'))
+
     options = {'subset': '( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )',
                'pp': '( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )',
                'pt': 'UTM',
@@ -75,7 +77,7 @@ def modis_convert(hdf_file, dest):
                'resampl': 'NEAREST_NEIGHBOR',
                'datum': 'WGS84',
                'utm': '18',
-               'output': os.path.join(mrt_dir_process, os.path.basename(hdf_file))}
+               'output': out_file}
 
     modisParse = parsemodis.parseModis(hdf_file)
     confname = modisParse.confResample(options['subset'], options['res'],
@@ -88,7 +90,7 @@ def modis_convert(hdf_file, dest):
     # move to dest
     if os.path.isfile(os.path.join(dest, os.path.basename(hdf_file))):
         os.remove(os.path.join(dest, os.path.basename(hdf_file)))
-    shutil.move(os.path.join(mrt_dir_process, os.path.basename(hdf_file)), dest)
+    shutil.move(out_file, dest)
 
     # delete tmp dir
     if os.path.isdir(mrt_dir_process):
