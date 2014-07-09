@@ -36,7 +36,7 @@ def run(config_run):
     # process file by file
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
-            files = [x for x in files if x[-4::] == '.tif']
+            files = [x for x in files if x[-4::] in ['.img', '.tif']]
             for file in files:
                 file_process = os.path.join(root, file)
                 list_files.append(file_process)
@@ -179,6 +179,85 @@ def script_R(list_files, dest):
 
         """.format(in_file=file_process,
                     out_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
+
+    ## Coefficient of dispersion
+    coef_disp_dir = os.path.join(dest, 'coef_disp')
+    if not os.path.isdir(coef_disp_dir):
+        os.makedirs(coef_disp_dir)
+
+    str_r += '##### COEFICIENTE DE DISPERSION DE IMAGENES DE SALIDA REPROYECTADAS Y SIN VALORES NEGATIVOS #####'
+
+    for file_process in list_files:
+        name_file = os.path.basename(file_process)
+        str_r += """
+        rm(list = ls(all = TRUE))
+        # Nombre y ruta del stack raster con la serie (1)
+        inImage<-'{in_file}'
+        # nombre y ruta de la imagen salida (2)
+        outImage <-'{out_file}'
+
+        mediaImage <- '{media_file}'
+        sdImage <- '{sd_file}'
+
+        satImage_media <- stack(mediaImage)
+        for (b in 1:nlayers(satImage_media)) {{ NAvalue(satImage_media@layers[[b]]) <- 0 }}
+
+        satImage_sd <- stack(sdImage)
+        for (b in 1:nlayers(satImage_sd)) {{ NAvalue(satImage_sd@layers[[b]]) <- 0 }}
+
+        satImage_media       ## para ver nombre de las bandas en el stack de la media (imagen media) ##
+        satImage_sd          ## para ver el nombre de las bandas en el stack de la des stand (imagen desviación estandar) ##
+
+        coef_disp <- satImage_media/satImage_sd
+        coef_disp <- coef_disp*100
+
+        writeRaster(coef_disp, outImage, bandorder='BIL', datatype='INT2S', format="GTiff")
+
+
+        """.format(in_file=file_process,
+                    out_file=os.path.join(coef_disp_dir, os.path.splitext(name_file)[0]+'_coef_disp.tif'),
+                    media_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'),
+                    sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
+
+    ## Coefficient of variation
+    coef_var_dir = os.path.join(dest, 'coef_var')
+    if not os.path.isdir(coef_var_dir):
+        os.makedirs(coef_var_dir)
+
+    str_r += '##### COEFICIENTE DE VARIACION DE IMAGENES DE SALIDA REPROYECTADAS Y SIN VALORES NEGATIVOS #####'
+
+    for file_process in list_files:
+        name_file = os.path.basename(file_process)
+        str_r += """
+        rm(list = ls(all = TRUE))
+        # Nombre y ruta del stack raster con la serie (1)
+        inImage<-'{in_file}'
+        # nombre y ruta de la imagen salida (2)
+        outImage <-'{out_file}'
+
+        mediaImage <- '{media_file}'
+        sdImage <- '{sd_file}'
+
+        satImage_media <- stack(mediaImage)
+        for (b in 1:nlayers(satImage_media)) {{ NAvalue(satImage_media@layers[[b]]) <- 0 }}
+
+        satImage_sd <- stack(sdImage)
+        for (b in 1:nlayers(satImage_sd)) {{ NAvalue(satImage_sd@layers[[b]]) <- 0 }}
+
+        satImage_media       ## para ver nombre de las bandas en el stack de la media (imagen media) ##
+        satImage_sd          ## para ver el nombre de las bandas en el stack de la des stand (imagen desviación estandar) ##
+
+        coef_var <- satImage_sd/satImage_media
+        coef_var <- coef_var*100
+
+        writeRaster(coef_var, outImage, bandorder='BIL', datatype='INT2S', format="GTiff")
+
+
+        """.format(in_file=file_process,
+                    out_file=os.path.join(coef_var_dir, os.path.splitext(name_file)[0]+'_coef_var.tif'),
+                    media_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'),
+                    sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
+
 
     r_file.write(str_r)
     r_file.close()
