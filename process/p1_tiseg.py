@@ -28,25 +28,34 @@ def run(config_run):
         config_run.save()
         return
 
-    # copying the directory
-    try:
-        shutil.copytree(source_path, dir_process)
-    except OSError as error:
-        msg = '\nError copying directory:\n' + str(error)
-        config_run.process_logfile.write(msg+'\n')
-        print msg
-        # save in setting
-        config_run.p1_tiseg = 'with errors! - '+datetime_format(datetime.today())
-        config_run.save()
-        return
+    if os.path.isdir(dir_process):
+        shutil.rmtree(dir_process)
+    if not os.path.isdir(dir_process):
+        os.makedirs(dir_process)
 
-    # clear some log files
-    if os.path.isfile(os.path.join(dir_process, 'download.log')):
-        os.remove(os.path.join(dir_process, 'download.log'))
-    if os.path.isfile(os.path.join(dir_process,'MOD09A1', 'MOD09A1_status.csv')):
-        os.remove(os.path.join(dir_process,'MOD09A1', 'MOD09A1_status.csv'))
-    if os.path.isfile(os.path.join(dir_process,'MOD09Q1', 'MOD09Q1_status.csv')):
-        os.remove(os.path.join(dir_process,'MOD09Q1', 'MOD09Q1_status.csv'))
+    # copiar los archivos xml por escena y modo (A y Q), y generar la nomenclatura
+    # para guardar los archivos de Tiseq por banda, los archivos xml son necesarios
+    # para el siguiente proceso (MRT)
+    for root, dirs, files in os.walk(source_path):
+        if len(files) != 0:
+            files = [x for x in files if x[-4::] == '.xml']
+            if files:
+                scene = os.path.basename(root)
+                mode = os.path.basename(os.path.dirname(root))
+
+                msg = 'Copying xml file in Tiseq process for {0} in scene {1}'.format(mode, scene)
+                config_run.process_logfile.write(msg+'\n')
+                print msg
+
+                if mode == 'MOD09A1':
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda03.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda04.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda05.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda06.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda07.hdf.xml'))
+                if mode == 'MOD09Q1':
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoQ_banda01.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoQ_banda02.hdf.xml'))
 
     # finishing the process
     msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
