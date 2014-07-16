@@ -30,6 +30,9 @@ def run(config_run):
         config_run.save()
         return
 
+    if os.path.isdir(dir_process):
+        shutil.rmtree(dir_process)
+
     imgs_group_by_var = {}
 
     scenes = [
@@ -41,7 +44,9 @@ def run(config_run):
         'h11v09',
     ]
 
-    # process file by file
+    # recorre los archivos tif de la carpeta del proceso anterior (p5_nodata)
+    # detecta y reagrupa todas las imagenes de una misma banda y modo, seleccionando
+    # todas las escenas de esta banda para generar y crear el mosaico con Gdal
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
             files = [x for x in files if x[-4::] == '.tif']
@@ -58,15 +63,20 @@ def run(config_run):
                     file_group = files_temp_list[0]
                     for group_name in scenes:
                         if group_name in os.path.basename(file_group):
-                            scene_group_name = file_group.split(group_name)[0]
+                            scene_group_name = file_group.split(group_name)[1]
+
                     # seleccionar los archivos para el mosaico
                     mosaic_input_list = []
                     for file in files_temp_list:
                         if scene_group_name in file:
                             mosaic_input_list.append(file)
-                    # nombre y ruta del archivo del mosaico
-                    scene_group_name = scene_group_name[0:-1] if scene_group_name[-1]=='.' else scene_group_name
+                    # nombre de salida del mosaico
+                    scene_group_name = scene_group_name.replace(var, '')
+                    scene_group_name = scene_group_name.replace('.tif', '')
+                    scene_group_name = scene_group_name[0:-1] if scene_group_name[-1]=='_' else scene_group_name
+                    scene_group_name = scene_group_name[1::] if scene_group_name[0]=='_' else scene_group_name
                     mosaic_name = scene_group_name + '_mosaico_' + var + '.tif'
+                    # ruta del archivo del mosaico
                     mosaic_dest = os.path.dirname(os.path.join(dir_process, os.path.join(root, file).split('/p5_nodata/')[-1]))
                     # lista de archivos para el mosaico con ruta absoluta
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
@@ -107,14 +117,6 @@ def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
         os.makedirs(mosaic_dest)
 
     out_file = os.path.join(mosaic_dest, mosaic_name)
-
-    # only for test TODO delete
-    mosaic_input_list = ['/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h10v07_modoa_banda03_utmnull_media.tif',
-'/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h10v08_modoa_banda03_utmnull_media.tif',
-'/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h10v09_modoa_banda03_utmnull_media.tif',
-'/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h11v07_modoa_banda03_utmnull_media.tif',
-'/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h11v08_modoa_banda03_utmnull_media.tif',
-'/multimedia/Tmp_build/ATD_data/6/Entrada/salida_h11v09_modoa_banda03_utmnull_media.tif',]
 
     # generar el mosaico con el programa gdalwarp de gdal
     # gdalwarp salida_h1* m.tif -srcnodata 0 -dstnodata 255
