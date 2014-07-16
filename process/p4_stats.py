@@ -180,6 +180,15 @@ def script_R(list_files, dest):
         """.format(in_file=file_process,
                     out_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
 
+
+    #### TODO delete and enable the next statistics
+    r_file.write(str_r)
+    r_file.close()
+
+    return os.path.join(dest, 'script_R.r')
+
+
+
     ## Coefficient of dispersion
     coef_disp_dir = os.path.join(dest, 'coef_disp')
     if not os.path.isdir(coef_disp_dir):
