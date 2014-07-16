@@ -74,6 +74,10 @@ def run(config_run, name_process):
     print msg
     # save in setting
     config_run.process_[name_process] = 'with errors! - ' if any_error else 'done - '+datetime_format(datetime.today())
+    if name_process == 'p3_nodata':
+        config_run.p3_nodata = config_run.process_[name_process]
+    if name_process == 'p5_nodata':
+        config_run.p5_nodata = config_run.process_[name_process]
     config_run.save()
 
 
