@@ -5,6 +5,7 @@ import os
 from pymodis import convertmodis, parsemodis
 
 import shutil
+from subprocess import call
 from lib import datetime_format
 
 
@@ -29,6 +30,9 @@ def run(config_run):
         config_run.save()
         return
 
+    if os.path.isdir(dir_process):
+        shutil.rmtree(dir_process)
+
     # process file by file
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
@@ -42,18 +46,21 @@ def run(config_run):
                 config_run.process_logfile.flush()
                 print msg
 
-                msg = modis_convert(hdf_file, dest)
-                if 'was converted successfully' in msg:
-                    msg = 'was converted successfully'
+                return_code, msg = modis_convert(hdf_file, dest)
+                #if 'was converted successfully' in msg:
+                #    msg = 'was converted successfully'
                 config_run.process_logfile.write(msg+'\n')
                 print msg
 
     # finishing the process
-    msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
+    msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
+                                                           'with errors! ' if return_code != 0 else '',
+                                                           datetime_format(datetime.today()))
+
     config_run.process_logfile.write(msg+'\n')
     print msg
     # save in setting
-    config_run.p2_mrt = 'done - '+datetime_format(datetime.today())
+    config_run.p2_mrt = 'with errors! - ' if return_code != 0 else 'done - '+datetime_format(datetime.today())
     config_run.save()
 
 
@@ -64,11 +71,17 @@ def modis_convert(hdf_file, dest):
 
     # create a temporal directory for process the file with mrt
     mrt_dir_process = '.tmp_mrt'
+    # primero eliminar antes de crearla si existe
+    if os.path.isdir(mrt_dir_process):
+        shutil.rmtree(mrt_dir_process)
     if not os.path.isdir(mrt_dir_process):
         os.makedirs(mrt_dir_process)
 
-    out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf','.tif'))
+    tmp_out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf','.tif'))
 
+    out_file = os.path.join(dest, os.path.basename(hdf_file)).replace('.hdf','.tif')
+
+    # opciones del remuestreo de la herramienta MRT
     options = {'subset': '( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )',
                'pp': '( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )',
                'pt': 'UTM',
@@ -77,7 +90,7 @@ def modis_convert(hdf_file, dest):
                'resampl': 'NEAREST_NEIGHBOR',
                'datum': 'WGS84',
                'utm': '18',
-               'output': out_file}
+               'output': tmp_out_file}
 
     modisParse = parsemodis.parseModis(hdf_file)
     confname = modisParse.confResample(options['subset'], options['res'],
@@ -87,13 +100,34 @@ def modis_convert(hdf_file, dest):
     modisConver = convertmodis.convertModis(hdf_file, confname, options['mrt'])
     msg = modisConver.run()
 
-    # move to dest
-    if os.path.isfile(os.path.join(dest, os.path.basename(hdf_file))):
-        os.remove(os.path.join(dest, os.path.basename(hdf_file)))
-    shutil.move(out_file, dest)
+    if 'was converted successfully' not in msg:
+        # delete tmp dir
+        if os.path.isdir(mrt_dir_process):
+            shutil.rmtree(mrt_dir_process)
+        return 1, msg
+
+    ####### unir todas las bandas GeoTiff reproyectadas por cada imagen a GeoTiff multibanda
+
+    # buscar todas las bandas dentro del directorio temporal
+    input_all_band = []
+    for root, dirs, files in os.walk(os.path.dirname(tmp_out_file)):
+        if len(files) != 0:
+            input_all_band = [os.path.join(root, x) for x in files if x[-4::] == '.tif']
+
+    # ordenarlas segun las fechas de las bandas
+    input_all_band = sorted(input_all_band)
+
+    # combinacion de bandas a GeoTiff multibanda usando gdal
+    return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate"]+input_all_band)
+
+    if return_code == 0:  # successfully
+        msg = 'was converted successfully'
+    else:
+        msg = '\nError: Problem generating the output GeoTiff multiband\n' \
+              'with gdal merge tool.'
 
     # delete tmp dir
     if os.path.isdir(mrt_dir_process):
         shutil.rmtree(mrt_dir_process)
 
-    return msg
+    return return_code, msg
