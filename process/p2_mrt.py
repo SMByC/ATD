@@ -17,7 +17,6 @@ def run(config_run):
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
-
     source_path = os.path.join(config_run.abs_path_dir, 'p1_tiseg')
 
     if not os.path.isdir(source_path):
@@ -69,8 +68,9 @@ def modis_convert(hdf_file, dest):
     if not os.path.isdir(dest):
         os.makedirs(dest)
 
-    # create a temporal directory for process the file with mrt
-    mrt_dir_process = '.tmp_mrt'
+    # temporal directory for process files with mrt
+    os.chdir(os.path.dirname(dest))
+    mrt_dir_process = '.p2_mrt_tmp'
     # primero eliminar antes de crearla si existe
     if os.path.isdir(mrt_dir_process):
         shutil.rmtree(mrt_dir_process)
