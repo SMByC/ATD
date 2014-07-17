@@ -367,7 +367,7 @@ def update_folder_name(config_run):
 ###############################################################################
 
 class ConfigRun():
-    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata', 'p6_mosaic']
+    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 
     def __init__(self, path_to_run):
         ## [General]
@@ -394,7 +394,8 @@ class ConfigRun():
         # create the dictionary access process
         self.process_ = {'p1_tiseg':self.p1_tiseg, 'p2_mrt':self.p2_mrt,
                          'p3_nodata':self.p3_nodata, 'p4_stats':self.p4_stats,
-                         'p5_nodata':self.p5_nodata, 'p6_mosaic':self.p6_mosaic}
+                         'p5_nodata':self.p5_nodata, 'p6_mosaic':self.p6_mosaic,
+                         'p7_layerstack':self.p7_layerstack}
 
     def create(self, current_working_dir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
@@ -442,6 +443,11 @@ class ConfigRun():
         ## [Process]
         for p in ConfigRun.list_of_process:
             exec("self."+p+" = config.get('Process', '"+p+"')")
+        # create the dictionary access process
+        self.process_ = {'p1_tiseg':self.p1_tiseg, 'p2_mrt':self.p2_mrt,
+                         'p3_nodata':self.p3_nodata, 'p4_stats':self.p4_stats,
+                         'p5_nodata':self.p5_nodata, 'p6_mosaic':self.p6_mosaic,
+                         'p7_layerstack':self.p7_layerstack}
 
     def save(self):
         config = ConfigParser.RawConfigParser()

@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 from download import main as download_main
-from process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic
+from process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
 from lib import datetime_format
 import settings
 
@@ -51,7 +51,7 @@ group_download.add_argument('--type',type=str, dest='download_type', choices=set
 group_download.add_argument('path', help='path to download modis files', action=readable_dir, nargs='?', default=os.getcwd())
 group_download.add_argument('--email', type=str, help='send email when finnish')
 # process
-list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata', 'p6_mosaic']
+list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process, help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
@@ -104,6 +104,10 @@ if args.make == 'process':
 ######################################### make mosaic #########################################
     if args.process == 'p6_mosaic':
         p6_mosaic.run(config_run)
+
+################################### create the layer stack ####################################
+    if args.process == 'p7_layerstack':
+        p7_layerstack.run(config_run)
 
 
 print '\nFinish'
