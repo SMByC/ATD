@@ -45,8 +45,7 @@ def run(config_run):
 
         # download
         dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09A1')
-        #dnld_errors_Q1, status_file_Q1 = modis.download('MOD09Q1', config_run.path_to_run, config_run.year_to_run, config_run.month_to_process)
-        dnld_errors_Q1, status_file_Q1 = 0, 'ff'
+        dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09Q1')
 
         msg_error = None
         ## check errors from download
