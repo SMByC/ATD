@@ -85,7 +85,7 @@ def modis_convert(hdf_file, dest):
     options = {'subset': '( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )',
                'pp': '( 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 )',
                'pt': 'UTM',
-               'mrt': '/multimedia/Tmp_build/MRT_download_Linux64/MRT',
+               'mrt': os.environ["MRT_HOME"],
                'res': None,
                'resampl': 'NEAREST_NEIGHBOR',
                'datum': 'WGS84',
