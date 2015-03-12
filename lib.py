@@ -3,6 +3,7 @@
 
 import os
 import ConfigParser
+import gdal
 from copy import deepcopy
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -363,6 +364,18 @@ def update_folder_name(config_run):
     config_run.dnld_logfile = open(os.path.join(config_run.download_path,'download.log'), 'a')
 
     config_run.save()
+
+###############################################################################
+
+def get_pixel_size(raster_file):
+    """
+    Return the pixel size of raster, for square pixel else
+    return absolute value of w-e pixel resolution.
+    for n-s pixel resolution -> geo_transform[5]
+    """
+    gdal_file=gdal.Open(raster_file)
+    geo_transform = gdal_file.GetGeoTransform()
+    return abs(float(geo_transform[1]))
 
 ###############################################################################
 

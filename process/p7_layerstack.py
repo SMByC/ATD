@@ -5,7 +5,7 @@ import os
 
 import shutil
 from subprocess import call
-from lib import datetime_format
+from lib import datetime_format, get_pixel_size
 
 
 def run(config_run):
@@ -43,8 +43,7 @@ def run(config_run):
             if files:
                 var = os.path.basename(root)
                 msg = 'Generating layer stack for variable {0}: '.format(var)
-                config_run.process_logfile.write(msg)
-                config_run.process_logfile.flush()
+                config_run.process_logfile.write(msg+'\n')
                 print msg
 
                 dest = os.path.join(dir_process, var)
@@ -56,14 +55,22 @@ def run(config_run):
                 input_all_band = [x for (y,x) in sorted(zip(sorted_bands,input_all_band))]
                 input_all_band = [os.path.join(root, x) for x in input_all_band]
 
+                # get the lower pixel size of all input band
+                all_pixel_sizes = [get_pixel_size(f) for f in input_all_band]
+                lower_pixel_size = sorted(all_pixel_sizes)[0]
+                msg = '  calculating the lower pixel size for all bands: ' + str(lower_pixel_size)
+                config_run.process_logfile.write(msg+'\n')
+                config_run.process_logfile.flush()
+                print msg
+
                 # nombre del layer stack
                 out_file = os.path.join(dest, "LayerStack_"+var+".tif")
 
                 # combinacion de bandas a GeoTiff multibanda usando gdal
-                return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate"]+input_all_band)
+                return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate", "-ps", str(lower_pixel_size), str(lower_pixel_size)]+input_all_band)
 
                 if return_code == 0:  # successfully
-                    msg = 'was converted successfully'
+                    msg = '  was converted successfully'
                     config_run.process_logfile.write(msg+'\n')
                     print msg
                 else:
