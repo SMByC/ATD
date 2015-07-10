@@ -35,7 +35,7 @@ def run(config_run):
     # process file by file
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
-            files = [x for x in files if x[-4::] == '.hdf']
+            files = [x for x in files if x.endswith(('.hdf', '.HDF'))]
             for file in files:
                 hdf_file = os.path.join(root, file)
                 dest = os.path.dirname(os.path.join(dir_process, os.path.join(root, file).split('/p1_tiseg/')[-1]))
