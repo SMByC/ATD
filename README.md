@@ -5,7 +5,7 @@ El programa ATD es el proceso de automatizacioón de alertas tempranas de defore
 
 ## Los dos esquemas del monitoreo de deforestación 
 
-El monitoreo de deforestación, cumple dos funciones a distintas escalas de tiempo y resolución, una la de generar el mapa de áreas deforestadas y el otro para generar el mapa de cambio de cobertura. El primero hace uso de imágenes satelitales MODIS de escala gruesa (250m de resolución espacial) y se realiza cada 6 meses, el segundo usa las imagenes satelitales Landsat de escala fina (30m de resolución espacial) y se realiza cada 2 años
+El monitoreo de deforestación, cumple dos funciones a distintas escalas de tiempo y resolución, una la de generar el mapa de áreas deforestadas y el otro para generar el mapa de cambio de cobertura. El primero hace uso de imágenes satelitales MODIS de escala gruesa (250m de resolución espacial) y se realiza cada 6 meses, el segundo usa las imagenes satelitales Landsat de escala fina (30m de resolución espacial) y se realiza cada 2 años.
 
 A continuación se describen los dos esquemas de monitoreo de la deforestacion de Colombia a nivel nacional: 
 
@@ -40,16 +40,16 @@ El programa ATD cuenta con los siguientes procesos:
 
 - Xavier Corredor Llano <xcorredorl(a)ideam.gov.co>
 - Gustavo Galindo <gusgalin(a)gmail.com>
-- Edersson Cabrera <cabrera.edersson(a)gmail.com>
 - Cristhian Forero <cristhian0224(a)gmail.com>
 - Juan Pablo Ramirez <juanramirez85(a)gmail.com>
+- Edersson Cabrera <cabrera.edersson(a)gmail.com>
 
 ***
 
     Copyright © 2014-2015 IDEAM
     Instituto de Hidrología, Meteorología y Estudios Ambientales
     Sistema de Monitoreo de Bosques y Carbono - SMBYC
-    Carrera 10 No. 20-30
-    Bogotá, Colombia
+    Calle 25 D No. 96 B - 70
+    Bogotá DC, Colombia
 
 
