@@ -1,13 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2014 IDEAM and Patrimonio Natural
+# Copyright © 2014-2015, SMBYC - IDEAM
 # Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
 import os
 from copy import deepcopy
-from datetime import datetime, date
-from math import floor
+from datetime import date
 
 from lib import ConfigRun, DateATD, dir_date_name, email_download_complete, update_folder_name
 

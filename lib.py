@@ -1,5 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+#
+# Copyright © 2014-2015, SMBYC - IDEAM
+# Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
 import os
 import ConfigParser
