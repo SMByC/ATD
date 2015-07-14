@@ -84,8 +84,7 @@ def script_R(list_files, dest):
     r_file = open(os.path.join(dest, 'script_R.r'), 'w')
     ## start script
 
-    str_r = '''
-    ##### MEDIANA, MEDIA y SD DE IMAGENES DE SALIDA REPROYECTADAS Y SIN VALORES NEGATIVOS #####
+    str_r = '''##### MEDIANA, MEDIA y SD DE IMAGENES DE SALIDA REPROYECTADAS Y SIN VALORES NEGATIVOS #####
 
     #Load libraries
     rm(list = ls(all = TRUE))
@@ -100,8 +99,7 @@ def script_R(list_files, dest):
     registerDoSNOW(makeCluster(2, type = "SOCK"))
     getDoParWorkers()
     getDoParName()
-
-    '''
+    \n'''
 
     ## mediana
     mediana_dir = os.path.join(dest, 'mediana')
@@ -130,6 +128,8 @@ def script_R(list_files, dest):
         """.format(in_file=file_process,
                     out_file=os.path.join(mediana_dir, os.path.splitext(name_file)[0]+'_mediana.tif'))
 
+    str_r += "removeTmpFiles(h=0)\n\n"
+
     ## media
     media_dir = os.path.join(dest, 'media')
     if not os.path.isdir(media_dir):
@@ -156,6 +156,8 @@ def script_R(list_files, dest):
 
         """.format(in_file=file_process,
                     out_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'))
+
+    str_r += "removeTmpFiles(h=0)\n\n"
 
     ## standard deviation
     sd_dir = os.path.join(dest, 'sd')
@@ -184,6 +186,7 @@ def script_R(list_files, dest):
         """.format(in_file=file_process,
                     out_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
 
+    str_r += "removeTmpFiles(h=0)\n\n"
 
     #### TODO delete and enable the next statistics
     r_file.write(str_r)
