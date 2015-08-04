@@ -12,10 +12,9 @@ from lib import datetime_format
 
 
 def run(config_run):
-
     if config_run.p1_tiseg not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before'.format(config_run.process_name)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
@@ -25,10 +24,10 @@ def run(config_run):
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.'.format(source_path)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
         # save in setting
-        config_run.p1_tiseg = 'with errors! - '+datetime_format(datetime.today())
+        config_run.p1_tiseg = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -48,23 +47,30 @@ def run(config_run):
                 mode = os.path.basename(os.path.dirname(root))
 
                 msg = 'Copying xml file in Tiseq process for {0} in scene {1}'.format(mode, scene)
-                config_run.process_logfile.write(msg+'\n')
+                config_run.process_logfile.write(msg + '\n')
                 print msg
 
                 if mode == 'MOD09A1':
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda03.hdf.xml'))
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda04.hdf.xml'))
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda05.hdf.xml'))
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda06.hdf.xml'))
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoA_banda07.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoA_banda03.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoA_banda04.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoA_banda05.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoA_banda06.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoA_banda07.hdf.xml'))
                 if mode == 'MOD09Q1':
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoQ_banda01.hdf.xml'))
-                    shutil.copyfile(os.path.join(root, files[0]), os.path.join(dir_process, scene+'_modoQ_banda02.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoQ_banda01.hdf.xml'))
+                    shutil.copyfile(os.path.join(root, files[0]),
+                                    os.path.join(dir_process, scene + '_modoQ_banda02.hdf.xml'))
 
     # finishing the process
     msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
-    config_run.process_logfile.write(msg+'\n')
+    config_run.process_logfile.write(msg + '\n')
     print msg
     # save in setting
-    config_run.p1_tiseg = 'done - '+datetime_format(datetime.today())
+    config_run.p1_tiseg = 'done - ' + datetime_format(datetime.today())
     config_run.save()

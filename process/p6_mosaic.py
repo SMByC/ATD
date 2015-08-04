@@ -6,7 +6,7 @@
 
 from datetime import datetime
 import os
-#from pymodis import convertmodis, parsemodis
+# from pymodis import convertmodis, parsemodis
 
 import shutil
 from subprocess import call
@@ -14,10 +14,9 @@ from lib import datetime_format
 
 
 def run(config_run):
-
     if config_run.p2_mrt not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before\n'.format(config_run.process_name)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
@@ -27,10 +26,10 @@ def run(config_run):
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.'.format(source_path)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
         # save in setting
-        config_run.p2_mrt = 'with errors! - '+datetime_format(datetime.today())
+        config_run.p2_mrt = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -77,11 +76,12 @@ def run(config_run):
                     # nombre de salida del mosaico
                     scene_group_name = scene_group_name.replace(var, '')
                     scene_group_name = scene_group_name.replace('.tif', '')
-                    scene_group_name = scene_group_name[0:-1] if scene_group_name[-1]=='_' else scene_group_name
-                    scene_group_name = scene_group_name[1::] if scene_group_name[0]=='_' else scene_group_name
+                    scene_group_name = scene_group_name[0:-1] if scene_group_name[-1] == '_' else scene_group_name
+                    scene_group_name = scene_group_name[1::] if scene_group_name[0] == '_' else scene_group_name
                     mosaic_name = scene_group_name + '_mosaico_' + var + '.tif'
                     # ruta del archivo del mosaico
-                    mosaic_dest = os.path.dirname(os.path.join(dir_process, os.path.join(root, file).split('/p5_nodata/')[-1]))
+                    mosaic_dest = os.path.dirname(
+                        os.path.join(dir_process, os.path.join(root, file).split('/p5_nodata/')[-1]))
                     # lista de archivos para el mosaico con ruta absoluta
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
 
@@ -92,7 +92,7 @@ def run(config_run):
                     print msg
                     # generar el mosaico
                     return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name)
-                    config_run.process_logfile.write(msg+'\n')
+                    config_run.process_logfile.write(msg + '\n')
                     print msg
 
                     # quitar los archivos procesados en la lista y ordenarlos
@@ -106,17 +106,16 @@ def run(config_run):
 
     # finishing the process
     msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
-                                                           'with errors! ' if return_code != 0 else '',
-                                                           datetime_format(datetime.today()))
-    config_run.process_logfile.write(msg+'\n')
+                                                          'with errors! ' if return_code != 0 else '',
+                                                          datetime_format(datetime.today()))
+    config_run.process_logfile.write(msg + '\n')
     print msg
     # save in setting
-    config_run.p6_mosaic = 'with errors! - ' if return_code != 0 else 'done - '+datetime_format(datetime.today())
+    config_run.p6_mosaic = 'with errors! - ' if return_code != 0 else 'done - ' + datetime_format(datetime.today())
     config_run.save()
 
 
 def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
-
     if not os.path.isdir(mosaic_dest):
         os.makedirs(mosaic_dest)
 

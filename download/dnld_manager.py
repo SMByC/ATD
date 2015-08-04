@@ -19,7 +19,6 @@ from lib import datetime_format, cksum
 
 
 class File:
-
     name = None
     url = None
     path = None
@@ -31,12 +30,12 @@ class File:
         # is destination was defined
         if DnldMan.DEST:
             self.path = os.path.join(DnldMan.DEST, self.name)
-        else: # save in the same directory of run
+        else:  # save in the same directory of run
             self.path = self.name
 
     def getsize(self):
         if os.path.isfile(self.path):
-            return str(round(os.path.getsize(self.path)/1000000.0,1)) + ' MB'
+            return str(round(os.path.getsize(self.path) / 1000000.0, 1)) + ' MB'
         else:
             return '--'
 
@@ -56,7 +55,7 @@ class File:
 
         #### MODIS files #####
         file_with_cksum = self.url + '.xml'
-        wget_status =  call(DnldMan.wget_cmd + [file_with_cksum], shell=False)
+        wget_status = call(DnldMan.wget_cmd + [file_with_cksum], shell=False)
         if wget_status == 0:
             file_cksum = open(self.path + '.xml', 'rU')
             lines_cksum = file_cksum.readlines()
@@ -64,7 +63,7 @@ class File:
 
             for line in lines_cksum:
                 if line.strip().startswith('<Checksum>'):
-                    cksum_from_file = line.replace('<Checksum>','').replace('</Checksum>','').strip()
+                    cksum_from_file = line.replace('<Checksum>', '').replace('</Checksum>', '').strip()
                     cksum_from_file = int(cksum_from_file)
                     if cksum_from_file == cksum(self.path):
                         return 0, 'cksum checked'
@@ -72,7 +71,6 @@ class File:
                         return 3, 'error, the cksum is different'
         else:
             return 2, 'impossible checked'
-
 
 
 class DownloadManager:
@@ -117,14 +115,14 @@ class DownloadManager:
         self.dnld_logfile = None
         self.dnld_statusfile = None
         self.errors = None
-        
+
         for i in range(num_workers):
             t = Thread(target=self.worker)
             t.setDaemon(True)
             t.start()
 
     def main(self, urls_files, DEST=False):
-        Q = Queue() # Create a second queue so the worker
+        Q = Queue()  # Create a second queue so the worker
         self.DEST = DEST
         self.start_dnld_datetime = datetime.today()
 
@@ -132,14 +130,15 @@ class DownloadManager:
         if self.DEST:
             if not os.path.isdir(self.DEST):
                 os.makedirs(self.DEST)
-        msg = '\n## Start download for: '+self.dnld_name+'/'+self.dnld_date+' - ('+datetime_format(datetime.today())+')'
-        self.dnld_logfile.write(msg+'\n')
+        msg = '\n## Start download for: ' + self.dnld_name + '/' + self.dnld_date + ' - (' + datetime_format(
+            datetime.today()) + ')'
+        self.dnld_logfile.write(msg + '\n')
         print msg
 
         # is destination was defined
         if self.DEST:
             self.wget_cmd = self.WGET + ["-P", self.DEST]
-        else: # save in the same directory of run
+        else:  # save in the same directory of run
             self.wget_cmd = self.WGET
 
         # start daemon request for check available files
@@ -164,7 +163,7 @@ class DownloadManager:
         # save errors produced in the download
         for status in self.dnld_status:
             if status[2] == 'ERROR':
-                self.errors.append('error downloading file '+status[0])
+                self.errors.append('error downloading file ' + status[0])
 
         DownloadManager.DNLD_ERRORS = len(self.errors)
 
@@ -175,31 +174,37 @@ class DownloadManager:
             file_download_ok = False
 
             for attempt in range(self.NUM_ATTEMPT):
-                self.dnld_logfile.write('download started:  ' + file.url + ' (' + datetime_format(datetime.today())+')\n')
+                self.dnld_logfile.write(
+                    'download started:  ' + file.url + ' (' + datetime_format(datetime.today()) + ')\n')
                 print 'download started:  ' + os.path.basename(file.url)
                 self.dnld_logfile.flush()
                 # download with wget
-                wget_status =  call(self.wget_cmd + [file.url], shell=False) # TODO: Download real file
-                #wget_status =  call(self.wget_cmd + [file.url+ '.xml'], shell=False) # TODO: Download xml file
+                wget_status = call(self.wget_cmd + [file.url], shell=False)  # TODO: Download real file
+                # wget_status =  call(self.wget_cmd + [file.url+ '.xml'], shell=False) # TODO: Download xml file
                 # TODO: check time for wget process
                 # check wget_status
                 if wget_status == 0:
                     # check cksum
-                    check_status, check_msg = file.check(self) # TODO: Download real file and .check(self)
-                    #check_status, check_msg = 0,'ok' # TODO: no check for download test xml file
-                    if check_status in [0,1]:
-                        self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(datetime.today())+') - '+check_msg+'\n')
+                    check_status, check_msg = file.check(self)  # TODO: Download real file and .check(self)
+                    # check_status, check_msg = 0,'ok' # TODO: no check for download test xml file
+                    if check_status in [0, 1]:
+                        self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(
+                            datetime.today()) + ') - ' + check_msg + '\n')
                         print 'download finished:  ' + os.path.basename(file.url)
                         self.dnld_logfile.flush()
                         file_download_ok = True
-                        Q.put(('OK ('+check_msg+')', file))
+                        Q.put(('OK (' + check_msg + ')', file))
                         break
                     else:
-                        self.dnld_logfile.write('error downloading, attempt '+str(attempt)+', '+check_msg+', try again: ' +file.url+' ('+datetime_format(datetime.today())+')\n')
+                        self.dnld_logfile.write('error downloading, attempt ' + str(
+                            attempt) + ', ' + check_msg + ', try again: ' + file.url + ' (' + datetime_format(
+                            datetime.today()) + ')\n')
                         sleep(self.WAIT_TIME_ATTEMPT)
                 else:
                     # if wget_status != 0 is due a some error
-                    self.dnld_logfile.write('error downloading, attempt '+str(attempt)+', '+file.url+' ('+datetime_format(datetime.today())+')\n')
+                    self.dnld_logfile.write(
+                        'error downloading, attempt ' + str(attempt) + ', ' + file.url + ' (' + datetime_format(
+                            datetime.today()) + ')\n')
                     self.dnld_logfile.flush()
                     sleep(self.WAIT_TIME_ATTEMPT)
 
@@ -211,14 +216,14 @@ class DownloadManager:
         if len(urls_files) == 0 or len(self.errors) != 0:
             self.dnld_logfile.write('Errors reported before download:\n')
             for error in self.errors:
-                self.dnld_logfile.write('   '+error+'\n')
+                self.dnld_logfile.write('   ' + error + '\n')
                 self.dnld_logfile.flush()
             if len(urls_files) == 0:
-                self.dnld_logfile.write('   no files to download!!, '+ datetime_format(datetime.today()) + '\n')
+                self.dnld_logfile.write('   no files to download!!, ' + datetime_format(datetime.today()) + '\n')
                 self.dnld_logfile.flush()
                 return False
         else:
-            self.dnld_logfile.write('Getting list of download files: OK, '+ datetime_format(datetime.today()) + '\n')
+            self.dnld_logfile.write('Getting list of download files: OK, ' + datetime_format(datetime.today()) + '\n')
             self.dnld_logfile.flush()
         self.dnld_logfile.write('\n')
 
@@ -226,7 +231,7 @@ class DownloadManager:
 
         def file_exists(url):
             request = urllib2.Request(url)
-            request.get_method = lambda : 'HEAD'
+            request.get_method = lambda: 'HEAD'
             try:
                 response = urllib2.urlopen(request)
                 return True
@@ -234,20 +239,23 @@ class DownloadManager:
                 return False
 
         for attempt in range(self.NUM_ATTEMPT_DAEMON):
-            url_file_to_test = urls_files[randint(0,len(urls_files)-1)] # take a random file
+            url_file_to_test = urls_files[randint(0, len(urls_files) - 1)]  # take a random file
             if file_exists(url_file_to_test):
                 self.dnld_logfile.write('ready to download ' + datetime_format(datetime.today()) + '\n')
                 self.dnld_logfile.flush()
                 return True
             else:
-                self.dnld_logfile.write('waiting for available files, attempt ' + str(attempt) + ', '+ datetime_format(datetime.today()) + '\n')
+                self.dnld_logfile.write('waiting for available files, attempt ' + str(attempt) + ', ' + datetime_format(
+                    datetime.today()) + '\n')
                 self.dnld_logfile.flush()
                 sleep(self.WAIT_TIME_DAEMON)
 
         # impossible request files to download... exit
-        self.dnld_logfile.write('maximum of attempt for daemon, impossible request files to download, exiting ' + datetime_format(datetime.today()) + '\n')
+        self.dnld_logfile.write(
+            'maximum of attempt for daemon, impossible request files to download, exiting ' + datetime_format(
+                datetime.today()) + '\n')
         self.dnld_logfile.flush()
-        #TODO: sendmail error
+        # TODO: sendmail error
         exit()
 
     def download_status(self):
@@ -258,11 +266,11 @@ class DownloadManager:
         self.end_dnld_datetime = datetime.today()
 
         csv_dnld_statusfile.writerow([])
-        csv_dnld_statusfile.writerow(['########### START LOG STATUS FOR: '+self.dnld_name+' - '+self.dnld_date])
+        csv_dnld_statusfile.writerow(['########### START LOG STATUS FOR: ' + self.dnld_name + ' - ' + self.dnld_date])
         csv_dnld_statusfile.writerow([self.dnld_name, self.dnld_date])
 
         csv_dnld_statusfile.writerow(['started: ' + datetime_format(self.start_dnld_datetime),
-                                  'finished: ' + datetime_format(self.end_dnld_datetime)])
+                                      'finished: ' + datetime_format(self.end_dnld_datetime)])
 
         for status in self.dnld_status:
             csv_dnld_statusfile.writerow(status)
@@ -294,13 +302,13 @@ class DownloadManager:
                 year = int(_dir[0:4])
                 month = int(_dir[4:6])
                 day = int(_dir[6:8])
-                #hour = int(_dir[8:10])
+                # hour = int(_dir[8:10])
                 datetime_dir = datetime(year, month, day)
             except:
-                self.dnld_logfile.write('unknown format directory (for clean old files): ' + os.path.join(base_path, _dir) + '\n')
+                self.dnld_logfile.write(
+                    'unknown format directory (for clean old files): ' + os.path.join(base_path, _dir) + '\n')
 
             if datetime_dir < datetime_limit:
                 # delete directory
                 shutil.rmtree(os.path.join(base_path, _dir), ignore_errors=True)
                 self.dnld_logfile.write('cleaning old directory: ' + os.path.join(base_path, _dir) + '\n')
-

@@ -13,10 +13,9 @@ from lib import datetime_format
 
 
 def run(config_run):
-
     if config_run.p4_stats not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before\n'.format(config_run.process_name)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
@@ -26,10 +25,10 @@ def run(config_run):
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.'.format(source_path)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
         # save in setting
-        config_run.p4_stats = 'with errors! - '+datetime_format(datetime.today())
+        config_run.p4_stats = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -61,23 +60,22 @@ def run(config_run):
               'error message above, likely the files not were\n' \
               'processed successfully.'
 
-    config_run.process_logfile.write(msg+'\n')
+    config_run.process_logfile.write(msg + '\n')
     print msg
 
     # finishing the process
     msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
-                                                           'with errors! ' if return_code != 0 else '',
-                                                           datetime_format(datetime.today()))
+                                                          'with errors! ' if return_code != 0 else '',
+                                                          datetime_format(datetime.today()))
 
-    config_run.process_logfile.write(msg+'\n')
+    config_run.process_logfile.write(msg + '\n')
     print msg
     # save in setting
-    config_run.p4_stats = 'done - '+datetime_format(datetime.today())
+    config_run.p4_stats = 'done - ' + datetime_format(datetime.today())
     config_run.save()
 
 
 def script_R(list_files, dest):
-
     if not os.path.isdir(dest):
         os.makedirs(dest)
 
@@ -126,7 +124,7 @@ def script_R(list_files, dest):
         writeRaster(mediana, outImage,  bandorder='BIL', datatype='INT2S', format="GTiff")
 
         """.format(in_file=file_process,
-                    out_file=os.path.join(mediana_dir, os.path.splitext(name_file)[0]+'_mediana.tif'))
+                   out_file=os.path.join(mediana_dir, os.path.splitext(name_file)[0] + '_mediana.tif'))
 
     str_r += "removeTmpFiles(h=0)\n\n"
 
@@ -155,7 +153,7 @@ def script_R(list_files, dest):
         writeRaster(mean, outImage,  bandorder='BIL', datatype='INT2S', format="GTiff")
 
         """.format(in_file=file_process,
-                    out_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'))
+                   out_file=os.path.join(media_dir, os.path.splitext(name_file)[0] + '_media.tif'))
 
     str_r += "removeTmpFiles(h=0)\n\n"
 
@@ -184,7 +182,7 @@ def script_R(list_files, dest):
         writeRaster(sd, outImage,  bandorder='BIL', datatype='INT2S', format="GTiff")
 
         """.format(in_file=file_process,
-                    out_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
+                   out_file=os.path.join(sd_dir, os.path.splitext(name_file)[0] + '_sd.tif'))
 
     str_r += "removeTmpFiles(h=0)\n\n"
 
@@ -231,9 +229,9 @@ def script_R(list_files, dest):
 
 
         """.format(in_file=file_process,
-                    out_file=os.path.join(coef_disp_dir, os.path.splitext(name_file)[0]+'_coef_disp.tif'),
-                    media_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'),
-                    sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
+                   out_file=os.path.join(coef_disp_dir, os.path.splitext(name_file)[0] + '_coef_disp.tif'),
+                   media_file=os.path.join(media_dir, os.path.splitext(name_file)[0] + '_media.tif'),
+                   sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0] + '_sd.tif'))
 
     ## Coefficient of variation
     coef_var_dir = os.path.join(dest, 'coef_var')
@@ -270,10 +268,9 @@ def script_R(list_files, dest):
 
 
         """.format(in_file=file_process,
-                    out_file=os.path.join(coef_var_dir, os.path.splitext(name_file)[0]+'_coef_var.tif'),
-                    media_file=os.path.join(media_dir, os.path.splitext(name_file)[0]+'_media.tif'),
-                    sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0]+'_sd.tif'))
-
+                   out_file=os.path.join(coef_var_dir, os.path.splitext(name_file)[0] + '_coef_var.tif'),
+                   media_file=os.path.join(media_dir, os.path.splitext(name_file)[0] + '_media.tif'),
+                   sd_file=os.path.join(sd_dir, os.path.splitext(name_file)[0] + '_sd.tif'))
 
     r_file.write(str_r)
     r_file.close()

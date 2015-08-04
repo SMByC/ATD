@@ -59,19 +59,20 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
 
     # Send the message via our own SMTP server
     server = smtplib.SMTP("mail.ideam.gov.co", 587)
-    #Next, log in to the server
+    # Next, log in to the server
     server.login("xcorredorl@ideam.gov.co", base64.b64decode("WGNvcnJlZG9yMjAxMA=="))
     server.sendmail(msg["From"], msg["To"].split(","), msg.as_string())
     server.quit()
 
+
 ## example:
-#send_mail('xcorredorl@ideam.gov.co', 'xavier.corredor.llano@gmail.com', 'test subject', 'bodyy test\nnew lineee', 'howto_config.txt')
+# send_mail('xcorredorl@ideam.gov.co', 'xavier.corredor.llano@gmail.com', 'test subject', 'bodyy test\nnew lineee', 'howto_config.txt')
 
 def email_download_complete(config_run, files_attached=[]):
     mail_subject = "Reporte de la descarga de Aler.Temp.Defor. para {0}-{1} ({2}/{3})".format(config_run.year_to_run,
-                                                                                          config_run.month_to_process,
-                                                                                          config_run.months_made,
-                                                                                          config_run.months_to_run)
+                                                                                              config_run.month_to_process,
+                                                                                              config_run.months_made,
+                                                                                              config_run.months_to_run)
     mail_body = \
         '\n{0}\n\nEste es el reporte automático de la descarga de las\n' \
         'Alertas Tempranas de Deforestación\n\n' \
@@ -79,11 +80,11 @@ def email_download_complete(config_run, files_attached=[]):
         'Realizados {3} mes(es) de {4}\n\n' \
         'La ruta de almacenamiento de los resultados:\n' \
         '   (SAN): {5}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-                             config_run.year_to_run,
-                             config_run.month_to_process,
-                             config_run.months_made,
-                             config_run.months_to_run,
-                             config_run.path_to_run)
+                                 config_run.year_to_run,
+                                 config_run.month_to_process,
+                                 config_run.months_made,
+                                 config_run.months_to_run,
+                                 config_run.path_to_run)
 
     mail_body += '\nLa descarga se ha completado!.\n'
 
@@ -209,7 +210,7 @@ def dirs_and_files_in_url(url):
     dirs = []
     files = []
     for name, date, size in items:
-        #print name
+        # print name
         if size.strip() == '-':
             size = 'dir'
         if name.endswith('/'):
@@ -218,14 +219,15 @@ def dirs_and_files_in_url(url):
             files.append(name)
     return dirs, files, 'ok'
 
-#print dirs_and_files_in_url("http://aa.com123")
+
+# print dirs_and_files_in_url("http://aa.com123")
 
 ###############################################################################
 
 def get_all_start_n_days_of_month(year, month, num_days=8):
-    reference_date = date(year,01,01)
+    reference_date = date(year, 01, 01)
 
-    #if reference_date.year > year:
+    # if reference_date.year > year:
     #    raise Exception("The date is bigger than reference date")
 
     tmp_date = reference_date
@@ -251,6 +253,7 @@ class DateATD():
     self.is_start_month: True if nd_date start inside interval N days for this month
     self.is_end_month: True if nd_date end inside interval N days for this month
     """
+
     def __init__(self, date_str, type=None):
         self.set(date_str, type)
 
@@ -267,7 +270,8 @@ class DateATD():
             if type == "end":
                 self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[-1]))
             if type is None:
-                print "For date {0} with only year and month, you must set the type date ('start' or 'end').".format(date_str)
+                print "For date {0} with only year and month, you must set the type date ('start' or 'end').".format(
+                    date_str)
                 exit()
         else:
             print "Date {0} is not a valid date format, e.g. 2009-01-20 or 2009-01".format(date_str)
@@ -307,7 +311,7 @@ class DateATD():
             days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month)
             self.date = date(date_plus1.year, date_plus1.month, days_list_plus1[0])
         else:
-            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day)+1])
+            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day) + 1])
         self.start_end_month()
 
     def back(self):
@@ -317,8 +321,9 @@ class DateATD():
             days_list_minus1 = get_all_start_n_days_of_month(date_minus1.year, date_minus1.month)
             self.date = date(date_minus1.year, date_minus1.month, days_list_minus1[-1])
         else:
-            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day)-1])
+            self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day) - 1])
         self.start_end_month()
+
 
 ###############################################################################
 
@@ -326,6 +331,7 @@ def dir_date_name(start, end):
     """
     start and end must be instances of DateATD class
     """
+
     def parse_date(self):
         self.year = int(self.current_working_dir.split('_')[0])
         self.start_month = self.current_working_dir.split('_')[1].split('-')[0]
@@ -334,7 +340,7 @@ def dir_date_name(start, end):
     if start.date.year == end.date.year:
         year = start.date.year
     else:
-        year = "{0}|{1}".format(start.date.year,str(end.date.year)[2::])
+        year = "{0}|{1}".format(start.date.year, str(end.date.year)[2::])
     #
     if start.is_start_month:
         month1 = "{0}".format(start.date.month)
@@ -346,6 +352,7 @@ def dir_date_name(start, end):
     else:
         month2 = "{0}p".format(end.date.month)
     return "{0}_({1}-{2})".format(year, month1, month2)
+
 
 def update_folder_name(config_run):
     """
@@ -364,9 +371,10 @@ def update_folder_name(config_run):
     config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run, config_run.current_working_dir))
     config_run.download_path = os.path.join(config_run.abs_path_dir, 'p0_download')
     # re-open log file
-    config_run.dnld_logfile = open(os.path.join(config_run.download_path,'download.log'), 'a')
+    config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 
     config_run.save()
+
 
 ###############################################################################
 
@@ -376,14 +384,15 @@ def get_pixel_size(raster_file):
     return absolute value of w-e pixel resolution.
     for n-s pixel resolution -> geo_transform[5]
     """
-    gdal_file=gdal.Open(raster_file)
+    gdal_file = gdal.Open(raster_file)
     geo_transform = gdal_file.GetGeoTransform()
     return abs(float(geo_transform[1]))
+
 
 ###############################################################################
 
 class ConfigRun():
-    list_of_process = ['p1_tiseg','p2_mrt','p3_nodata','p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+    list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 
     def __init__(self, path_to_run):
         ## [General]
@@ -406,17 +415,17 @@ class ConfigRun():
 
         ## init process list
         for p in ConfigRun.list_of_process:
-            exec('self.'+p+' = None')
+            exec ('self.' + p + ' = None')
         # create the dictionary access process
-        self.process_ = {'p1_tiseg':self.p1_tiseg, 'p2_mrt':self.p2_mrt,
-                         'p3_nodata':self.p3_nodata, 'p4_stats':self.p4_stats,
-                         'p5_nodata':self.p5_nodata, 'p6_mosaic':self.p6_mosaic,
-                         'p7_layerstack':self.p7_layerstack}
+        self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
+                         'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
+                         'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
+                         'p7_layerstack': self.p7_layerstack}
 
     def create(self, current_working_dir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
         #### values by default
-        _months_to_run = 6 # meses a correr (periodo)
+        _months_to_run = 6  # meses a correr (periodo)
 
         self.current_working_dir = current_working_dir
 
@@ -458,12 +467,12 @@ class ConfigRun():
         self.dnld_finished = config.get('Download', 'dnld_finished')
         ## [Process]
         for p in ConfigRun.list_of_process:
-            exec("self."+p+" = config.get('Process', '"+p+"')")
+            exec ("self." + p + " = config.get('Process', '" + p + "')")
         # create the dictionary access process
-        self.process_ = {'p1_tiseg':self.p1_tiseg, 'p2_mrt':self.p2_mrt,
-                         'p3_nodata':self.p3_nodata, 'p4_stats':self.p4_stats,
-                         'p5_nodata':self.p5_nodata, 'p6_mosaic':self.p6_mosaic,
-                         'p7_layerstack':self.p7_layerstack}
+        self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
+                         'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
+                         'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
+                         'p7_layerstack': self.p7_layerstack}
 
     def save(self):
         config = ConfigParser.RawConfigParser()
@@ -474,11 +483,12 @@ class ConfigRun():
         config.set('General', 'end_date', self.end_date)
         config.add_section('Download')
         config.set('Download', 'download_type', self.download_type)
-        config.set('Download', 'dnld_errors', ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
+        config.set('Download', 'dnld_errors',
+                   ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
         config.set('Download', 'dnld_finished', self.dnld_finished)
         config.add_section('Process')
         for p in ConfigRun.list_of_process:
-            exec("config.set('Process', '"+p+"', self."+p+")")
+            exec ("config.set('Process', '" + p + "', self." + p + ")")
 
         # Writing our configuration file to 'example.cfg'
         with open(self.config_file, 'wb') as configfile:

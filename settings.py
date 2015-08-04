@@ -12,9 +12,8 @@ from lib import ConfigRun, DateATD, dir_date_name, email_download_complete, upda
 
 
 def get(args):
-
-    #global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
-    #global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
+    # global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'
+    # global_path_to_run = '/Modelo_Raster/Modelos/Modelos1/Alertas_Temp_Deforest/'
 
     if args.make == 'download':
 
@@ -67,11 +66,13 @@ def get(args):
         if not os.path.isdir(config_run.abs_path_dir):
             msg = '\nWarning: The current working directory {0} not exists, \n' \
                   'start again the download in new work directory {1}: '.format(config_run.current_working_dir,
-                                                                                dir_date_name(config_run.start_date, config_run.start_date))
+                                                                                dir_date_name(config_run.start_date,
+                                                                                              config_run.start_date))
             print msg
             config_run.target_date = deepcopy(config_run.start_date)
             config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-            config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run, config_run.current_working_dir))
+            config_run.abs_path_dir = os.path.abspath(
+                os.path.join(config_run.path_to_run, config_run.current_working_dir))
             os.makedirs(config_run.abs_path_dir)
 
         ## end date update
@@ -127,21 +128,20 @@ def get(args):
             del config_run
             return get(args)
 
-        ## update the target date
-        #config_run.target_date.next()
+            ## update the target date
+            # config_run.target_date.next()
 
     if args.make == 'process':
-
         config_run = ConfigRun(args.folder)
         config_run.load()
 
         config_run.abs_path_dir = os.path.abspath(config_run.path_to_run)
 
 
-    #print config_run.current_working_dir
-    #print config_run.start_date
-    #print vars(config_run)
-    #print config_run.end_date
+    # print config_run.current_working_dir
+    # print config_run.start_date
+    # print vars(config_run)
+    # print config_run.end_date
 
 
     return config_run

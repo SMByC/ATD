@@ -14,10 +14,9 @@ from lib import datetime_format
 
 
 def run(config_run):
-
     if config_run.p2_mrt not in [None, 'None']:
         msg = '\nWarning: The process {0} was executed before\n'.format(config_run.process_name)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
 
     dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
@@ -26,10 +25,10 @@ def run(config_run):
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.'.format(source_path)
-        config_run.process_logfile.write(msg+'\n')
+        config_run.process_logfile.write(msg + '\n')
         print msg
         # save in setting
-        config_run.p2_mrt = 'with errors! - '+datetime_format(datetime.today())
+        config_run.p2_mrt = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -50,25 +49,24 @@ def run(config_run):
                 print msg
 
                 return_code, msg = modis_convert(hdf_file, dest)
-                #if 'was converted successfully' in msg:
+                # if 'was converted successfully' in msg:
                 #    msg = 'was converted successfully'
-                config_run.process_logfile.write(msg+'\n')
+                config_run.process_logfile.write(msg + '\n')
                 print msg
 
     # finishing the process
     msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
-                                                           'with errors! ' if return_code != 0 else '',
-                                                           datetime_format(datetime.today()))
+                                                          'with errors! ' if return_code != 0 else '',
+                                                          datetime_format(datetime.today()))
 
-    config_run.process_logfile.write(msg+'\n')
+    config_run.process_logfile.write(msg + '\n')
     print msg
     # save in setting
-    config_run.p2_mrt = 'with errors! - ' if return_code != 0 else 'done - '+datetime_format(datetime.today())
+    config_run.p2_mrt = 'with errors! - ' if return_code != 0 else 'done - ' + datetime_format(datetime.today())
     config_run.save()
 
 
 def modis_convert(hdf_file, dest):
-
     if not os.path.isdir(dest):
         os.makedirs(dest)
 
@@ -81,9 +79,9 @@ def modis_convert(hdf_file, dest):
     if not os.path.isdir(mrt_dir_process):
         os.makedirs(mrt_dir_process)
 
-    tmp_out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf','.tif'))
+    tmp_out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf', '.tif'))
 
-    out_file = os.path.join(dest, os.path.basename(hdf_file)).replace('.hdf','.tif')
+    out_file = os.path.join(dest, os.path.basename(hdf_file)).replace('.hdf', '.tif')
 
     # opciones del remuestreo de la herramienta MRT
     options = {'subset': '( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )',
@@ -122,7 +120,7 @@ def modis_convert(hdf_file, dest):
     input_all_band = sorted(input_all_band)
 
     # combinacion de bandas a GeoTiff multibanda usando gdal
-    return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate"]+input_all_band)
+    return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate"] + input_all_band)
 
     if return_code == 0:  # successfully
         msg = 'was converted successfully'
