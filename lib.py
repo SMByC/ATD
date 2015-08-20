@@ -340,7 +340,7 @@ def dir_date_name(start, end):
     if start.date.year == end.date.year:
         year = start.date.year
     else:
-        year = "{0}|{1}".format(start.date.year, str(end.date.year)[2::])
+        year = "{0}-{1}".format(start.date.year, str(end.date.year)[2::])
     #
     if start.is_start_month:
         month1 = "{0}".format(start.date.month)
