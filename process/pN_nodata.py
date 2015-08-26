@@ -4,12 +4,11 @@
 # Copyright © 2014-2015, SMBYC - IDEAM
 # Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
-from datetime import datetime
 import os
-# from pymodis import convertmodis, parsemodis
-
+import numpy
 import shutil
-from lib import datetime_format, ConfigRun
+from datetime import datetime
+# from pymodis import convertmodis, parsemodis
 
 try:
     from osgeo import gdal
@@ -20,7 +19,7 @@ except ImportError:
     import gdal
     from gdalconst import *
 
-import numpy
+from ATD.lib import datetime_format, ConfigRun
 
 
 def run(config_run, name_process):

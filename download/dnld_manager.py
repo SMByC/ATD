@@ -15,7 +15,7 @@ from datetime import datetime
 from time import sleep
 from dateutil.relativedelta import relativedelta
 
-from lib import datetime_format, cksum
+from ATD.lib import datetime_format, cksum
 
 
 class File:

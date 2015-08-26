@@ -4,13 +4,13 @@
 # Copyright © 2014-2015, SMBYC - IDEAM
 # Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
-from datetime import datetime
 import os
+import shutil
+from datetime import datetime
+from subprocess import call
 # from pymodis import convertmodis, parsemodis
 
-import shutil
-from subprocess import call
-from lib import datetime_format
+from ATD.lib import datetime_format
 
 
 def run(config_run):

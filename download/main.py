@@ -7,8 +7,8 @@
 import os
 from datetime import date, datetime
 
-from lib import email_download_complete, update_folder_name, datetime_format
-from download.files_download_scripts import modis
+from ATD.lib import email_download_complete, update_folder_name, datetime_format
+from ATD.download.files_download_scripts import modis
 
 
 def run(config_run):

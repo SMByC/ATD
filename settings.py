@@ -8,8 +8,7 @@ import os
 from copy import deepcopy
 from datetime import date
 
-from lib import ConfigRun, DateATD, dir_date_name, email_download_complete, update_folder_name
-
+from ATD.lib import ConfigRun, DateATD, dir_date_name, email_download_complete, update_folder_name
 
 def get(args):
     # global_path_to_run = '/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp/'

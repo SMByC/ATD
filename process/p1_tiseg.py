@@ -8,7 +8,7 @@ from datetime import datetime
 import os
 
 import shutil
-from lib import datetime_format
+from ATD.lib import datetime_format
 
 
 def run(config_run):

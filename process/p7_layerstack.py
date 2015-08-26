@@ -4,12 +4,12 @@
 # Copyright © 2014-2015, SMBYC - IDEAM
 # Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
 
-from datetime import datetime
 import os
-
 import shutil
 from subprocess import call
-from lib import datetime_format, get_pixel_size
+from datetime import datetime
+
+from ATD.lib import datetime_format, get_pixel_size
 
 
 def run(config_run):

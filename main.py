@@ -10,10 +10,10 @@ import argparse
 import time
 from datetime import datetime
 
-from download import main as download_main
-from process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
-from lib import datetime_format
-import settings
+from ATD import settings
+from ATD.lib import datetime_format
+from ATD.download import main as download_main
+from ATD.process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
 
 
 # set encoding to utf-8
