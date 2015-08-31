@@ -50,7 +50,7 @@ def run(config_run):
                 config_run.process_logfile.write(msg + '\n')
                 print msg
 
-                if mode == 'MOD09A1':
+                if mode in ['MOD09A1', 'MYD09A1']:
                     shutil.copyfile(os.path.join(root, files[0]),
                                     os.path.join(dir_process, scene + '_modoA_banda03.hdf.xml'))
                     shutil.copyfile(os.path.join(root, files[0]),
@@ -61,7 +61,7 @@ def run(config_run):
                                     os.path.join(dir_process, scene + '_modoA_banda06.hdf.xml'))
                     shutil.copyfile(os.path.join(root, files[0]),
                                     os.path.join(dir_process, scene + '_modoA_banda07.hdf.xml'))
-                if mode == 'MOD09Q1':
+                if mode in ['MOD09Q1', 'MYD09Q1']:
                     shutil.copyfile(os.path.join(root, files[0]),
                                     os.path.join(dir_process, scene + '_modoQ_banda01.hdf.xml'))
                     shutil.copyfile(os.path.join(root, files[0]),
