@@ -37,10 +37,7 @@ El programa ATD cuenta con los siguientes procesos (en la actualidad):
 
 ## Team ##
 
-#### Developer ####
 - Xavier Corredor Llano <xcorredorl(a)ideam.gov.co>
-
-#### SMBYC Team ####
 - Edersson Cabrera <cabrera.edersson(a)gmail.com>
 - Gustavo Galindo <gusgalin(a)gmail.com>
 - Cristhian Forero <cristhian0224(a)gmail.com>
