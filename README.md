@@ -1,11 +1,10 @@
-
 # Automatización de las Alertas Tempranas de Deforestación
 
-El programa ATD es el proceso de automatizacioón de alertas tempranas de deforestación, uno de los metodos para el monitoreo de la deforestación en Colombia realizado por el IDEAM.
+El programa ATD haceparte del proceso de automatización de alertas tempranas de deforestación, uno de los componentes del Sistema de Monitoreo de Bosques y Carbono  realizado por el IDEAM para Colombia.
 
 ## Los dos esquemas del monitoreo de deforestación 
 
-El monitoreo de deforestación, cumple dos funciones a distintas escalas de tiempo y resolución, una la de generar el mapa de áreas deforestadas y el otro para generar el mapa de cambio de cobertura. El primero hace uso de imágenes satelitales MODIS de escala gruesa (250m de resolución espacial) y se realiza cada 6 meses, el segundo usa las imagenes satelitales Landsat de escala fina (30m de resolución espacial) y se realiza cada 2 años.
+El monitoreo de deforestación, desarrolla dos productos a distintas escalas de tiempo y resolución espacial, uno  genera alertas temprans indicando donde se están presentando las áreas deforestadas y el otro generael mapa de cambio de cobertura boscosas . Para el primer caso, hace uso de imágenes satelitales MODIS de escala gruesa (250m de resolución espacial) y se realiza cada 6 meses, el segundo usa las imagenes satelitales Landsat de escala fina (30m de resolución espacial) y se realiza cada  año.
 
 A continuación se describen los dos esquemas de monitoreo de la deforestacion de Colombia a nivel nacional: 
 
@@ -51,5 +50,3 @@ El programa ATD cuenta con los siguientes procesos:
     Sistema de Monitoreo de Bosques y Carbono - SMBYC
     Calle 25 D No. 96 B - 70
     Bogotá DC, Colombia
-
-
