@@ -1,6 +1,6 @@
 # Automatización de las Alertas Tempranas de Deforestación #
 
-El programa ATD hace parte del proceso de automatización de alertas tempranas de deforestación, uno de los componentes del Sistema de Monitoreo de Bosques y Carbono realizado por el IDEAM para Colombia.
+El programa ATD hace parte del proceso de alertas tempranas de deforestación, uno de los componentes del Sistema de Monitoreo de Bosques y Carbono realizado por el IDEAM para Colombia.
 
 ## Los dos esquemas del monitoreo de deforestación ##
 
@@ -35,7 +35,7 @@ El programa ATD cuenta con los siguientes procesos (en la actualidad):
 6. Mosaic
 7. Layerstack
 
-Una vez realizado todo el proceso de ATD, los resultados del layerstack (proceso 7) son comparados y analizados con el producto del anterior periodo, aplicando filtros y análsis de un especialista que realiza los productos finales.
+Una vez realizado todo el proceso de ATD, los resultados del layerstack (ultimo proceso) son comparados y analizados con el producto del anterior periodo, aplicando filtros y análsis de un especialista que realiza los productos finales.
 
 ## Team ##
 
