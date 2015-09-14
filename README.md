@@ -4,11 +4,11 @@ El programa ATD hace parte del proceso de automatización de alertas tempranas d
 
 ## Los dos esquemas del monitoreo de deforestación ##
 
-El monitoreo de deforestación, desarrolla dos productos a distintas escalas de tiempo y resolución espacial, uno  genera alertas tempranas indicando donde se están presentando las áreas deforestadas y el otro genera el mapa de cambio de cobertura boscosas . Para el primer caso, hace uso de imágenes satelitales MODIS de escala gruesa (250m de resolución espacial) y se realiza cada 6 meses, el segundo usa las imágenes satelitales Landsat de escala fina (30m de resolución espacial) y se realiza cada año.
+El monitoreo de deforestación, desarrolla dos productos a distintas escalas de tiempo y resolución espacial, uno  genera alertas tempranas indicando donde se están presentando las áreas deforestadas y el otro genera el mapa de cambio de cobertura boscosas . Para el primer caso, hace uso de imágenes satelitales MODIS de escala gruesa pero alta resolución temporal y se realiza cada 6 meses, el segundo usa las imágenes satelitales Landsat de escala fina pero baja resolución temporal y se realiza cada año.
 
 A continuación se describen los dos esquemas de monitoreo de la deforestación de Colombia a nivel nacional: 
 
-* Escala gruesa usa imágenes de sensores remotos de baja resolución espacial, cuyos tamaños de pixel oscilan entre 500m-150m, y que proveen una alta resolución temporal generando información muy actualizada, y permitiendo identificar rápidamente las áreas de cambio (“Hotspots” en deforestación) en las coberturas de Bosque/ No Bosque. Esta escala aplicada en un monitoreo anual permite hacer un seguimiento periódico, constituyéndose un sistema de alerta temprana en las dinámicas de cambio de este tipo de coberturas. Así mismo, los productos espectrales generados apoyarán la estimación del almacenamiento de carbono a nivel nacional
+* Escala gruesa usa imágenes de sensores remotos de baja resolución espacial, cuyos tamaños de pixel oscilan entre 250m-500m, y que proveen una alta resolución temporal generando información muy actualizada, y permitiendo identificar rápidamente las áreas de cambio (“Hotspots” en deforestación) en las coberturas de Bosque/ No Bosque. Esta escala aplicada en un monitoreo anual permite hacer un seguimiento periódico, constituyéndose un sistema de alerta temprana en las dinámicas de cambio de este tipo de coberturas. Así mismo, los productos espectrales generados apoyarán la estimación del almacenamiento de carbono a nivel nacional
 
 * Escala fina usa imágenes de sensores remotos de media resolución espacial (imágenes tipo Landsat TM y ETM+), cuyos tamaños de pixel oscilan entre 15m-60m, las cuales permiten tener un cubrimiento completo del país con un buen nivel de detalle espacial para la identificación de coberturas de la Tierra. 
 
@@ -22,7 +22,7 @@ Ambos procesos requieren de varias etapas, aunque similares, difieren en varios 
 
 ## Proceso de Alertas Tempranas de Deforestación ##
 
-El programa ATD es el proceso de automatización de alertas tempranas de deforestación de escala gruesa realizado cada 6 meses. Este proceso de automatización se encarga de realizar todas las tareas operativas de la metodología de este producto (descargas, calculos, prepocesos, etc) con el fin de mejorar el proceso haciéndolo mas rápido, fiable (evitando errores humanos) y facilitar su elaboración.
+El programa ATD es el proceso de automatización de alertas tempranas de deforestación (escala gruesa y alta resolución temporal). Este proceso de automatización se encarga de realizar toda la descarga y procesamiento de la información (ítems 1 y 2) cuyas tareas son automatizables ya que su metodología no varia de un producto a otro. La generación final del producto (ítem 3) es un proceso complejo de automatización ya que requiere de análisis y conocimientos de un especialista. El proceso ATD surge con la idea de operatizar y automatizar todas las tareas y procesos posibles dentro de la metodología de alertas tempranas que no requieran de conocimiento experto, con el fin de realizar las alertas tempranas de manera mas eficiente y veloz, facilitando su elaboración y ejecución, evitando errores y demoras en tareas repetitivas o operacionales.
 
 El programa ATD cuenta con los siguientes procesos (en la actualidad):
 
@@ -34,6 +34,8 @@ El programa ATD cuenta con los siguientes procesos (en la actualidad):
 5. NoData
 6. Mosaic
 7. Layerstack
+
+Una vez realizado todo el proceso de ATD, los resultados del layerstack (proceso 7) son comparados y analizados con el producto del anterior periodo, aplicando filtros y análsis de un especialista que realiza los productos finales.
 
 ## Team ##
 
