@@ -19,8 +19,6 @@ def get(args):
         config_run = ConfigRun(args.path)
         config_run.load()
 
-        print vars(config_run)
-
         #########################
         ## loads all arguments and settings.cfg into config_run
 
