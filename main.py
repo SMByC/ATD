@@ -45,22 +45,26 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter)
 
 subparsers = parser.add_subparsers(dest='make', help='operation to be performed')
-# download
+
+# DOWNLOAD
 group_download = subparsers.add_parser('download', help='download modis files')
+group_download.add_argument('--source', type=str, dest='source', choices={'terra', 'aqua'}, required=True)
 group_download.add_argument('--from', type=str, dest='from_date',
                             help='date from download modis files, format: y-m-d')  # else None
 group_download.add_argument('--to', type=str, dest='to_date',
                             help='date to download modis files, format: y-m-d')  # else None
-group_download.add_argument('--type', type=str, dest='download_type', choices=set(('steps', 'full')),
+group_download.add_argument('--type', type=str, dest='download_type', choices={'steps', 'full'},
                             help='type of download, steps or full')  # else None
 group_download.add_argument('path', help='path to download modis files', action=readable_dir, nargs='?',
-                            default=os.getcwd())
+                            default=os.getcwd())  # else current directory
 group_download.add_argument('--email', type=str, help='send email when finnish')
-# process
+
+# PROCESS
 list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
+group_process.add_argument('--source', type=str, dest='from_date', choices={'terra', 'aqua'}, required=True)
 group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
 group_process.add_argument('--email', type=str, help='send email when finnish')
 

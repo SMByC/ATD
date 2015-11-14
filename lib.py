@@ -396,6 +396,7 @@ class ConfigRun():
 
     def __init__(self, path_to_run):
         ## [General]
+        self.source = None
         self.current_working_dir = None
         self.start_date = None
         self.target_date = None
@@ -422,11 +423,12 @@ class ConfigRun():
                          'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                          'p7_layerstack': self.p7_layerstack}
 
-    def create(self, current_working_dir=None, start_date=None, target_date=None,
+    def create(self, source=None, current_working_dir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
         #### values by default
         _months_to_run = 6  # meses a correr (periodo)
 
+        self.source = source
         self.current_working_dir = current_working_dir
 
         if start_date is not None:
@@ -457,6 +459,7 @@ class ConfigRun():
             return
         config.read(self.config_file)
         ## [General]
+        self.source = config.get('General', 'source')
         self.current_working_dir = config.get('General', 'current_working_dir')
         self.start_date = config.get('General', 'start_date')
         self.target_date = config.get('General', 'target_date')
@@ -477,6 +480,7 @@ class ConfigRun():
     def save(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('General')
+        config.set('General', 'source', self.source)
         config.set('General', 'current_working_dir', self.current_working_dir)
         config.set('General', 'start_date', self.start_date)
         config.set('General', 'target_date', self.target_date)

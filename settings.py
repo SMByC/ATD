@@ -22,6 +22,13 @@ def get(args):
         #########################
         ## loads all arguments and settings.cfg into config_run
 
+        ## source
+        if config_run.source in [None, 'None']:
+            config_run.source = args.source
+        elif args.source not in [None, 'None']:
+            if args.source == config_run.source:
+                config_run.source = args.source
+
         ## start date
         if args.from_date is not None:
             config_run.start_date = DateATD(args.from_date, 'start')
@@ -30,6 +37,7 @@ def get(args):
             config_run.start_date = DateATD(today.strftime('%Y-%m-%d'), 'start')
         else:
             config_run.start_date = DateATD(config_run.start_date, 'start')
+
         ## end date
         if args.to_date is not None:
             config_run.end_date = DateATD(args.to_date, 'end')
@@ -46,7 +54,6 @@ def get(args):
                 msg = '\nWarning: The start date is bigger than target date, changing\n' \
                       'the target date to start date'
                 print msg
-
                 config_run.target_date = deepcopy(config_run.start_date)
 
         ## current working dir
@@ -104,6 +111,12 @@ def get(args):
             print "\nError: you need specify the 'end_date' in settings.cfg or '--to' in arguments\n" \
                   "when you want send email when finnish."
             exit()
+
+        if args.source not in [None, 'None']:
+            if args.source != config_run.source:
+                print "\nError: the source in settings.cfg and in arguments are different\n" \
+                  "if you want run other source, finished/delete the other source before run this."
+                exit()
 
         #########################
         ## check the current and end date are equal, finished criteria
