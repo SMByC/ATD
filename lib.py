@@ -368,7 +368,9 @@ def update_folder_name(config_run):
               os.path.join(config_run.path_to_run, dir_date_name(config_run.start_date, config_run.target_date)))
     # update config variables
     config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-    config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run, config_run.current_working_dir))
+    config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run,
+                                                           config_run.current_working_dir,
+                                                           config_run.source,))
     config_run.download_path = os.path.join(config_run.abs_path_dir, 'p0_download')
     # re-open log file
     config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
