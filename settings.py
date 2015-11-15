@@ -23,9 +23,10 @@ def get(args):
         ## loads all arguments and settings.cfg into config_run
 
         ## source
+        if args.source not in [None, 'None']:
+            args.source = args.source.split(',')
+
         if config_run.source in [None, 'None']:
-            config_run.source = args.source
-        elif args.source == config_run.source:
             config_run.source = args.source
 
         ## start date
@@ -112,6 +113,11 @@ def get(args):
         if config_run.email not in [None, 'None'] and config_run.end_date in [None, 'None']:
             print "\nError: you need specify the 'end_date' in settings.cfg or '--to' in arguments\n" \
                   "when you want send email when finnish."
+            exit()
+
+        if args.source not in [['terra'], ['agua'], ['terra','aqua'], ['aqua','terra']]:
+            print "\nError: the source in argument is not recognized, this should be\n" \
+                  "'terra', 'aqua' or 'terra,aqua'."
             exit()
 
         if args.source not in [None, 'None']:

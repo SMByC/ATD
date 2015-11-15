@@ -48,7 +48,8 @@ subparsers = parser.add_subparsers(dest='make', help='operation to be performed'
 
 # DOWNLOAD
 group_download = subparsers.add_parser('download', help='download modis files')
-group_download.add_argument('--source', type=str, dest='source', choices={'terra', 'aqua'}, required=True)
+group_download.add_argument('--source', type=str, dest='source', default='terra,aqua',
+                            help='satellite source of MODIS, terra or aqua')
 group_download.add_argument('--from', type=str, dest='from_date',
                             help='date from download modis files, format: y-m-d')  # else None
 group_download.add_argument('--to', type=str, dest='to_date',
@@ -64,7 +65,6 @@ list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', '
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
-group_process.add_argument('--source', type=str, dest='from_date', choices={'terra', 'aqua'}, required=True)
 group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
 group_process.add_argument('--email', type=str, help='send email when finnish')
 
