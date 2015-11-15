@@ -76,10 +76,11 @@ def email_download_complete(config_run, files_attached=[]):
     mail_body = \
         '\n{0}\n\nEste es el reporte automático de la descarga de las\n' \
         'Alertas Tempranas de Deforestación\n\n' \
-        'Archivos modis MOD09A1 y MOD09Q1 para el {1}-{2}\n\n' \
-        'Realizados {3} mes(es) de {4}\n\n' \
+        'Archivos modis de {1} para el {2}-{3}\n\n' \
+        'Realizados {4} mes(es) de {5}\n\n' \
         'La ruta de almacenamiento de los resultados:\n' \
-        '   (SAN): {5}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+        '   (SAN): {6}\n'.format(datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+                                 ','.join(config_run.source).upper(),
                                  config_run.year_to_run,
                                  config_run.month_to_process,
                                  config_run.months_made,
