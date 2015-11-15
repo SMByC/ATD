@@ -55,9 +55,14 @@ def run(config_run):
         config_run.dnld_logfile.write(msg + '\n')
         print msg
 
-        # download
-        dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09A1')
-        dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09Q1')
+        # download from terra
+        if config_run.current_source == 'terra':
+            dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09A1')
+            dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09Q1')
+        # download from aqua
+        if config_run.current_source == 'aqua':
+            dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MYD09A1')
+            dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MYD09Q1')
 
         msg_error = None
         ## check errors from download

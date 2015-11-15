@@ -52,9 +52,16 @@ def download(config_run, name):
     # return DownloadManager.DNLD_ERRORS, os.path.join(dest_dir, name+'_'+dnld_date+"_status.csv")
     ### test
 
+    # download from terra
+    if config_run.current_source == 'terra':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLT'
+    # download from aqua
+    if config_run.current_source == 'aqua':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLA'
+
     urls_files = []
-    url = 'http://e4ftl01.cr.usgs.gov/MOLT/{name}.005/{year}.{month}.{day}/' \
-        .format(name=name, year=config_run.target_date.date.year,
+    url = '{url_source}/{name}.005/{year}.{month}.{day}/' \
+        .format(url_source=url_source, name=name, year=config_run.target_date.date.year,
                 month=fix_zeros_in_datetime(config_run.target_date.date.month),
                 day=fix_zeros_in_datetime(config_run.target_date.date.day))
 
