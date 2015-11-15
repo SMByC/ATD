@@ -361,19 +361,24 @@ def update_folder_name(config_run):
     if config_run.current_working_dir == dir_date_name(config_run.start_date, config_run.target_date):
         return
 
-    # close log file
-    config_run.dnld_logfile.close()
+    if config_run.make == 'download':
+        # close log file
+        config_run.dnld_logfile.close()
+
     # rename directory
-    os.rename(config_run.abs_path_dir,
+    os.rename(config_run.path_current_working_dir,
               os.path.join(config_run.path_to_run, dir_date_name(config_run.start_date, config_run.target_date)))
     # update config variables
     config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-    config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                           config_run.current_working_dir,
-                                                           config_run.source,))
-    config_run.download_path = os.path.join(config_run.abs_path_dir, 'p0_download')
-    # re-open log file
-    config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
+    config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
+                                                          config_run.current_working_dir))
+
+    if config_run.make == 'download':
+        # re-set download paths
+        config_run.path_source_dir = os.path.join(config_run.path_current_working_dir, config_run.current_source)
+        config_run.download_path = os.path.join(config_run.path_source_dir, 'p0_download')
+        # re-open log file
+        config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 
     config_run.save()
 
@@ -482,7 +487,8 @@ class ConfigRun():
     def save(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('General')
-        config.set('General', 'source', self.source)
+        config.set('General', 'source',
+                   ','.join(self.source) if self.source not in [None, 'None'] else 'None')
         config.set('General', 'current_working_dir', self.current_working_dir)
         config.set('General', 'start_date', self.start_date)
         config.set('General', 'target_date', self.target_date)

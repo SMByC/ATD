@@ -77,12 +77,19 @@ config_run = settings.get(args)
 ########################################## download ###########################################
 
 if args.make == 'download':
-    download_main.run(config_run)
+    for source in config_run.source:
+        # save make in config_run
+        config_run.make = args.make
+        # save the current source to download
+        config_run.current_source = source
 
+        download_main.run(config_run)
 
 ########################################### process ###########################################
 
 if args.make == 'process':
+    # save make in config_run
+    config_run.make = args.make
     # set the log file for process
     config_run.process_logfile = open(os.path.join(config_run.abs_path_dir, 'process.log'), 'a')
     # init log of process

@@ -29,6 +29,17 @@ def get(args):
         if config_run.source in [None, 'None']:
             config_run.source = args.source
 
+        if args.source not in [['terra'], ['aqua'], ['terra','aqua'], ['aqua','terra']]:
+            print "\nError: the source in argument is not recognized, this should be\n" \
+                  "'terra', 'aqua' or 'terra,aqua'."
+            exit()
+
+        if args.source not in [None, 'None']:
+            if args.source != config_run.source:
+                print "\nError: the source in settings.cfg and in arguments are different\n" \
+                  "if you want run other source, finished/delete the other source before run this."
+                exit()
+
         ## start date
         if args.from_date is not None:
             config_run.start_date = DateATD(args.from_date, 'start')
@@ -66,10 +77,9 @@ def get(args):
             config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
 
         ## current working dir update
-        config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                               config_run.current_working_dir,
-                                                               config_run.source,))
-        if not os.path.isdir(config_run.abs_path_dir):
+        config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
+                                                               config_run.current_working_dir))
+        if not os.path.isdir(config_run.path_current_working_dir):
             msg = '\nWarning: The current working directory {0} not exists, \n' \
                   'start again the download in new work directory {1}: '.format(config_run.current_working_dir,
                                                                                 dir_date_name(config_run.start_date,
@@ -77,10 +87,9 @@ def get(args):
             print msg
             config_run.target_date = deepcopy(config_run.start_date)
             config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-            config_run.abs_path_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                                   config_run.current_working_dir,
-                                                                   config_run.source,))
-            os.makedirs(config_run.abs_path_dir)
+            config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
+                                                                  config_run.current_working_dir))
+            os.makedirs(config_run.path_current_working_dir)
 
         ## end date update
         if config_run.end_date not in [None, 'None'] and (config_run.end_date.date < config_run.target_date.date):
@@ -115,17 +124,6 @@ def get(args):
                   "when you want send email when finnish."
             exit()
 
-        if args.source not in [['terra'], ['agua'], ['terra','aqua'], ['aqua','terra']]:
-            print "\nError: the source in argument is not recognized, this should be\n" \
-                  "'terra', 'aqua' or 'terra,aqua'."
-            exit()
-
-        if args.source not in [None, 'None']:
-            if args.source != config_run.source:
-                print "\nError: the source in settings.cfg and in arguments are different\n" \
-                  "if you want run other source, finished/delete the other source before run this."
-                exit()
-
         #########################
         ## check the current and end date are equal, finished criteria
         if config_run.end_date not in [None, 'None'] and (config_run.target_date.date == config_run.end_date.date):
@@ -138,9 +136,10 @@ def get(args):
                 email_download_complete(config_run)
             # rename folder
             update_folder_name(config_run)
-            # move settings into directory
-            os.rename(config_run.config_file,
-                      os.path.join(config_run.abs_path_dir, os.path.basename(config_run.config_file)))
+
+            ## move settings into directory  TODO settings
+            #os.rename(config_run.config_file,
+            #          os.path.join(config_run.abs_path_dir, os.path.basename(config_run.config_file)))
 
             # start new instance (restart) and continue
             del config_run

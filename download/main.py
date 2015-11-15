@@ -14,16 +14,21 @@ from ATD.download.files_download_scripts import modis
 def run(config_run):
     ######################################## pre download ########################################
 
+    # prepare source directory
+    config_run.path_source_dir = os.path.join(config_run.path_current_working_dir, config_run.current_source)
+    if not os.path.isdir(config_run.path_current_working_dir):
+        os.makedirs(config_run.path_current_working_dir)
+
     # prepare directory to download
-    config_run.download_path = os.path.join(config_run.abs_path_dir, 'p0_download')
+    config_run.download_path = os.path.join(config_run.path_source_dir, 'p0_download')
     if not os.path.isdir(config_run.download_path):
         os.makedirs(config_run.download_path)
 
     # set the log file for download
-    config_run.dnld_logfile = open(os.path.join(config_run.abs_path_dir, 'p0_download', 'download.log'), 'a')
+    config_run.dnld_logfile = open(os.path.join(config_run.path_source_dir, 'p0_download', 'download.log'), 'a')
 
     # init log of download
-    msg = '\n\n########### START LOG FOR: target:' + config_run.target_date.date.strftime(
+    msg = '\n\n########### START LOG FOR: '+config_run.current_source.upper()+', target:' + config_run.target_date.date.strftime(
         '%Y-%m-%d') + ' in dir:' + config_run.current_working_dir + ' - (' + datetime_format(
         datetime.today()) + ') ###########'
     config_run.dnld_logfile.write(msg + '\n')
@@ -117,9 +122,9 @@ def run(config_run):
         config_run.dnld_finished = True
         config_run.save()
 
-        # move settings into directory
-        os.rename(config_run.config_file,
-                  os.path.join(config_run.abs_path_dir, os.path.basename(config_run.config_file)))
+        # move settings into directory  TODO settings
+        #os.rename(config_run.config_file,
+        #          os.path.join(config_run.path_source_dir, os.path.basename(config_run.config_file)))
 
     # close log file
     config_run.dnld_logfile.close()
