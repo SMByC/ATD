@@ -19,7 +19,8 @@ except ImportError:
     import gdal
     from gdalconst import *
 
-from ATD.lib import datetime_format, ConfigRun
+from ATD.lib import datetime_format
+from ATD.settings import ConfigRun
 
 
 def run(config_run, name_process):
