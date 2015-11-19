@@ -242,25 +242,12 @@ def get(args):
             exit()
 
         #########################
-        ## check the current and end date are equal, finished criteria
+        ## check the current and end date are equal, not run because the download is already finished
         if config_run.end_date not in [None, 'None'] and (config_run.target_date.date == config_run.end_date.date):
-            print config_run.end_date.date
-            msg = '\nWarning: the target date is equal or bigger than the end date.\nexit'
-            print msg
-
-            # send mail
-            if config_run.email is not None:
-                email_download_complete(config_run)
-
-            # rename folder
-            update_working_directory(config_run)
-
-            # start new instance (restart) and continue
-            del config_run
-            return get(args)
-
-            ## update the target date
-            # config_run.target_date.next()
+            if config_run.dnld_finished:
+                msg = '\nThe download is already finished!\n\nExit'
+                print msg
+                exit()
 
     if args.make == 'process':
         config_run = ConfigRun(args.working_directory)
