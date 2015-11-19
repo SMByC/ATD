@@ -70,40 +70,11 @@ class ConfigRun:
         if self.make == "process":
             self.config_file = os.path.join(self.working_directory, 'process_settings.cfg')
 
-    # TODO delete
-    def create(self, source=None, rundir=None, start_date=None, target_date=None,
-               end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
-        #### values by default
-
-        self.source = source
-        self.rundir = rundir
-
-        if start_date is not None:
-            self.start_date = parse(start_date).date()
-        else:
-            self.start_date = None
-
-        if target_date is not None:
-            self.target_date = parse(target_date).date()
-        else:
-            self.target_date = deepcopy(self.start_date)
-
-        if end_date is not None:
-            self.end_date = parse(end_date).date()
-        else:
-            self.end_date = None
-
-        self.download_type = download_type
-        self.dnld_errors = dnld_errors
-        self.dnld_finished = dnld_finished
-
-        self.save()
-
     def load(self):
         config = ConfigParser.RawConfigParser()
         if not os.path.isfile(self.config_file):
-            #self.create()  TODO
             return
+
         config.read(self.config_file)
 
         if self.make == "download":
