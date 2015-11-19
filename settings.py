@@ -132,7 +132,8 @@ def get(args):
     if args.make == 'download':
 
         config_run = ConfigRun(args.working_directory)
-        config_run.load()
+        if os.path.isfile(config_run.config_file):
+            config_run.load()
 
         #########################
         ## loads all arguments and settings.cfg into config_run
@@ -195,6 +196,8 @@ def get(args):
                   'and target date parameters, setting the new working directory to:\n\t' + \
                   config_run.working_directory
             print msg
+        # re-set the config file
+        config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
 
         ## create working dir
         if not os.path.isdir(config_run.working_directory):

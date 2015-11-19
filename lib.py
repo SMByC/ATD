@@ -364,7 +364,7 @@ def update_working_directory(config_run):
               os.path.join(os.path.dirname(config_run.working_directory),
                            dir_date_name(config_run.start_date, config_run.target_date)))
     # update config variables
-    config_run.working_directory = dir_date_name(config_run.start_date, config_run.target_date)
+    config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
 
     # re-set config path
     config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
