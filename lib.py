@@ -370,7 +370,7 @@ def update_working_directory(config_run):
     # re-set config path
     config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
     # re-set download paths
-    config_run.download_path = os.path.join(config_run.working_directory, config_run.source, 'p0_download')
+    config_run.download_path = os.path.join(config_run.working_directory, config_run.current_source, 'p0_download')
     # re-open log file
     config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 

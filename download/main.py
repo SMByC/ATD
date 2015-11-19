@@ -15,8 +15,7 @@ def run(config_run):
     ######################################## pre download ########################################
 
     # prepare directory to download
-    print config_run.working_directory
-    config_run.download_path = os.path.join(config_run.working_directory, config_run.source, 'p0_download')
+    config_run.download_path = os.path.join(config_run.working_directory, config_run.current_source, 'p0_download')
     if not os.path.isdir(config_run.download_path):
         os.makedirs(config_run.download_path)
 
