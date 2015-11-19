@@ -90,8 +90,9 @@ if args.make == 'process':
     # set the log file for process
     config_run.process_logfile = open(os.path.join(config_run.working_directory, 'process.log'), 'a')
     # init log of process
-    msg = '\n\n########### START LOG FOR PROCESS: ' + args.process + ' - (' + datetime_format(
-        datetime.today()) + ') ###########'
+    msg = '\n\n########### START LOG FOR PROCESS: ' + args.process + \
+          ' - (' + datetime_format(datetime.today()) + ') ###########' + \
+          '\n#### in dir: ' + os.path.basename(config_run.working_directory)
     config_run.process_logfile.write(msg + '\n')
     print msg
 

@@ -32,9 +32,10 @@ def run(config_run):
             config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 
             # init log of download
-            msg = '\n\n########### START LOG FOR: '+config_run.current_source.upper()+', target:' + config_run.target_date.date.strftime(
-                '%Y-%m-%d') + ' in dir:' + os.path.basename(config_run.working_directory) + ' - (' + datetime_format(
-                datetime.today()) + ') ###########'
+            msg = '\n\n########### START LOG FOR: '+config_run.current_source.upper() + \
+                  ' - (' + datetime_format(datetime.today()) + ') ###########' + \
+                  '\n#### target: ' + config_run.target_date.date.strftime('%Y-%m-%d') + \
+                  '\n#### in dir: ' + os.path.basename(config_run.working_directory)
             config_run.dnld_logfile.write(msg + '\n')
             print msg
 

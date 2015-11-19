@@ -192,13 +192,13 @@ def get(args):
         if config_run.working_directory == os.getcwd():
             config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
             msg = '\nWarning: The working directory is empty, not set in arguments, \n' \
-                  'start new empty working directory base on dates of run:\n\t' + \
+                  'start new empty working directory base on dates of run:\n\n\t' + \
                   config_run.working_directory
             print msg
         elif os.path.basename(config_run.working_directory) != dir_date_name(config_run.start_date, config_run.target_date):
             config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
             msg = '\nWarning: The current working directory not match with the start \n' \
-                  'and target date parameters, setting the new working directory to:\n\t' + \
+                  'and target date parameters, setting the new working directory to:\n\n\t' + \
                   config_run.working_directory
             print msg
         # re-set the config file
