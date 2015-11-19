@@ -56,17 +56,17 @@ group_download.add_argument('--to', type=str, dest='to_date',
                             help='date to download modis files, format: y-m-d')  # else None
 group_download.add_argument('--type', type=str, dest='download_type', choices={'steps', 'full'},
                             help='type of download, steps or full')  # else None
-group_download.add_argument('path', help='path to download modis files', action=readable_dir, nargs='?',
-                            default=os.getcwd())  # else current directory
 group_download.add_argument('--email', type=str, help='send email when finnish')
+group_download.add_argument('working_directory', help='working directory to process', action=readable_dir,
+                            nargs='?', default=os.getcwd())
 
 # PROCESS
 list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
-group_process.add_argument('folder', type=str, action=readable_dir, help='folder to process')
 group_process.add_argument('--email', type=str, help='send email when finnish')
+group_process.add_argument('working_directory', help='working directory to process', action=readable_dir)
 
 args = parser.parse_args()
 
@@ -91,7 +91,7 @@ if args.make == 'process':
     # save make in config_run
     config_run.make = args.make
     # set the log file for process
-    config_run.process_logfile = open(os.path.join(config_run.abs_path_dir, 'process.log'), 'a')
+    config_run.process_logfile = open(os.path.join(config_run.working_directory, 'process.log'), 'a')
     # init log of process
     msg = '\n\n########### START LOG FOR PROCESS: ' + args.process + ' - (' + datetime_format(
         datetime.today()) + ') ###########'

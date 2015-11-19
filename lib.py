@@ -83,7 +83,7 @@ def email_download_complete(config_run, files_attached=[]):
                                  config_run.month_to_process,
                                  config_run.months_made,
                                  config_run.months_to_run,
-                                 config_run.path_to_run)
+                                 config_run.working_directory)
 
     mail_body += '\nLa descarga se ha completado!.\n'
 
@@ -331,11 +331,6 @@ def dir_date_name(start, end):
     start and end must be instances of DateATD class
     """
 
-    def parse_date(self):
-        self.year = int(self.current_working_dir.split('_')[0])
-        self.start_month = self.current_working_dir.split('_')[1].split('-')[0]
-        self.end_month = self.current_working_dir.split('_')[1].split('-')[1]
-
     if start.date.year == end.date.year:
         year = start.date.year
     else:
@@ -353,31 +348,31 @@ def dir_date_name(start, end):
     return "{0}_({1}-{2})".format(year, month1, month2)
 
 
-def update_folder_name(config_run):
+def update_working_directory(config_run):
+    """Move/rename working directory with the last date of download made,
+    only for download mode.
     """
-    Move/rename working directory with the last date of download made
-    """
-    if config_run.current_working_dir == dir_date_name(config_run.start_date, config_run.target_date):
+    if config_run.working_directory == dir_date_name(config_run.start_date, config_run.target_date):
         return
 
-    if config_run.make == 'download':
-        # close log file
+    # close files
+    if config_run.dnld_logfile is not None:
         config_run.dnld_logfile.close()
+    config_run.config_file.close()
 
     # rename directory
-    os.rename(config_run.path_current_working_dir,
-              os.path.join(config_run.path_to_run, dir_date_name(config_run.start_date, config_run.target_date)))
+    os.rename(config_run.working_directory,
+              os.path.join(os.path.dirname(config_run.working_directory),
+                           dir_date_name(config_run.start_date, config_run.target_date)))
     # update config variables
-    config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-    config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                          config_run.current_working_dir))
+    config_run.working_directory = dir_date_name(config_run.start_date, config_run.target_date)
 
-    if config_run.make == 'download':
-        # re-set download paths
-        config_run.path_source_dir = os.path.join(config_run.path_current_working_dir, config_run.current_source)
-        config_run.download_path = os.path.join(config_run.path_source_dir, 'p0_download')
-        # re-open log file
-        config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
+    # re-set config path
+    config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
+    # re-set download paths
+    config_run.download_path = os.path.join(config_run.working_directory, config_run.source, 'p0_download')
+    # re-open log file
+    config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 
     config_run.save()
 

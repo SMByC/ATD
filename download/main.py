@@ -7,29 +7,25 @@
 import os
 from datetime import date, datetime
 
-from ATD.lib import email_download_complete, update_folder_name, datetime_format
+from ATD.lib import email_download_complete, update_working_directory, datetime_format
 from ATD.download.files_download_scripts import modis
 
 
 def run(config_run):
     ######################################## pre download ########################################
 
-    # prepare source directory
-    config_run.path_source_dir = os.path.join(config_run.path_current_working_dir, config_run.current_source)
-    if not os.path.isdir(config_run.path_current_working_dir):
-        os.makedirs(config_run.path_current_working_dir)
-
     # prepare directory to download
-    config_run.download_path = os.path.join(config_run.path_source_dir, 'p0_download')
+    print config_run.working_directory
+    config_run.download_path = os.path.join(config_run.working_directory, config_run.source, 'p0_download')
     if not os.path.isdir(config_run.download_path):
         os.makedirs(config_run.download_path)
 
     # set the log file for download
-    config_run.dnld_logfile = open(os.path.join(config_run.path_source_dir, 'p0_download', 'download.log'), 'a')
+    config_run.dnld_logfile = open(os.path.join(config_run.download_path, 'download.log'), 'a')
 
     # init log of download
     msg = '\n\n########### START LOG FOR: '+config_run.current_source.upper()+', target:' + config_run.target_date.date.strftime(
-        '%Y-%m-%d') + ' in dir:' + config_run.current_working_dir + ' - (' + datetime_format(
+        '%Y-%m-%d') + ' in dir:' + os.path.basename(config_run.working_directory) + ' - (' + datetime_format(
         datetime.today()) + ') ###########'
     config_run.dnld_logfile.write(msg + '\n')
     print msg
@@ -51,7 +47,7 @@ def run(config_run):
         # print message of start download
         msg = '\n#### Download target {0} (in dir: {1}) - ({2})'.format(
             config_run.target_date.date.strftime('%Y-%m-%d'),
-            config_run.current_working_dir, datetime_format(datetime.today()))
+            os.path.basename(config_run.working_directory), datetime_format(datetime.today()))
         config_run.dnld_logfile.write(msg + '\n')
         print msg
 
@@ -85,7 +81,7 @@ def run(config_run):
         # update the target date
         config_run.target_date.next()
         # rename folder
-        update_folder_name(config_run)
+        update_working_directory(config_run)
         # update/save config file
         config_run.save()
 
@@ -129,7 +125,7 @@ def run(config_run):
 
         # move settings into directory  TODO settings
         #os.rename(config_run.config_file,
-        #          os.path.join(config_run.path_source_dir, os.path.basename(config_run.config_file)))
+        #          os.path.join(config_run.working_directory, config_run.source, os.path.basename(config_run.config_file)))
 
     # close log file
     config_run.dnld_logfile.close()

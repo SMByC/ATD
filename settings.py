@@ -11,7 +11,7 @@ import ConfigParser
 from dateutil.parser import parse
 
 
-from ATD.lib import DateATD, dir_date_name, email_download_complete, update_folder_name
+from ATD.lib import DateATD, dir_date_name, email_download_complete, update_working_directory
 
 
 ###############################################################################
@@ -20,25 +20,24 @@ from ATD.lib import DateATD, dir_date_name, email_download_complete, update_fold
 class ConfigRun():
     list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 
-    def __init__(self, path_to_run):
+    def __init__(self, working_directory):
         ## [General]
         self.source = None
-        self.current_working_dir = None
         self.start_date = None
         self.target_date = None
         self.end_date = None
         ## [Download]
         self.download_type = None
+        self.dnld_logfile = None
         self.dnld_errors = None
         self.dnld_finished = False
         ## [Process]
 
         ## variables that not save into settings
-        self.path_to_run = path_to_run
-        self.config_file = os.path.abspath(os.path.join(path_to_run, 'settings.cfg'))
-        self.abs_path_dir = None  # (path_to_run + current_working_dir)
+        self.working_directory = os.path.abspath(working_directory)
+        self.config_file = os.path.join(self.working_directory, 'settings.cfg')
         self.email = None
-        self.download_path = None  # complete path to download (abs_path_dir + 'p0_download')
+        self.download_path = None  # complete path to download (working_directory + 'p0_download')
 
         ## init process list
         for p in ConfigRun.list_of_process:
@@ -49,13 +48,13 @@ class ConfigRun():
                          'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                          'p7_layerstack': self.p7_layerstack}
 
-    def create(self, source=None, current_working_dir=None, start_date=None, target_date=None,
+    def create(self, source=None, rundir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
         #### values by default
         _months_to_run = 6  # meses a correr (periodo)
 
         self.source = source
-        self.current_working_dir = current_working_dir
+        self.rundir = rundir
 
         if start_date is not None:
             self.start_date = parse(start_date).date()
@@ -86,7 +85,6 @@ class ConfigRun():
         config.read(self.config_file)
         ## [General]
         self.source = config.get('General', 'source')
-        self.current_working_dir = config.get('General', 'current_working_dir')
         self.start_date = config.get('General', 'start_date')
         self.target_date = config.get('General', 'target_date')
         self.end_date = config.get('General', 'end_date')
@@ -108,7 +106,6 @@ class ConfigRun():
         config.add_section('General')
         config.set('General', 'source',
                    ','.join(self.source) if self.source not in [None, 'None'] else 'None')
-        config.set('General', 'current_working_dir', self.current_working_dir)
         config.set('General', 'start_date', self.start_date)
         config.set('General', 'target_date', self.target_date)
         config.set('General', 'end_date', self.end_date)
@@ -134,7 +131,7 @@ def get(args):
 
     if args.make == 'download':
 
-        config_run = ConfigRun(args.path)
+        config_run = ConfigRun(args.working_directory)
         config_run.load()
 
         #########################
@@ -185,29 +182,23 @@ def get(args):
                 print msg
                 config_run.target_date = deepcopy(config_run.start_date)
 
-        ## current working dir
-        if config_run.current_working_dir in [None, 'None']:
-            config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-        elif config_run.current_working_dir != dir_date_name(config_run.start_date, config_run.target_date):
+        ## fix name the working directory
+        if config_run.working_directory == os.getcwd():
+            config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
+            msg = '\nWarning: The working directory is empty, not set in arguments, \n' \
+                  'start new empty working directory base on dates of run:\n\t' + \
+                  config_run.working_directory
+            print msg
+        elif os.path.basename(config_run.working_directory) != dir_date_name(config_run.start_date, config_run.target_date):
+            config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
             msg = '\nWarning: The current working directory not match with the start \n' \
-                  'and target date parameters, creating new work directory: ' + config_run.current_working_dir
+                  'and target date parameters, setting the new working directory to:\n\t' + \
+                  config_run.working_directory
             print msg
-            config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
 
-        ## current working dir update
-        config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                               config_run.current_working_dir))
-        if not os.path.isdir(config_run.path_current_working_dir):
-            msg = '\nWarning: The current working directory {0} not exists, \n' \
-                  'start again the download in new work directory {1}: '.format(config_run.current_working_dir,
-                                                                                dir_date_name(config_run.start_date,
-                                                                                              config_run.start_date))
-            print msg
-            config_run.target_date = deepcopy(config_run.start_date)
-            config_run.current_working_dir = dir_date_name(config_run.start_date, config_run.target_date)
-            config_run.path_current_working_dir = os.path.abspath(os.path.join(config_run.path_to_run,
-                                                                  config_run.current_working_dir))
-            os.makedirs(config_run.path_current_working_dir)
+        ## create working dir
+        if not os.path.isdir(config_run.working_directory):
+            os.makedirs(config_run.working_directory)
 
         ## end date update
         if config_run.end_date not in [None, 'None'] and (config_run.end_date.date < config_run.target_date.date):
@@ -253,7 +244,7 @@ def get(args):
             if config_run.email is not None:
                 email_download_complete(config_run)
             # rename folder
-            update_folder_name(config_run)
+            update_working_directory(config_run)
 
             ## move settings into directory  TODO settings
             #os.rename(config_run.config_file,
@@ -267,15 +258,8 @@ def get(args):
             # config_run.target_date.next()
 
     if args.make == 'process':
-        config_run = ConfigRun(args.folder)
+        config_run = ConfigRun(args.working_directory)
         config_run.load()
-
-        config_run.abs_path_dir = os.path.abspath(config_run.path_to_run)
-
-    # print config_run.current_working_dir
-    # print config_run.start_date
-    # print vars(config_run)
-    # print config_run.end_date
 
     return config_run
 

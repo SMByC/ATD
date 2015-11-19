@@ -18,9 +18,8 @@ def run(config_run):
         config_run.process_logfile.write(msg + '\n')
         print msg
 
-    dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
-
-    source_path = os.path.join(config_run.abs_path_dir, 'p3_nodata')
+    source_path = os.path.join(config_run.working_directory, 'p3_nodata')
+    dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \

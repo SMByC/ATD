@@ -29,10 +29,9 @@ def run(config_run, name_process):
         config_run.process_logfile.write(msg + '\n')
         print msg
 
-    dir_process = os.path.join(config_run.abs_path_dir, config_run.process_name)
-
     before_name_process = ConfigRun.list_of_process[ConfigRun.list_of_process.index(name_process) - 1]
-    source_path = os.path.join(config_run.abs_path_dir, before_name_process)
+    source_path = os.path.join(config_run.working_directory, before_name_process)
+    dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
