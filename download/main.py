@@ -114,7 +114,7 @@ def run(config_run):
     ## check the current and end date are equal, finished criteria
     if config_run.end_date not in [None, 'None'] and (config_run.target_date.date >= config_run.end_date.date):
         msg = '\nThe target date {0} is equal or bigger than\n' \
-              'the end date {1} in settings.cfg file.\n\n' \
+              'the end date {1} in download_settings.cfg file.\n\n' \
               'Download completed!'.format(config_run.target_date.date.strftime('%Y-%m-%d'),
                                              config_run.end_date.date.strftime('%Y-%m-%d'))
         config_run.dnld_logfile.write(msg + '\n')

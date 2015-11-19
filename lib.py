@@ -367,7 +367,7 @@ def update_working_directory(config_run):
     config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
 
     # re-set config path
-    config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
+    config_run.set_config_file()
     # re-set download paths
     config_run.download_path = os.path.join(config_run.working_directory, config_run.current_source, 'p0_download')
     # re-open log file

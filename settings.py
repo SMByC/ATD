@@ -17,10 +17,18 @@ from ATD.lib import DateATD, dir_date_name, email_download_complete, update_work
 ###############################################################################
 
 
-class ConfigRun():
-    list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+class ConfigRun:
+    def __init__(self, working_directory, make):
+        self.working_directory = os.path.abspath(working_directory)
+        self.make = make
 
-    def __init__(self, working_directory):
+        if self.make == "download":
+            self.__init_download__()
+
+        if self.make == "process":
+            self.__init_process__()
+
+    def __init_download__(self):
         ## [General]
         self.source = None
         self.start_date = None
@@ -31,16 +39,20 @@ class ConfigRun():
         self.dnld_logfile = None
         self.dnld_errors = None
         self.dnld_finished = False
-        ## [Process]
 
         ## variables that not save into settings
-        self.working_directory = os.path.abspath(working_directory)
-        self.config_file = os.path.join(self.working_directory, 'settings.cfg')
+        self.set_config_file()
         self.email = None
         self.download_path = None  # complete path to download (working_directory + 'p0_download')
 
-        ## init process list
-        for p in ConfigRun.list_of_process:
+    def __init_process__(self):
+        ## [General]
+        self.source = None
+        self.start_date = None
+        self.end_date = None
+        ## [Process]
+        self.list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+        for p in self.list_of_process:
             exec ('self.' + p + ' = None')
         # create the dictionary access process
         self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
@@ -48,10 +60,20 @@ class ConfigRun():
                          'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                          'p7_layerstack': self.p7_layerstack}
 
+        ## variables that not save into settings
+        self.set_config_file()
+        self.email = None
+
+    def set_config_file(self):
+        if self.make == "download":
+            self.config_file = os.path.join(self.working_directory, 'download_settings.cfg')
+        if self.make == "process":
+            self.config_file = os.path.join(self.working_directory, 'process_settings.cfg')
+
+    # TODO delete
     def create(self, source=None, rundir=None, start_date=None, target_date=None,
                end_date=None, download_type='steps', dnld_errors=None, dnld_finished=False):
         #### values by default
-        _months_to_run = 6  # meses a correr (periodo)
 
         self.source = source
         self.rundir = rundir
@@ -80,43 +102,60 @@ class ConfigRun():
     def load(self):
         config = ConfigParser.RawConfigParser()
         if not os.path.isfile(self.config_file):
-            self.create()
+            #self.create()  TODO
             return
         config.read(self.config_file)
-        ## [General]
-        self.source = config.get('General', 'source')
-        self.start_date = config.get('General', 'start_date')
-        self.target_date = config.get('General', 'target_date')
-        self.end_date = config.get('General', 'end_date')
-        ## [Download]
-        self.download_type = config.get('Download', 'download_type')
-        self.dnld_errors = config.get('Download', 'dnld_errors')
-        self.dnld_finished = config.get('Download', 'dnld_finished')
-        ## [Process]
-        for p in ConfigRun.list_of_process:
-            exec ("self." + p + " = config.get('Process', '" + p + "')")
-        # create the dictionary access process
-        self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
-                         'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
-                         'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
-                         'p7_layerstack': self.p7_layerstack}
+
+        if self.make == "download":
+            ## [General]
+            self.source = config.get('General', 'source')
+            self.start_date = config.get('General', 'start_date')
+            self.target_date = config.get('General', 'target_date')
+            self.end_date = config.get('General', 'end_date')
+            ## [Download]
+            self.download_type = config.get('Download', 'download_type')
+            self.dnld_errors = config.get('Download', 'dnld_errors')
+            self.dnld_finished = config.get('Download', 'dnld_finished')
+
+        if self.make == "process":
+            ## [General]
+            self.source = config.get('General', 'source')
+            self.start_date = config.get('General', 'start_date')
+            self.end_date = config.get('General', 'end_date')
+            ## [Process]
+            for p in self.list_of_process:
+                exec ("self." + p + " = config.get('Process', '" + p + "')")
+            # create the dictionary access process
+            self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
+                             'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
+                             'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
+                             'p7_layerstack': self.p7_layerstack}
 
     def save(self):
         config = ConfigParser.RawConfigParser()
-        config.add_section('General')
-        config.set('General', 'source',
-                   ','.join(self.source) if self.source not in [None, 'None'] else 'None')
-        config.set('General', 'start_date', self.start_date)
-        config.set('General', 'target_date', self.target_date)
-        config.set('General', 'end_date', self.end_date)
-        config.add_section('Download')
-        config.set('Download', 'download_type', self.download_type)
-        config.set('Download', 'dnld_errors',
-                   ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
-        config.set('Download', 'dnld_finished', self.dnld_finished)
-        config.add_section('Process')
-        for p in ConfigRun.list_of_process:
-            exec ("config.set('Process', '" + p + "', self." + p + ")")
+
+        if self.make == "download":
+            config.add_section('General')
+            config.set('General', 'source',
+                       ','.join(self.source) if self.source not in [None, 'None'] else 'None')
+            config.set('General', 'start_date', self.start_date)
+            config.set('General', 'target_date', self.target_date)
+            config.set('General', 'end_date', self.end_date)
+            config.add_section('Download')
+            config.set('Download', 'download_type', self.download_type)
+            config.set('Download', 'dnld_errors',
+                       ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
+            config.set('Download', 'dnld_finished', self.dnld_finished)
+
+        if self.make == "process":
+            config.add_section('General')
+            config.set('General', 'source',
+                       ','.join(self.source) if self.source not in [None, 'None'] else 'None')
+            config.set('General', 'start_date', self.start_date)
+            config.set('General', 'end_date', self.end_date)
+            config.add_section('Process')
+            for p in self.list_of_process:
+                exec ("config.set('Process', '" + p + "', self." + p + ")")
 
         # Writing our configuration file to 'example.cfg'
         with open(self.config_file, 'wb') as configfile:
@@ -131,7 +170,7 @@ def get(args):
 
     if args.make == 'download':
 
-        config_run = ConfigRun(args.working_directory)
+        config_run = ConfigRun(args.working_directory, args.make)
         if os.path.isfile(config_run.config_file):
             config_run.load()
 
@@ -141,10 +180,10 @@ def get(args):
         ## source
         if args.source not in [None, 'None']:
             if config_run.source is not None and sorted(args.source.split(',')) != sorted(config_run.source.split(',')):
-                print "\nError: the source in settings.cfg and in arguments are different, if you\n" \
+                print "\nError: the source in download_settings.cfg and in arguments are different, if you\n" \
                       "want run other source, finished/delete the other source before run this.\n" \
                       "\tin argumets:     " + args.source +\
-                      "\n\tin settings.cfg: " + config_run.source
+                      "\n\tin file settings: " + config_run.source
 
                 exit()
             args.source = args.source.split(',')
@@ -202,7 +241,7 @@ def get(args):
                   config_run.working_directory
             print msg
         # re-set the config file
-        config_run.config_file = os.path.join(config_run.working_directory, 'settings.cfg')
+        config_run.set_config_file()
 
         ## create working dir
         if not os.path.isdir(config_run.working_directory):
@@ -233,11 +272,11 @@ def get(args):
         #########################
         ## checks
         if config_run.end_date in [None, 'None'] and config_run.download_type == 'full':
-            print "\nError: you need specify the 'end_date' in settings.cfg or '--to' in arguments\n" \
+            print "\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
                   "when the download type is 'full'."
             exit()
         if config_run.email not in [None, 'None'] and config_run.end_date in [None, 'None']:
-            print "\nError: you need specify the 'end_date' in settings.cfg or '--to' in arguments\n" \
+            print "\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
                   "when you want send email when finnish."
             exit()
 
@@ -250,7 +289,7 @@ def get(args):
                 exit()
 
     if args.make == 'process':
-        config_run = ConfigRun(args.working_directory)
+        config_run = ConfigRun(args.working_directory, args.make)
         config_run.load()
 
     return config_run

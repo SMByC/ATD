@@ -20,7 +20,6 @@ except ImportError:
     from gdalconst import *
 
 from ATD.lib import datetime_format
-from ATD.settings import ConfigRun
 
 
 def run(config_run, name_process):
@@ -29,7 +28,7 @@ def run(config_run, name_process):
         config_run.process_logfile.write(msg + '\n')
         print msg
 
-    before_name_process = ConfigRun.list_of_process[ConfigRun.list_of_process.index(name_process) - 1]
+    before_name_process = config_run.list_of_process[config_run.list_of_process.index(name_process) - 1]
     source_path = os.path.join(config_run.working_directory, before_name_process)
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
