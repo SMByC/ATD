@@ -251,12 +251,9 @@ def get(args):
             # send mail
             if config_run.email is not None:
                 email_download_complete(config_run)
+
             # rename folder
             update_working_directory(config_run)
-
-            ## move settings into directory  TODO settings
-            #os.rename(config_run.config_file,
-            #          os.path.join(config_run.abs_path_dir, os.path.basename(config_run.config_file)))
 
             # start new instance (restart) and continue
             del config_run

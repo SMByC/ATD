@@ -127,9 +127,5 @@ def run(config_run):
         config_run.dnld_finished = True
         config_run.save()
 
-        # move settings into directory  TODO settings
-        #os.rename(config_run.config_file,
-        #          os.path.join(config_run.working_directory, config_run.source, os.path.basename(config_run.config_file)))
-
     # close log file
     config_run.dnld_logfile.close()
