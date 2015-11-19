@@ -358,7 +358,6 @@ def update_working_directory(config_run):
     # close files
     if config_run.dnld_logfile is not None:
         config_run.dnld_logfile.close()
-    config_run.config_file.close()
 
     # rename directory
     os.rename(config_run.working_directory,
