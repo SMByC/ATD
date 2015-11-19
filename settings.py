@@ -140,7 +140,7 @@ def get(args):
 
         ## source
         if args.source not in [None, 'None']:
-            if sorted(args.source.split(',')) != sorted(config_run.source.split(',')):
+            if config_run.source is not None and sorted(args.source.split(',')) != sorted(config_run.source.split(',')):
                 print "\nError: the source in settings.cfg and in arguments are different, if you\n" \
                       "want run other source, finished/delete the other source before run this.\n" \
                       "\tin argumets:     " + args.source +\
