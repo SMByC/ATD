@@ -140,21 +140,26 @@ def get(args):
 
         ## source
         if args.source not in [None, 'None']:
+            if sorted(args.source.split(',')) != sorted(config_run.source.split(',')):
+                print "\nError: the source in settings.cfg and in arguments are different, if you\n" \
+                      "want run other source, finished/delete the other source before run this.\n" \
+                      "\tin argumets:     " + args.source +\
+                      "\n\tin settings.cfg: " + config_run.source
+
+                exit()
             args.source = args.source.split(',')
+        else:
+            args.source = ['terra','aqua']
 
         if config_run.source in [None, 'None']:
             config_run.source = args.source
+        else:
+            config_run.source = config_run.source.split(',')
 
-        if args.source not in [['terra'], ['aqua'], ['terra','aqua'], ['aqua','terra']]:
+        if config_run.source not in [['terra'], ['aqua'], ['terra','aqua'], ['aqua','terra']]:
             print "\nError: the source in argument is not recognized, this should be\n" \
                   "'terra', 'aqua' or 'terra,aqua'."
             exit()
-
-        if args.source not in [None, 'None']:
-            if args.source != config_run.source:
-                print "\nError: the source in settings.cfg and in arguments are different\n" \
-                  "if you want run other source, finished/delete the other source before run this."
-                exit()
 
         ## start date
         if args.from_date is not None:

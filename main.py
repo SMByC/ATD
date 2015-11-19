@@ -48,7 +48,7 @@ subparsers = parser.add_subparsers(dest='make', help='operation to be performed'
 
 # DOWNLOAD
 group_download = subparsers.add_parser('download', help='download modis files')
-group_download.add_argument('--source', type=str, dest='source', default='terra,aqua',
+group_download.add_argument('--source', type=str, dest='source', default=None,
                             help='satellite source of MODIS, terra or aqua')
 group_download.add_argument('--from', type=str, dest='from_date',
                             help='date from download modis files, format: y-m-d')  # else None
