@@ -280,8 +280,6 @@ def get(args):
         config_run.start_date = download_config_run.start_date
         config_run.end_date = download_config_run.end_date
 
-
-
     return config_run
 
 

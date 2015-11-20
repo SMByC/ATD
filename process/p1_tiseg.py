@@ -13,8 +13,8 @@ from ATD.lib import datetime_format
 
 def run(config_run):
     if config_run.p1_tiseg not in [None, 'None']:
-        msg = '\nWarning: The process {0} was executed before'.format(config_run.process_name)
-        config_run.process_logfile.write(msg + '\n')
+        msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
+        config_run.process_logfile.write(msg)
         print msg
 
     source_path = os.path.join(config_run.working_directory, 'p0_download')
@@ -22,8 +22,8 @@ def run(config_run):
 
     if not os.path.isdir(source_path):
         msg = '\nError: The directory of previous process: {0}\n' \
-              'not exist, please run the previous process before it.'.format(source_path)
-        config_run.process_logfile.write(msg + '\n')
+              'not exist, please run the previous process before it.\n'.format(source_path)
+        config_run.process_logfile.write(msg)
         print msg
         # save in setting
         config_run.p1_tiseg = 'with errors! - ' + datetime_format(datetime.today())

@@ -35,7 +35,7 @@ def run(config_run):
             msg = '\n\n########### START LOG FOR: '+config_run.current_source.upper() + \
                   ' - (' + datetime_format(datetime.today()) + ') ###########' + \
                   '\n#### target: ' + config_run.target_date.date.strftime('%Y-%m-%d') + \
-                  '\n#### in dir: ' + os.path.basename(config_run.working_directory)
+                  '\n#### in dir: ' + os.path.basename(config_run.working_directory) + '\n'
             config_run.dnld_logfile.write(msg + '\n')
             print msg
 
