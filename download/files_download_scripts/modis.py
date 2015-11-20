@@ -1,14 +1,15 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2014-2015, SMBYC - IDEAM
-# Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
+#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  Authors: Xavier Corredor Llano
+#  Email: xcorredorl at ideam.gov.co
 
 import os
 from datetime import datetime
 
 from ATD.download.dnld_manager import DownloadManager
-from ATD.lib import fix_zeros_in_datetime, dirs_and_files_in_url, get_all_start_n_days_of_month
+from ATD.lib import fix_zeros_in_datetime, dirs_and_files_in_url
 
 scenes = [
     'h10v07',

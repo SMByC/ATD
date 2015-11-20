@@ -1,8 +1,9 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2014-2015, SMBYC - IDEAM
-# Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
+#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  Authors: Xavier Corredor Llano
+#  Email: xcorredorl at ideam.gov.co
 
 import os
 import sys

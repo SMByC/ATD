@@ -1,17 +1,16 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2014-2015, SMBYC - IDEAM
-# Author: Xavier Corredor Llano <xcorredorl@ideam.gov.co>
+#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  Authors: Xavier Corredor Llano
+#  Email: xcorredorl at ideam.gov.co
 
 import os
 from copy import deepcopy
 from datetime import date
 import ConfigParser
-from dateutil.parser import parse
 
-
-from ATD.lib import DateATD, dir_date_name, email_download_complete, update_working_directory
+from ATD.lib import DateATD, dir_date_name
 
 
 ###############################################################################
