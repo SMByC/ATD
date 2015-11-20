@@ -263,6 +263,25 @@ def get(args):
         config_run = ConfigRun(args.working_directory, args.make)
         config_run.load()
 
+        #########################
+        ## load and set config_run variables
+
+        # load the download_settings.cfg for get the start_date and end_date
+        download_config_run = ConfigRun(os.path.dirname(os.path.dirname(args.working_directory)), 'download')
+        download_config_run.load()
+
+        if config_run.source is None and download_config_run.source is not None:
+            source = [os.path.basename(config_run.working_directory)]
+            if source[0] in download_config_run.source.split(','):
+                config_run.source = source
+        elif config_run.source is not None:
+            config_run.source = [config_run.source]
+
+        config_run.start_date = download_config_run.start_date
+        config_run.end_date = download_config_run.end_date
+
+
+
     return config_run
 
 
