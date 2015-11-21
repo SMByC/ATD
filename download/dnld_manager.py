@@ -200,6 +200,8 @@ class DownloadManager:
                         self.dnld_logfile.write('error downloading, attempt ' + str(
                             attempt) + ', ' + check_msg + ', try again: ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ')\n')
+                        self.dnld_logfile.flush()
+                        os.remove(file.path)
                         sleep(self.WAIT_TIME_ATTEMPT)
                 else:
                     # if wget_status != 0 is due a some error
@@ -207,6 +209,7 @@ class DownloadManager:
                         'error downloading, attempt ' + str(attempt) + ', ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ')\n')
                     self.dnld_logfile.flush()
+                    os.remove(file.path)
                     sleep(self.WAIT_TIME_ATTEMPT)
 
             if not file_download_ok:
