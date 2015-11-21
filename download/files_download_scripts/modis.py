@@ -22,6 +22,7 @@ scenes = [
 
 
 def download(config_run, name):
+    global scenes
     # save any error occur
     errors = []
 
