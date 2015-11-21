@@ -171,9 +171,28 @@ class DownloadManager:
     def worker(self):
         while True:
             file, Q = self.Q.get()
-
             file_download_ok = False
 
+            # Check if file exists and check it and not download if is corrected
+            if os.path.isfile(file.path):
+                # check cksum
+                check_status, check_msg = file.check(self)
+                if check_status in [0]:
+                    self.dnld_logfile.write('file exits and it is correct: ' + file.url + ' (' + datetime_format(
+                        datetime.today()) + ') - ' + check_msg + '\n')
+                    print 'file exits and it is correct: ' + os.path.basename(file.url)
+                    self.dnld_logfile.flush()
+                    file_download_ok = True
+                    Q.put(('OK (' + check_msg + ')', file))
+                    return
+                if check_status in [2, 3]:
+                    self.dnld_logfile.write('file exits but this is corrupt: ' + file.url + ' (' + datetime_format(
+                        datetime.today()) + ') - ' + check_msg + '\n')
+                    print 'file exits but this is corrupt: ' + os.path.basename(file.url)
+                    self.dnld_logfile.flush()
+                    os.remove(file.path)
+
+            # download the file with some num of attempt if has error
             for attempt in range(self.NUM_ATTEMPT):
                 self.dnld_logfile.write(
                     'download started:  ' + file.url + ' (' + datetime_format(datetime.today()) + ')\n')
@@ -191,11 +210,11 @@ class DownloadManager:
                     if check_status in [0, 1]:
                         self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ') - ' + check_msg + '\n')
-                        print 'download finished:  ' + os.path.basename(file.url)
+                        print 'download finished: ' + os.path.basename(file.url)
                         self.dnld_logfile.flush()
                         file_download_ok = True
                         Q.put(('OK (' + check_msg + ')', file))
-                        break
+                        return
                     else:
                         self.dnld_logfile.write('error downloading, attempt ' + str(
                             attempt) + ', ' + check_msg + ', try again: ' + file.url + ' (' + datetime_format(
