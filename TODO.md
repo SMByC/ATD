@@ -3,10 +3,15 @@
 
 * Crear un ejecutable para correr todo_ el proceso segundo plano (nohub)
 * Facilitar la corrida
-* Crear script para traer el ultimo codigo en bitbucket (actualizacion)
 * Eliminar Tiseq e integrar el proceso QC4SD
 
 ## DONE
+
+### Jan 2016
+
+* Crear script para traer el ultimo codigo en bitbucket (actualizacion) - DONE
+
+### Nov 2015
 
 * Facilitar la descarga de aqua a traves de un nuevo argumento - DONE
 * La descarga de aqua y terra queden en carpetas distintas terra/p0... aqua/p0.... - DONE
