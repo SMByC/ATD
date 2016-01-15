@@ -18,3 +18,8 @@ fi
 hg pull
 hg update -C
 hg status -un|xargs rm 2> /dev/null
+
+# print status
+echo -e "\nThe last commit:\n"
+hg tip
+echo -e "Update finished\n"
