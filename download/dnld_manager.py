@@ -49,6 +49,7 @@ class File:
             1, 'not check files'
             2, 'impossible checked'
             3, 'error, the cksum is different'
+            4, 'xml file is corrupt, not check the file but continue'
         '''
 
         if not DnldMan.check_files:
@@ -70,6 +71,9 @@ class File:
                         return 0, 'cksum checked'
                     else:
                         return 3, 'error, the cksum is different'
+            # If not return 0 or 3, maybe is because the xml file is corrupt
+            os.remove(self.path + '.xml')
+            return 4, 'xml file is corrupt, not check the file but continue'
         else:
             return 2, 'impossible checked'
 
@@ -191,6 +195,14 @@ class DownloadManager:
                     print 'file exits but this is corrupt: ' + os.path.basename(file.url)
                     self.dnld_logfile.flush()
                     os.remove(file.path)
+                if check_status in [4]:
+                    self.dnld_logfile.write('xml file is corrupt, not check the file but continue: ' + file.url + ' (' + datetime_format(
+                        datetime.today()) + ') - ' + check_msg + '\n')
+                    print 'xml file is corrupt, not check but continue: ' + os.path.basename(file.url)
+                    self.dnld_logfile.flush()
+                    file_download_ok = True
+                    Q.put(('NO CHECKED (' + check_msg + ')', file))
+                    return
 
             # download the file with some num of attempt if has error
             for attempt in range(self.NUM_ATTEMPT):
@@ -214,6 +226,14 @@ class DownloadManager:
                         self.dnld_logfile.flush()
                         file_download_ok = True
                         Q.put(('OK (' + check_msg + ')', file))
+                        return
+                    elif check_status in [4]:
+                        self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(
+                            datetime.today()) + ') - ' + check_msg + '\n')
+                        print 'download finished: ' + os.path.basename(file.url)
+                        self.dnld_logfile.flush()
+                        file_download_ok = True
+                        Q.put(('NO CHECKED (' + check_msg + ')', file))
                         return
                     else:
                         self.dnld_logfile.write('error downloading, attempt ' + str(

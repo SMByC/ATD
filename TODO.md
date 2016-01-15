@@ -10,6 +10,7 @@
 ### Jan 2016
 
 * Crear script para traer el ultimo codigo en bitbucket (actualizacion) - DONE
+* Permitir xml corruptos, no se verifica el archivo pero continua
 
 ### Nov 2015
 
