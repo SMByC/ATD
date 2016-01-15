@@ -9,7 +9,7 @@ cd $ATD_DIR
 # check if the project ATD exist with VCS
 if [ ! -d ${ATD_DIR}/.hg ]; then
     cd ..
-    rm -rf atd
+    rm -rf ATD
     hg clone ssh://hg@bitbucket.org/SMBYC/atd ATD
     cd $ATD_DIR
 fi
