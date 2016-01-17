@@ -6,6 +6,8 @@
 #  Email: xcorredorl at ideam.gov.co
 
 import os
+import urllib
+
 import gdal
 from datetime import date, datetime
 from dateutil.parser import parse
@@ -389,3 +391,9 @@ def get_pixel_size(raster_file):
     geo_transform = gdal_file.GetGeoTransform()
     return abs(float(geo_transform[1]))
 
+
+###############################################################################
+
+def get_http_code(url):
+    conn = urllib.urlopen(url)
+    return conn.getcode()

@@ -16,7 +16,7 @@ from datetime import datetime
 from time import sleep
 from dateutil.relativedelta import relativedelta
 
-from ATD.lib import datetime_format, cksum
+from ATD.lib import datetime_format, cksum, get_http_code
 
 
 class File:
@@ -242,6 +242,14 @@ class DownloadManager:
                         self.dnld_logfile.flush()
                         os.remove(file.path)
                         sleep(self.WAIT_TIME_ATTEMPT)
+                elif get_http_code(file.url) == 508:
+                    self.dnld_logfile.write('the file is corrupt, file not downloaded (download continue): ' + file.url + ' (' + datetime_format(
+                            datetime.today()) + ') - ' + '\n')
+                    print 'file is corrupt: ' + os.path.basename(file.url)
+                    self.dnld_logfile.flush()
+                    file_download_ok = True
+                    Q.put(('CORRUPT (NOT DOWNLOADED)', file))
+                    return
                 else:
                     # if wget_status != 0 is due a some error
                     self.dnld_logfile.write(
@@ -270,20 +278,10 @@ class DownloadManager:
             self.dnld_logfile.flush()
         self.dnld_logfile.write('\n')
 
-        import urllib2
-
-        def file_exists(url):
-            request = urllib2.Request(url)
-            request.get_method = lambda: 'HEAD'
-            try:
-                response = urllib2.urlopen(request)
-                return True
-            except:
-                return False
-
         for attempt in range(self.NUM_ATTEMPT_DAEMON):
             url_file_to_test = urls_files[randint(0, len(urls_files) - 1)]  # take a random file
-            if file_exists(url_file_to_test):
+            # check if file exists or exists but is corrupt (200 and 508 respectively)
+            if get_http_code(url_file_to_test) in [200, 508]:
                 self.dnld_logfile.write('ready to download ' + datetime_format(datetime.today()) + '\n')
                 self.dnld_logfile.flush()
                 return True
