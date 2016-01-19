@@ -28,12 +28,12 @@ class ConfigRun:
             self.__init_process__()
 
     def __init_download__(self):
-        ## [General]
+        ## [MAIN]
         self.source = None
         self.start_date = None
         self.target_date = None
         self.end_date = None
-        ## [Download]
+        ## [DOWNLOAD]
         self.download_type = None
         self.dnld_logfile = None
         self.dnld_errors = None
@@ -45,16 +45,16 @@ class ConfigRun:
         self.download_path = None  # complete path to download (working_directory + 'p0_download')
 
     def __init_process__(self):
-        ## [General]
+        ## [MAIN]
         self.source = None
         self.start_date = None
         self.end_date = None
-        ## [Process]
-        self.list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+        ## [PROCESS]
+        self.list_of_process = ['p1_qc4sd', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
         for p in self.list_of_process:
             exec ('self.' + p + ' = None')
         # create the dictionary access process
-        self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
+        self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_mrt': self.p2_mrt,
                          'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
                          'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                          'p7_layerstack': self.p7_layerstack}
@@ -77,58 +77,55 @@ class ConfigRun:
         config.read(self.config_file)
 
         if self.make == "download":
-            ## [General]
-            self.source = config.get('General', 'source')
-            self.start_date = config.get('General', 'start_date')
-            self.target_date = config.get('General', 'target_date')
-            self.end_date = config.get('General', 'end_date')
-            ## [Download]
-            self.download_type = config.get('Download', 'download_type')
-            self.dnld_errors = config.get('Download', 'dnld_errors')
-            self.dnld_finished = config.get('Download', 'dnld_finished')
+            ## [MAIN]
+            self.source = config.get('MAIN', 'source')
+            self.start_date = config.get('MAIN', 'start_date')
+            self.target_date = config.get('MAIN', 'target_date')
+            self.end_date = config.get('MAIN', 'end_date')
+            ## [DOWNLOAD]
+            self.download_type = config.get('DOWNLOAD', 'download_type')
+            self.dnld_errors = config.get('DOWNLOAD', 'dnld_errors')
+            self.dnld_finished = config.get('DOWNLOAD', 'dnld_finished')
 
         if self.make == "process":
-            ## [General]
-            self.source = config.get('General', 'source')
-            self.start_date = config.get('General', 'start_date')
-            self.end_date = config.get('General', 'end_date')
-            ## [Process]
+            ## [MAIN]
+            self.source = config.get('MAIN', 'source')
+            self.start_date = config.get('MAIN', 'start_date')
+            self.end_date = config.get('MAIN', 'end_date')
+            ## [PROCESS]
             for p in self.list_of_process:
-                exec ("self." + p + " = config.get('Process', '" + p + "')")
+                exec("self." + p + " = config.get('PROCESS', '" + p + "')")
             # create the dictionary access process
-            self.process_ = {'p1_tiseg': self.p1_tiseg, 'p2_mrt': self.p2_mrt,
+            self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_mrt': self.p2_mrt,
                              'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
                              'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                              'p7_layerstack': self.p7_layerstack}
 
     def save(self):
-        config = configparser.RawConfigParser()
+        config = configparser.ConfigParser()
 
         if self.make == "download":
-            config.add_section('General')
-            config.set('General', 'source',
-                       ','.join(self.source) if self.source not in [None, 'None'] else 'None')
-            config.set('General', 'start_date', self.start_date)
-            config.set('General', 'target_date', self.target_date)
-            config.set('General', 'end_date', self.end_date)
-            config.add_section('Download')
-            config.set('Download', 'download_type', self.download_type)
-            config.set('Download', 'dnld_errors',
-                       ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None')
-            config.set('Download', 'dnld_finished', self.dnld_finished)
+            config['MAIN'] = {}
+            config['MAIN']['source'] = ','.join(self.source) if self.source not in [None, 'None'] else 'None'
+            config['MAIN']['start_date'] = str(self.start_date)
+            config['MAIN']['target_date'] = str(self.target_date)
+            config['MAIN']['end_date'] = str(self.end_date)
+            config['DOWNLOAD'] = {}
+            config['DOWNLOAD']['download_type'] = self.download_type
+            config['DOWNLOAD']['dnld_errors'] = ','.join(self.dnld_errors) if self.dnld_errors not in [None, 'None'] else 'None'
+            config['DOWNLOAD']['dnld_finished'] = str(self.dnld_finished)
 
         if self.make == "process":
-            config.add_section('General')
-            config.set('General', 'source',
-                       ','.join(self.source) if self.source not in [None, 'None'] else 'None')
-            config.set('General', 'start_date', self.start_date)
-            config.set('General', 'end_date', self.end_date)
-            config.add_section('Process')
+            config['MAIN'] = {}
+            config['MAIN']['source'] = ','.join(self.source) if self.source not in [None, 'None'] else 'None'
+            config['MAIN']['start_date'] = str(self.start_date)
+            config['MAIN']['end_date'] = str(self.end_date)
+            config['PROCESS'] = {}
             for p in self.list_of_process:
-                exec ("config.set('Process', '" + p + "', self." + p + ")")
+                exec("config['PROCESS']['" + p + "'] = str(self." + p + ")")
 
         # Writing our configuration file to 'example.cfg'
-        with open(self.config_file, 'wb') as configfile:
+        with open(self.config_file, 'w') as configfile:
             config.write(configfile)
 
 ###############################################################################
