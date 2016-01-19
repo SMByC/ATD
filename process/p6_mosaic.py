@@ -9,13 +9,12 @@ import os
 import shutil
 from datetime import datetime
 from subprocess import call
-# from pymodis import convertmodis, parsemodis
 
 from ATD.lib import datetime_format
 
 
 def run(config_run):
-    if config_run.p2_mrt not in [None, 'None']:
+    if config_run.p6_mosaic not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
@@ -29,7 +28,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p2_mrt = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p6_mosaic = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
