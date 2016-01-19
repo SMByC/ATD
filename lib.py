@@ -201,7 +201,7 @@ def dirs_and_files_in_url(url):
 
     parse_re = re.compile('href="([^"]*)".*(..-...-.... ..:..).*?(\d+[^\s<]*|-)')
     try:
-        html = urllib.request.urlopen(url).read()
+        html = urllib.request.urlopen(url).read().decode('utf-8')
     except IOError as e:
         status = 'error fetching %s: %s' % (url, e)
         return None, None, status
