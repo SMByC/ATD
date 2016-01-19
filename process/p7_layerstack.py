@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -17,7 +17,7 @@ def run(config_run):
     if config_run.p7_layerstack not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
-        print msg
+        print(msg)
 
     source_path = os.path.join(config_run.working_directory, 'p6_mosaic')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
@@ -26,7 +26,7 @@ def run(config_run):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.\n'.format(source_path)
         config_run.process_logfile.write(msg)
-        print msg
+        print(msg)
         # save in setting
         config_run.p7_layerstack = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
@@ -47,7 +47,7 @@ def run(config_run):
                 var = os.path.basename(root)
                 msg = 'Generating layer stack for variable {0}: '.format(var)
                 config_run.process_logfile.write(msg + '\n')
-                print msg
+                print(msg)
 
                 dest = os.path.join(dir_process, var)
                 if not os.path.isdir(dest):
@@ -64,7 +64,7 @@ def run(config_run):
                 msg = '  calculating the lower pixel size for all bands: ' + str(lower_pixel_size)
                 config_run.process_logfile.write(msg + '\n')
                 config_run.process_logfile.flush()
-                print msg
+                print(msg)
 
                 # nombre del layer stack
                 out_file = os.path.join(dest, "LayerStack_" + var + ".tif")
@@ -77,13 +77,13 @@ def run(config_run):
                 if return_code == 0:  # successfully
                     msg = '  was converted successfully'
                     config_run.process_logfile.write(msg + '\n')
-                    print msg
+                    print(msg)
                 else:
                     msg = '\nError: The R script return a error, please check\n' \
                           'error message above, likely the files not were\n' \
                           'processed successfully.'
                     config_run.process_logfile.write(msg + '\n')
-                    print msg
+                    print(msg)
                     break
 
     # finishing the process
@@ -92,7 +92,7 @@ def run(config_run):
                                                           datetime_format(datetime.today()))
 
     config_run.process_logfile.write(msg + '\n')
-    print msg
+    print(msg)
     # save in setting
     config_run.p7_layerstack = 'done - ' + datetime_format(datetime.today())
     config_run.save()

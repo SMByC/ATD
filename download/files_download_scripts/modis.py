@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -87,7 +87,7 @@ def download(config_run, name):
             .format(name, config_run.target_date.date.strftime('%Y-%m-%d'))
 
         config_run.dnld_logfile.write(msg + '\n')
-        print msg
+        print(msg)
         exit()
 
     # ==============================================================================

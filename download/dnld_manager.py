@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -10,7 +10,7 @@ import os
 import shutil
 from random import randint
 from threading import Thread
-from Queue import Queue
+from queue import Queue
 from subprocess import call
 from datetime import datetime
 from time import sleep
@@ -138,7 +138,7 @@ class DownloadManager:
         msg = '\n## Start download for: ' + self.dnld_name + '/' + self.dnld_date + ' - (' + datetime_format(
             datetime.today()) + ')'
         self.dnld_logfile.write(msg + '\n')
-        print msg
+        print(msg)
 
         # is destination was defined
         if self.DEST:
@@ -184,7 +184,7 @@ class DownloadManager:
                 if check_status in [0]:
                     self.dnld_logfile.write('file exits and it is correct: ' + file.url + ' (' + datetime_format(
                         datetime.today()) + ') - ' + check_msg + '\n')
-                    print 'file exits and it is correct: ' + os.path.basename(file.url)
+                    print('file exits and it is correct: ' + os.path.basename(file.url))
                     self.dnld_logfile.flush()
                     file_download_ok = True
                     Q.put(('OK (' + check_msg + ')', file))
@@ -192,13 +192,13 @@ class DownloadManager:
                 if check_status in [2, 3]:
                     self.dnld_logfile.write('file exits but this is corrupt: ' + file.url + ' (' + datetime_format(
                         datetime.today()) + ') - ' + check_msg + '\n')
-                    print 'file exits but this is corrupt: ' + os.path.basename(file.url)
+                    print('file exits but this is corrupt: ' + os.path.basename(file.url))
                     self.dnld_logfile.flush()
                     os.remove(file.path)
                 if check_status in [4]:
                     self.dnld_logfile.write('xml file is corrupt, not check the file but continue: ' + file.url + ' (' + datetime_format(
                         datetime.today()) + ') - ' + check_msg + '\n')
-                    print 'xml file is corrupt, not check but continue: ' + os.path.basename(file.url)
+                    print('xml file is corrupt, not check but continue: ' + os.path.basename(file.url))
                     self.dnld_logfile.flush()
                     file_download_ok = True
                     Q.put(('NO CHECKED (' + check_msg + ')', file))
@@ -208,7 +208,7 @@ class DownloadManager:
             for attempt in range(self.NUM_ATTEMPT):
                 self.dnld_logfile.write(
                     'download started:  ' + file.url + ' (' + datetime_format(datetime.today()) + ')\n')
-                print 'download started:  ' + os.path.basename(file.url)
+                print('download started:  ' + os.path.basename(file.url))
                 self.dnld_logfile.flush()
                 # download with wget
                 wget_status = call(self.wget_cmd + [file.url], shell=False)  # TODO: Download real file
@@ -222,7 +222,7 @@ class DownloadManager:
                     if check_status in [0, 1]:
                         self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ') - ' + check_msg + '\n')
-                        print 'download finished: ' + os.path.basename(file.url)
+                        print('download finished: ' + os.path.basename(file.url))
                         self.dnld_logfile.flush()
                         file_download_ok = True
                         Q.put(('OK (' + check_msg + ')', file))
@@ -230,7 +230,7 @@ class DownloadManager:
                     elif check_status in [4]:
                         self.dnld_logfile.write('download finished: ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ') - ' + check_msg + '\n')
-                        print 'download finished: ' + os.path.basename(file.url)
+                        print('download finished: ' + os.path.basename(file.url))
                         self.dnld_logfile.flush()
                         file_download_ok = True
                         Q.put(('NO CHECKED (' + check_msg + ')', file))
@@ -245,7 +245,7 @@ class DownloadManager:
                 elif get_http_code(file.url) == 508:
                     self.dnld_logfile.write('the file is corrupt, file not downloaded (download continue): ' + file.url + ' (' + datetime_format(
                             datetime.today()) + ') - ' + '\n')
-                    print 'file is corrupt: ' + os.path.basename(file.url)
+                    print('file is corrupt: ' + os.path.basename(file.url))
                     self.dnld_logfile.flush()
                     file_download_ok = True
                     Q.put(('CORRUPT (NOT DOWNLOADED)', file))

@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -38,7 +38,7 @@ def run(config_run):
                   '\n#### target: ' + config_run.target_date.date.strftime('%Y-%m-%d') + \
                   '\n#### in dir: ' + os.path.basename(config_run.working_directory) + '\n'
             config_run.dnld_logfile.write(msg + '\n')
-            print msg
+            print(msg)
 
             # check if the download date is greater than the target date
             today = date.today()
@@ -46,7 +46,7 @@ def run(config_run):
                 msg = '\nThe target date for download files {0} is greater than current date {1}' \
                     .format(config_run.target_date.date.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'))
                 config_run.dnld_logfile.write(msg + '\n')
-                print msg
+                print(msg)
                 exit()
 
             ########################################## download ##########################################
@@ -56,7 +56,7 @@ def run(config_run):
                 config_run.target_date.date.strftime('%Y-%m-%d'),
                 os.path.basename(config_run.working_directory), datetime_format(datetime.today()))
             config_run.dnld_logfile.write(msg + '\n')
-            print msg
+            print(msg)
 
             # download from terra
             if config_run.current_source == 'terra':
@@ -83,7 +83,7 @@ def run(config_run):
                 config_run.target_date.date.strftime('%Y-%m-%d'),
                 msg_error, datetime_format(datetime.today()))
             config_run.dnld_logfile.write(msg + '\n')
-            print msg
+            print(msg)
 
         # update the target date
         config_run.target_date.next()
@@ -119,7 +119,7 @@ def run(config_run):
               'Download completed!'.format(config_run.target_date.date.strftime('%Y-%m-%d'),
                                              config_run.end_date.date.strftime('%Y-%m-%d'))
         config_run.dnld_logfile.write(msg + '\n')
-        print msg
+        print(msg)
         # send mail
         if config_run.email is not None:
             email_download_complete(config_run)

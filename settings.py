@@ -1,14 +1,14 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
 import os
 from copy import deepcopy
 from datetime import date
-import ConfigParser
+import configparser
 
 from ATD.lib import DateATD, dir_date_name
 
@@ -70,7 +70,7 @@ class ConfigRun:
             self.config_file = os.path.join(self.working_directory, 'process_settings.cfg')
 
     def load(self):
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
         if not os.path.isfile(self.config_file):
             return
 
@@ -102,7 +102,7 @@ class ConfigRun:
                              'p7_layerstack': self.p7_layerstack}
 
     def save(self):
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
 
         if self.make == "download":
             config.add_section('General')
@@ -150,10 +150,10 @@ def get(args):
         ## source
         if args.source not in [None, 'None']:
             if config_run.source is not None and sorted(args.source.split(',')) != sorted(config_run.source.split(',')):
-                print "\nError: the source in download_settings.cfg and in arguments are different, if you\n" \
+                print("\nError: the source in download_settings.cfg and in arguments are different, if you\n" \
                       "want run other source, finished/delete the other source before run this.\n" \
                       "\tin argumets:     " + args.source +\
-                      "\n\tin file settings: " + config_run.source
+                      "\n\tin file settings: " + config_run.source)
 
                 exit()
             args.source = args.source.split(',')
@@ -166,8 +166,8 @@ def get(args):
             config_run.source = config_run.source.split(',')
 
         if config_run.source not in [['terra'], ['aqua'], ['terra','aqua'], ['aqua','terra']]:
-            print "\nError: the source in argument is not recognized, this should be\n" \
-                  "'terra', 'aqua' or 'terra,aqua'."
+            print("\nError: the source in argument is not recognized, this should be\n" \
+                  "'terra', 'aqua' or 'terra,aqua'.")
             exit()
 
         ## start date
@@ -194,7 +194,7 @@ def get(args):
             if not (config_run.start_date.date <= config_run.target_date.date):
                 msg = '\nWarning: The start date is bigger than target date, changing\n' \
                       'the target date to start date'
-                print msg
+                print(msg)
                 config_run.target_date = deepcopy(config_run.start_date)
 
         ## fix name the working directory
@@ -203,14 +203,14 @@ def get(args):
             msg = '\nWarning: The working directory is empty, not set in arguments, \n' \
                   'start new empty working directory base on dates of run:\n\n\t' + \
                   config_run.working_directory
-            print msg
+            print(msg)
         elif os.path.basename(config_run.working_directory) != dir_date_name(config_run.start_date, config_run.target_date):
             old_working_directory = os.path.basename(config_run.working_directory)
             config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
             msg = '\nWarning: The current working directory not match with the start \n' \
                   'and target date parameters, renaming the working directory to:\n\n\t' + \
                   os.path.basename(old_working_directory) + '  -->  ' + os.path.basename(config_run.working_directory)
-            print msg
+            print(msg)
             # rename directory
             os.rename(old_working_directory, config_run.working_directory)
         # re-set the config file
@@ -245,12 +245,12 @@ def get(args):
         #########################
         ## checks
         if config_run.end_date in [None, 'None'] and config_run.download_type == 'full':
-            print "\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
-                  "when the download type is 'full'."
+            print("\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
+                  "when the download type is 'full'.")
             exit()
         if config_run.email not in [None, 'None'] and config_run.end_date in [None, 'None']:
-            print "\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
-                  "when you want send email when finnish."
+            print("\nError: you need specify the 'end_date' in download_settings.cfg or '--to' in arguments\n" \
+                  "when you want send email when finnish.")
             exit()
 
         #########################
@@ -258,7 +258,7 @@ def get(args):
         if config_run.end_date not in [None, 'None'] and (config_run.target_date.date == config_run.end_date.date):
             if config_run.dnld_finished:
                 msg = '\nThe download is already finished!\n\nExit'
-                print msg
+                print(msg)
                 exit()
 
     if args.make == 'process':

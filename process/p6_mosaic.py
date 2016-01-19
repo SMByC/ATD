@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -18,7 +18,7 @@ def run(config_run):
     if config_run.p2_mrt not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
-        print msg
+        print(msg)
 
     source_path = os.path.join(config_run.working_directory, 'p5_nodata')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
@@ -27,7 +27,7 @@ def run(config_run):
         msg = '\nError: The directory of previous process: {0}\n' \
               'not exist, please run the previous process before it.\n'.format(source_path)
         config_run.process_logfile.write(msg)
-        print msg
+        print(msg)
         # save in setting
         config_run.p2_mrt = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
@@ -89,11 +89,11 @@ def run(config_run):
                     msg = 'Processing mosaic {0}: '.format(mosaic_name)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print msg
+                    print(msg)
                     # generar el mosaico
                     return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name)
                     config_run.process_logfile.write(msg + '\n')
-                    print msg
+                    print(msg)
 
                     # quitar los archivos procesados en la lista y ordenarlos
                     files_temp_list = sorted(list(set(files_temp_list) - set(mosaic_input_list)))
@@ -109,7 +109,7 @@ def run(config_run):
                                                           'with errors! ' if return_code != 0 else '',
                                                           datetime_format(datetime.today()))
     config_run.process_logfile.write(msg + '\n')
-    print msg
+    print(msg)
     # save in setting
     config_run.p6_mosaic = 'with errors! - ' if return_code != 0 else 'done - ' + datetime_format(datetime.today())
     config_run.save()

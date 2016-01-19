@@ -1,12 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import gdal
 from datetime import date, datetime
@@ -27,7 +27,7 @@ def enumeration(start, stop, step):
 
     (0,18,3) -> ['00', '03', '06', '09', '12', '15', '18']
     """
-    enum = range(start, stop + 1, step)
+    enum = list(range(start, stop + 1, step))
     enum = ['0' + str(i) if len(str(i)) < 2 else str(i) for i in enum]
     return enum
 
@@ -180,7 +180,7 @@ def cksum(file_to_check):
             s = UNSIGNED((s << 8)) ^ crctab[tabidx]
 
         while n:
-            c = n & 0377
+            c = n & 377
             n = n >> 8
             s = UNSIGNED(s << 8) ^ crctab[(s >> 24) ^ c]
         return UNSIGNED(~s)
@@ -196,13 +196,13 @@ def dirs_and_files_in_url(url):
     Return all files and directories in specific URL
     '''
 
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
     import re
 
     parse_re = re.compile('href="([^"]*)".*(..-...-.... ..:..).*?(\d+[^\s<]*|-)')
     try:
-        html = urllib.urlopen(url).read()
-    except IOError, e:
+        html = urllib.request.urlopen(url).read()
+    except IOError as e:
         status = 'error fetching %s: %s' % (url, e)
         return None, None, status
 
@@ -227,7 +227,7 @@ def dirs_and_files_in_url(url):
 ###############################################################################
 
 def get_all_start_n_days_of_month(year, month, num_days=8):
-    reference_date = date(year, 01, 01)
+    reference_date = date(year, 1, 1)
 
     # if reference_date.year > year:
     #    raise Exception("The date is bigger than reference date")
@@ -272,11 +272,11 @@ class DateATD():
             if type == "end":
                 self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[-1]))
             if type is None:
-                print "For date {0} with only year and month, you must set the type date ('start' or 'end').".format(
-                    date_str)
+                print("For date {0} with only year and month, you must set the type date ('start' or 'end').".format(
+                    date_str))
                 exit()
         else:
-            print "Date {0} is not a valid date format, e.g. 2009-01-20 or 2009-01".format(date_str)
+            print("Date {0} is not a valid date format, e.g. 2009-01-20 or 2009-01".format(date_str))
             exit()
         days_list = get_all_start_n_days_of_month(self.date_orig.year, self.date_orig.month)
         for idx, day in enumerate(days_list):
@@ -395,5 +395,5 @@ def get_pixel_size(raster_file):
 ###############################################################################
 
 def get_http_code(url):
-    conn = urllib.urlopen(url)
+    conn = urllib.request.urlopen(url)
     return conn.getcode()

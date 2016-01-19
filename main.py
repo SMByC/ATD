@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  (c) Copyright SMBYC - IDEAM 2014-2015
+#  (c) Copyright SMBYC - IDEAM 2014-2016
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
@@ -15,10 +15,11 @@ from ATD import settings
 from ATD.lib import datetime_format
 from ATD.download import main as download_main
 from ATD.process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
+import imp
 
 
 # set encoding to utf-8
-reload(sys)
+imp.reload(sys)
 sys.setdefaultencoding("utf-8")
 
 
@@ -95,7 +96,7 @@ if args.make == 'process':
           ' - (' + datetime_format(datetime.today()) + ') ###########' + \
           '\n#### in dir: ' + os.path.basename(config_run.working_directory) + '\n'
     config_run.process_logfile.write(msg + '\n')
-    print msg
+    print(msg)
 
     config_run.process_name = args.process
 
@@ -127,6 +128,6 @@ if args.make == 'process':
     if args.process == 'p7_layerstack':
         p7_layerstack.run(config_run)
 
-print '\nFinish'
+print('\nFinish')
 
 exit()
