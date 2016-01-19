@@ -27,8 +27,8 @@ El programa ATD es el proceso de automatización de alertas tempranas de defores
 El programa ATD cuenta con los siguientes procesos (en la actualidad):
 
 0. Download
-1. Tiseq
-2. MRT
+1. QC4SD
+2. Reprojection
 3. NoData
 4. Stats
 5. NoData
@@ -46,7 +46,7 @@ Una vez realizado todo el proceso de ATD, los resultados del Layerstack (último
 - Juan Pablo Ramirez <juanramirez85(a)gmail.com>
 
 ***
-    Copyright © 2014-2015 IDEAM
+    Copyright © 2014-2016 IDEAM
     Instituto de Hidrología, Meteorología y Estudios Ambientales
     Sistema de Monitoreo de Bosques y Carbono - SMBYC
     Calle 25 D No. 96 B - 70

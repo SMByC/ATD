@@ -108,7 +108,7 @@ def email_download_complete(config_run, files_attached=[]):
 
 ###############################################################################
 
-def cksum(file_to_check):
+def cksum(file_to_check):  # TODO replace
     '''
     This module implements the cksum command found in most UNIXes in pure
     python.
