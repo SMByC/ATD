@@ -6,7 +6,6 @@
 #  Email: xcorredorl at ideam.gov.co
 
 import os
-import sys
 import argparse
 import time
 from datetime import datetime
@@ -14,13 +13,7 @@ from datetime import datetime
 from ATD import settings
 from ATD.lib import datetime_format
 from ATD.download import main as download_main
-from ATD.process import p1_tiseg, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
-import imp
-
-
-# set encoding to utf-8
-imp.reload(sys)
-sys.setdefaultencoding("utf-8")
+from ATD.process import p1_qc4sd, p2_mrt, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
 
 
 ########################################## arguments ##########################################
@@ -63,7 +56,7 @@ group_download.add_argument('working_directory', help='working directory to proc
                             nargs='?', default=os.getcwd())
 
 # PROCESS
-list_of_process = ['p1_tiseg', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+list_of_process = ['p1_qc4sd', 'p2_mrt', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
@@ -100,9 +93,9 @@ if args.make == 'process':
 
     config_run.process_name = args.process
 
-    ######################################## TiSeg process ########################################
-    if args.process == 'p1_tiseg':
-        p1_tiseg.run(config_run)
+    ############################### Quality Control process - QC4SD ###############################
+    if args.process == 'p1_qc4sd':
+        p1_qc4sd.run(config_run)
 
     ######################################### MRT process #########################################
     if args.process == 'p2_mrt':
