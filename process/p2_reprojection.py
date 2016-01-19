@@ -34,6 +34,8 @@ def run(config_run):
 
     if os.path.isdir(dir_process):
         shutil.rmtree(dir_process)
+    if not os.path.isdir(dir_process):
+        os.makedirs(dir_process)
 
     # process file by file
     for root, dirs, files in os.walk(source_path):

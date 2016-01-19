@@ -9,7 +9,6 @@ import os
 import numpy
 import shutil
 from datetime import datetime
-# from pymodis import convertmodis, parsemodis
 
 try:
     from osgeo import gdal
