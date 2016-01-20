@@ -10,7 +10,7 @@ cd $ATD_DIR
 if [ ! -d ${ATD_DIR}/.hg ]; then
     cd ..
     rm -rf ATD
-    hg clone ssh://hg@bitbucket.org/SMBYC/atd ATD
+    hg clone https://bitbucket.org/SMBYC/atd ATD
     cd $ATD_DIR
 fi
 
