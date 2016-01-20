@@ -62,7 +62,7 @@ def download(config_run, name):
         url_source = 'http://e4ftl01.cr.usgs.gov/MOLA'
 
     urls_files = []
-    url = '{url_source}/{name}.005/{year}.{month}.{day}/' \
+    url = '{url_source}/{name}.006/{year}.{month}.{day}/' \
         .format(url_source=url_source, name=name, year=config_run.target_date.date.year,
                 month=fix_zeros_in_datetime(config_run.target_date.date.month),
                 day=fix_zeros_in_datetime(config_run.target_date.date.day))
