@@ -8,7 +8,10 @@
 import os
 import urllib.request, urllib.parse, urllib.error
 
-import gdal
+try:
+    from osgeo import gdal
+except ImportError:
+    import gdal
 from datetime import date, datetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
