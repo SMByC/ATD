@@ -50,11 +50,11 @@ class ConfigRun:
         self.start_date = None
         self.end_date = None
         ## [PROCESS]
-        self.list_of_process = ['p1_qc4sd', 'p2_reprojection', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+        self.list_of_process = ['p1_mrt', 'p2_qc4sd', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
         for p in self.list_of_process:
             exec ('self.' + p + ' = None')
         # create the dictionary access process
-        self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reprojection': self.p2_reprojection,
+        self.process_ = {'p1_mrt': self.p1_mrt, 'p2_qc4sd': self.p2_qc4sd,
                          'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
                          'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                          'p7_layerstack': self.p7_layerstack}
@@ -96,7 +96,7 @@ class ConfigRun:
             for p in self.list_of_process:
                 exec("self." + p + " = config.get('PROCESS', '" + p + "')")
             # create the dictionary access process
-            self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reprojection': self.p2_reprojection,
+            self.process_ = {'p1_mrt': self.p1_mrt, 'p2_qc4sd': self.p2_qc4sd,
                              'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
                              'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
                              'p7_layerstack': self.p7_layerstack}

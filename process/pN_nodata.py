@@ -52,7 +52,7 @@ def run(config_run, name_process):
             files = [x for x in files if x[-4::] == '.tif']
             for file in files:
                 infile = os.path.join(root, file)
-                # outfile = os.path.dirname(os.path.join(dir_process, os.path.join(root, file).split('/p2_mrt/')[-1]))
+                # outfile = os.path.dirname(os.path.join(dir_process, os.path.join(root, file).split('/p1_mrt/')[-1]))
                 outfile = infile.replace(before_name_process, name_process)
 
                 msg = 'Processing file {0} converting negative values to zero: '.format(file)

@@ -27,8 +27,8 @@ El programa ATD es el proceso de automatización de alertas tempranas de defores
 El programa ATD cuenta con los siguientes procesos (en la actualidad):
 
 0. Download
-1. QC4SD
-2. Reprojection
+1. MRT
+2. QC4SD
 3. NoData
 4. Stats
 5. NoData
