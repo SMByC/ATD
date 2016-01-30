@@ -14,7 +14,7 @@ from qc4sd import qc4sd
 
 
 def run(config_run):
-    if config_run.p1_qc4sd not in [None, 'None']:
+    if config_run.p2_qc4sd not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
@@ -28,7 +28,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p1_qc4sd = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p2_qc4sd = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -64,5 +64,5 @@ def run(config_run):
     config_run.process_logfile.write(msg + '\n')
     print(msg)
     # save in setting
-    config_run.p1_qc4sd = 'done - ' + datetime_format(datetime.today())
+    config_run.p2_qc4sd = 'done - ' + datetime_format(datetime.today())
     config_run.save()

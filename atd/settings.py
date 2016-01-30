@@ -50,11 +50,11 @@ class ConfigRun:
         self.start_date = None
         self.end_date = None
         ## [PROCESS]
-        self.list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
+        self.list_of_process = ['p1_mrt', 'p2_qc4sd', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
         for p in self.list_of_process:
             exec ('self.' + p + ' = None')
         # create the dictionary access process
-        self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reproj': self.p2_reproj,
+        self.process_ = {'p1_mrt': self.p1_mrt, 'p2_qc4sd': self.p2_qc4sd,
                          'p3_stats': self.p3_stats, 'p4_mosaic': self.p4_mosaic,
                          'p5_layerstack': self.p5_layerstack}
 
@@ -95,7 +95,7 @@ class ConfigRun:
             for p in self.list_of_process:
                 exec("self." + p + " = config.get('PROCESS', '" + p + "')")
             # create the dictionary access process
-            self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reproj': self.p2_reproj,
+            self.process_ = {'p1_mrt': self.p1_mrt, 'p2_qc4sd': self.p2_qc4sd,
                              'p3_stats': self.p3_stats, 'p4_mosaic': self.p4_mosaic,
                              'p5_layerstack': self.p5_layerstack}
 

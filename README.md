@@ -27,13 +27,11 @@ El programa ATD es el proceso de automatización de alertas tempranas de defores
 El programa ATD cuenta con los siguientes procesos (en la actualidad):
 
 0. Download
-1. QC4SD
-2. Reprojection
-3. NoData
-4. Stats
-5. NoData
-6. Mosaic
-7. Layerstack
+1. MRT
+2. QC4SD
+3. Stats
+4. Mosaic
+5. Layerstack
 
 Una vez realizado todo el proceso de ATD, los resultados del Layerstack (último proceso) son comparados y analizados con el producto del anterior periodo, aplicando filtros y análsis de un especialista, que realiza los productos finales.
 

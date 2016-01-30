@@ -15,7 +15,7 @@ from datetime import datetime
 from atd import settings
 from atd.lib import datetime_format
 from atd.download import main as download_main
-from atd.process import p1_qc4sd, p2_reproj, p3_stats, p4_mosaic, p5_layerstack
+from atd.process import p1_mrt, p2_qc4sd, p3_stats, p4_mosaic, p5_layerstack
 
 
 ########################################## arguments ##########################################
@@ -61,7 +61,7 @@ group_download.add_argument('working_directory', help='working directory to proc
                             nargs='?', default=os.getcwd())
 
 # PROCESS
-list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
+list_of_process = ['p1_mrt', 'p2_qc4sd', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
@@ -109,13 +109,13 @@ if args.make == 'process':
 
     config_run.process_name = args.process
 
-    ############################### Quality Control process - QC4SD ###############################
-    if args.process == 'p1_qc4sd':
-        p1_qc4sd.run(config_run)
+    ######################################### MRT process #########################################
+    if args.process == 'p1_mrt':
+        p1_mrt.run(config_run)
 
-    #################################### Reprojection process #####################################
-    if args.process == 'p2_reproj':
-        p2_reproj.run(config_run)
+    ############################### Quality Control process - QC4SD ###############################
+    if args.process == 'p2_qc4sd':
+        p2_qc4sd.run(config_run)
 
     #################################### statistics R process #####################################
     if args.process == 'p3_stats':
