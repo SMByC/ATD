@@ -178,12 +178,12 @@ def cksum(file_to_check):  # TODO replace
         n = len(b)
         i = c = s = 0
         for ch in b:
-            c = ord(ch)
+            c = ch
             tabidx = (s >> 24) ^ c
             s = UNSIGNED((s << 8)) ^ crctab[tabidx]
 
         while n:
-            c = n & 377
+            c = n & 0o377
             n = n >> 8
             s = UNSIGNED(s << 8) ^ crctab[(s >> 24) ^ c]
         return UNSIGNED(~s)
