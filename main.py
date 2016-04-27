@@ -38,7 +38,10 @@ class readable_dir(argparse.Action):
 parser = argparse.ArgumentParser(
     prog='atd',
     description="Alertas Tempranas de Deforestacion",
-    formatter_class=argparse.RawTextHelpFormatter)
+    epilog="Xavier Corredor Llano <xcorredorl@ideam.gov.co>\n"
+           "Sistema de Monitoreo de Bosques y Carbono - SMBYC\n"
+           "IDEAM, Colombia",
+    formatter_class=argparse.RawTextHelpFormatter,)
 
 subparsers = parser.add_subparsers(dest='make', help='operation to be performed')
 
