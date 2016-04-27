@@ -6,6 +6,7 @@
 #  Email: xcorredorl at ideam.gov.co
 
 import os
+import sys
 import argparse
 import time
 from datetime import datetime
@@ -63,6 +64,12 @@ group_process.add_argument('process', type=str, choices=list_of_process,
 group_process.add_argument('--email', type=str, help='send email when finnish')
 group_process.add_argument('working_directory', help='working directory to process', action=readable_dir)
 
+# print help if not pass arguments
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
+
+# process arguments
 args = parser.parse_args()
 
 ####################################### set/get settings ######################################
