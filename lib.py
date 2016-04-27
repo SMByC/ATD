@@ -397,6 +397,19 @@ def get_pixel_size(raster_file):
 
 ###############################################################################
 
-def get_http_code(url):  # TODO: FIXME broken when migration 2to3
-    conn = urllib.request.urlopen(url)
-    return conn.getcode()
+def get_http_code(url):
+    """
+    Return the HTTP code from specific URL
+    """
+
+    try:
+        conn = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as e:
+        # Return code error (e.g. 404, 501, ...)
+        return e.code
+    except urllib.error.URLError as e:
+        # Not an HTTP-specific error (e.g. connection refused)
+        return -1
+    else:
+        # good url answer
+        return 200
