@@ -88,7 +88,9 @@ def download(config_run, name):
 
         config_run.dnld_logfile.write(msg + '\n')
         print(msg)
-        exit()
+        # report and continue
+        errors.append('There are not files to download for {0} for the date {1}'
+                      .format(name, config_run.target_date.date.strftime('%Y-%m-%d')))
 
     # ==============================================================================
     # download files
