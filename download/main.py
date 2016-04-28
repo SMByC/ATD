@@ -11,10 +11,11 @@ from datetime import date, datetime
 from ATD.lib import email_download_complete, update_working_directory, datetime_format
 from ATD.download.files_download_scripts import modis
 
+dnld_errors = []
+
 
 def run(config_run):
-
-    dnld_errors = []
+    global dnld_errors
 
     def do_download():
         for source in config_run.source:
