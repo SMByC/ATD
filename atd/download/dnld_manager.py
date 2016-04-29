@@ -16,7 +16,7 @@ from datetime import datetime
 from time import sleep
 from dateutil.relativedelta import relativedelta
 
-from ATD.lib import datetime_format, cksum, get_http_code
+from atd.lib import datetime_format, cksum, get_http_code
 
 
 class File:

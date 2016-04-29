@@ -10,7 +10,7 @@ import shutil
 from subprocess import call
 from datetime import datetime
 
-from ATD.lib import datetime_format, get_pixel_size
+from atd.lib import datetime_format, get_pixel_size
 
 
 def run(config_run):

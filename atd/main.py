@@ -11,10 +11,10 @@ import argparse
 import time
 from datetime import datetime
 
-from ATD import settings
-from ATD.lib import datetime_format
-from ATD.download import main as download_main
-from ATD.process import p1_qc4sd, p2_reprojection, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
+from atd import settings
+from atd.lib import datetime_format
+from atd.download import main as download_main
+from atd.process import p1_qc4sd, p2_reprojection, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
 
 
 ########################################## arguments ##########################################

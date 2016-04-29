@@ -8,8 +8,8 @@
 import os
 from datetime import date, datetime
 
-from ATD.lib import email_download_complete, update_working_directory, datetime_format
-from ATD.download.files_download_scripts import modis
+from atd.lib import email_download_complete, update_working_directory, datetime_format
+from atd.download.files_download_scripts import modis
 
 dnld_errors = []
 

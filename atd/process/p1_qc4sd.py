@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 
 import shutil
-from ATD.lib import datetime_format
+from atd.lib import datetime_format
 from QC4SD import qc4sd
 
 

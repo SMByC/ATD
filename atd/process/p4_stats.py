@@ -10,7 +10,7 @@ import shutil
 from datetime import datetime
 from subprocess import call
 
-from ATD.lib import datetime_format
+from atd.lib import datetime_format
 
 
 def run(config_run):

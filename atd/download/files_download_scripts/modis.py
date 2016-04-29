@@ -8,8 +8,8 @@
 import os
 from datetime import datetime
 
-from ATD.download.dnld_manager import DownloadManager
-from ATD.lib import fix_zeros_in_datetime, dirs_and_files_in_url
+from atd.download.dnld_manager import DownloadManager
+from atd.lib import fix_zeros_in_datetime, dirs_and_files_in_url
 
 scenes = [
     'h10v07',

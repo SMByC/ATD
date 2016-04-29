@@ -10,7 +10,7 @@ from copy import deepcopy
 from datetime import date
 import configparser
 
-from ATD.lib import DateATD, dir_date_name
+from atd.lib import DateATD, dir_date_name
 
 
 ###############################################################################
