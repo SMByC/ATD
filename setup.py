@@ -23,9 +23,9 @@ setup(
     install_requires=['gdal',
                       'numpy',
                       'python-dateutil'],
-    extras_require={
-        'statistics process': ["R", "sp (Rlib)", "raster (Rlib)", "rgdal (Rlib)",
-                               "spatial (Rlib)", "plyr (Rlib)", "doSNOW (Rlib)"]},
+    # extras_require={
+    #     'for statistics process': ["R", "sp (Rlib)", "raster (Rlib)", "rgdal (Rlib)",
+    #                            "spatial (Rlib)", "plyr (Rlib)", "doSNOW (Rlib)"],},
     platforms=['Any'],
     classifiers=[
         "Development Status :: 4 - Beta",
