@@ -1,0 +1,10 @@
+site_name: Alertas Tempranas de Deforestación
+site_description: Automatización de las Alertas Tempranas de Deforestación dentro del proyecto SMBYC del IDEAM
+site_author: Xavier Corredor Llano, SMBYC-IDEAM
+#site_favicon: favicon_whale.png
+site_url: http://
+repo_url: https://bitbucket.org/SMBYC/atd
+theme: readthedocs
+pages:
+- Home: index.md
+- Test: test.md
