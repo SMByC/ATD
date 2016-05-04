@@ -19,10 +19,11 @@ setup(
     author_email='xcorredorl@ideam.gov.co, smbyc@ideam.gov.co',
     url='https://bitbucket.org/SMBYC/atd',
     license='GPLv3',
-    packages=find_packages(exclude=('docs',)),
+    packages=find_packages(),
     install_requires=['gdal',
                       'numpy',
                       'python-dateutil'],
+    scripts=['bin/atd'],
     # extras_require={
     #     'for statistics process': ["R", "sp (Rlib)", "raster (Rlib)", "rgdal (Rlib)",
     #                            "spatial (Rlib)", "plyr (Rlib)", "doSNOW (Rlib)"],},
