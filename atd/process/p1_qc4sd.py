@@ -10,7 +10,7 @@ import os
 
 import shutil
 from atd.lib import datetime_format
-from QC4SD import qc4sd
+from qc4sd import qc4sd
 
 
 def run(config_run):
