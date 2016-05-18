@@ -79,8 +79,8 @@ def run(config_run):
                     pixel_size = ["250", "250"]
 
                 # Reprojection with Gdal
-                return_code = call(["gdalwarp", out_file_tmp, out_file,
-                                    "-r", "near", "-t_srs", "EPSG:32618", "-tr"] + pixel_size)
+                return_code = call(["gdalwarp", out_file_tmp, out_file, "-r", "near", "-t_srs", "EPSG:32618",
+                                    "-co", "COMPRESS=LZW", "-co", "PREDICTOR=2", "-co", "TILED=YES", "-tr"] + pixel_size)
 
                 if return_code == 0:  # successfully
                     msg = 'was reprojected to EPSG:32618 successfully'
