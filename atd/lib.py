@@ -390,7 +390,7 @@ def get_pixel_size(raster_file):
     return absolute value of w-e pixel resolution.
     for n-s pixel resolution -> geo_transform[5]
     """
-    gdal_file = gdal.Open(raster_file)
+    gdal_file = gdal.Open(raster_file, gdal.GA_ReadOnly)
     geo_transform = gdal_file.GetGeoTransform()
     return abs(float(geo_transform[1]))
 

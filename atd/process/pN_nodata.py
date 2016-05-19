@@ -12,12 +12,10 @@ from datetime import datetime
 
 try:
     from osgeo import gdal
-    from osgeo.gdalconst import *
 
     gdal.TermProgress = gdal.TermProgress_nocb
 except ImportError:
     import gdal
-    from gdalconst import *
 
 from atd.lib import datetime_format
 
@@ -93,10 +91,10 @@ def negative_to_zero(infile, outfile):
 
     outNoData = 0
     format = 'GTiff'
-    type = GDT_Int16
+    type = gdal.GDT_Int16
 
     try:
-        indataset = gdal.Open(infile, GA_ReadOnly)
+        indataset = gdal.Open(infile, gdal.GA_ReadOnly)
 
         out_driver = gdal.GetDriverByName(format)
         outdataset = out_driver.Create(outfile, indataset.RasterXSize, indataset.RasterYSize, indataset.RasterCount,
