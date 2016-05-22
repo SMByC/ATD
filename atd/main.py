@@ -14,7 +14,7 @@ from datetime import datetime
 from atd import settings
 from atd.lib import datetime_format
 from atd.download import main as download_main
-from atd.process import p1_qc4sd, p2_reprojection, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
+from atd.process import p1_qc4sd, p2_reproj, pN_nodata, p4_stats, p6_mosaic, p7_layerstack
 
 
 ########################################## arguments ##########################################
@@ -60,7 +60,7 @@ group_download.add_argument('working_directory', help='working directory to proc
                             nargs='?', default=os.getcwd())
 
 # PROCESS
-list_of_process = ['p1_qc4sd', 'p2_reprojection', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
@@ -108,8 +108,8 @@ if args.make == 'process':
         p1_qc4sd.run(config_run)
 
     #################################### Reprojection process #####################################
-    if args.process == 'p2_reprojection':
-        p2_reprojection.run(config_run)
+    if args.process == 'p2_reproj':
+        p2_reproj.run(config_run)
 
     ############################ convert negative data to zero - nodata ###########################
     if args.process == 'p3_nodata':
