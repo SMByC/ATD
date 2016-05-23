@@ -14,12 +14,12 @@ from atd.lib import datetime_format, get_pixel_size
 
 
 def run(config_run):
-    if config_run.p7_layerstack not in [None, 'None']:
+    if config_run.p5_layerstack not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p6_mosaic')
+    source_path = os.path.join(config_run.working_directory, 'p4_mosaic')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -28,7 +28,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p7_layerstack = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p5_layerstack = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -94,5 +94,5 @@ def run(config_run):
     config_run.process_logfile.write(msg + '\n')
     print(msg)
     # save in setting
-    config_run.p7_layerstack = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
+    config_run.p5_layerstack = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
     config_run.save()

@@ -14,12 +14,12 @@ from atd.lib import datetime_format
 
 
 def run(config_run):
-    if config_run.p6_mosaic not in [None, 'None']:
+    if config_run.p4_mosaic not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p5_nodata')
+    source_path = os.path.join(config_run.working_directory, 'p3_stats')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -28,7 +28,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p6_mosaic = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p4_mosaic = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -46,7 +46,7 @@ def run(config_run):
         'h11v09',
     ]
 
-    # recorre los archivos tif de la carpeta del proceso anterior (p5_nodata)
+    # recorre los archivos tif de la carpeta del proceso anterior (p3_stats)
     # detecta y reagrupa todas las imagenes de una misma banda y modo, seleccionando
     # todas las escenas de esta banda para generar y crear el mosaico con Gdal
     for root, dirs, files in os.walk(source_path):
@@ -80,7 +80,7 @@ def run(config_run):
                     mosaic_name = scene_group_name + '_mosaico_' + var + '.tif'
                     # ruta del archivo del mosaico
                     mosaic_dest = os.path.dirname(
-                        os.path.join(dir_process, os.path.join(root, file).split('/p5_nodata/')[-1]))
+                        os.path.join(dir_process, os.path.join(root, file).split('/p3_stats/')[-1]))
                     # lista de archivos para el mosaico con ruta absoluta
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
 
@@ -110,7 +110,7 @@ def run(config_run):
     config_run.process_logfile.write(msg + '\n')
     print(msg)
     # save in setting
-    config_run.p6_mosaic = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
+    config_run.p4_mosaic = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
     config_run.save()
 
 

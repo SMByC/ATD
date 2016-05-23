@@ -50,14 +50,13 @@ class ConfigRun:
         self.start_date = None
         self.end_date = None
         ## [PROCESS]
-        self.list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_nodata', 'p4_stats', 'p5_nodata', 'p6_mosaic', 'p7_layerstack']
+        self.list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
         for p in self.list_of_process:
             exec ('self.' + p + ' = None')
         # create the dictionary access process
         self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reproj': self.p2_reproj,
-                         'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
-                         'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
-                         'p7_layerstack': self.p7_layerstack}
+                         'p3_stats': self.p3_stats, 'p4_mosaic': self.p4_mosaic,
+                         'p5_layerstack': self.p5_layerstack}
 
         ## variables that not save into settings
         self.set_config_file()
@@ -97,9 +96,8 @@ class ConfigRun:
                 exec("self." + p + " = config.get('PROCESS', '" + p + "')")
             # create the dictionary access process
             self.process_ = {'p1_qc4sd': self.p1_qc4sd, 'p2_reproj': self.p2_reproj,
-                             'p3_nodata': self.p3_nodata, 'p4_stats': self.p4_stats,
-                             'p5_nodata': self.p5_nodata, 'p6_mosaic': self.p6_mosaic,
-                             'p7_layerstack': self.p7_layerstack}
+                             'p3_stats': self.p3_stats, 'p4_mosaic': self.p4_mosaic,
+                             'p5_layerstack': self.p5_layerstack}
 
     def save(self):
         config = configparser.ConfigParser()
