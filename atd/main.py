@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 import time
+import warnings
 from datetime import datetime
 
 from atd import settings
@@ -90,6 +91,8 @@ if args.make == 'download':
 ########################################### process ###########################################
 
 if args.make == 'process':
+    # ignore warnings
+    warnings.filterwarnings("ignore")
     # save make in config_run
     config_run.make = args.make
     # set the log file for process
