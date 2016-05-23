@@ -129,6 +129,34 @@ def run(config_run):
                         print(msg)
                         return msg
 
+                    ##############
+                    # Calculate the valid data
+                    # this count the valid data (no nans) across the layers (time axis) in percentage (0-100%)
+                    msg = 'Calculating the valid data for {0}: '.format(file)
+                    config_run.process_logfile.write(msg)
+                    config_run.process_logfile.flush()
+                    print(msg, end='')
+
+                    # valid data directory
+                    vd_dir = os.path.join(dir_process, 'valid_data')
+                    if not os.path.isdir(vd_dir):
+                        os.makedirs(vd_dir)
+
+                    in_file = os.path.join(root, file)
+                    out_file = os.path.join(vd_dir, os.path.splitext(file)[0] + '_valid_data.tif')
+
+                    try:
+                        statistics('valid_data', in_file, out_file)
+
+                        msg = 'OK'
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                    except Exception as error:
+                        msg = 'FAIL\nError: While calculating valid data\n' + error
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                        return msg
+
         return 0
 
     return_code = process()
@@ -171,7 +199,8 @@ def statistics(stat, infile, outfile):
 
     # loop thru bands of raster and append each band of data to 'layers'
     layers = []
-    for i in range(1, dataset.RasterCount + 1):
+    num_layers = dataset.RasterCount
+    for i in range(1, num_layers + 1):
         raster_band = dataset.GetRasterBand(i).ReadAsArray()
         # raster_band[raster_band == 0] = np.nan
         raster_band = raster_band.astype(float)
@@ -197,6 +226,11 @@ def statistics(stat, infile, outfile):
     # Calculate the standard deviation
     if stat == 'std':
         new_array = np.nanstd(raster_stack, axis=2)
+    # Calculate the valid data
+    if stat == 'valid_data':
+        # calculate the number of valid data used in statistics products in percentage (0-100%),
+        # this count the valid data (no nans) across the layers (time axis)
+        new_array = (num_layers - np.isnan(raster_stack).sum(axis=2))*100/num_layers
 
     #### create the output geo tif
     # Set up the GTiff driver
