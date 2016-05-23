@@ -157,6 +157,34 @@ def run(config_run):
                         print(msg)
                         return msg
 
+                    ##############
+                    # Calculate the signal-to-noise ratio
+                    # this signal-to-noise ratio defined as the mean divided by the standard deviation.
+                    msg = 'Calculating the signal-to-noise ratio for {0}: '.format(file)
+                    config_run.process_logfile.write(msg)
+                    config_run.process_logfile.flush()
+                    print(msg, end='')
+
+                    # valid data directory
+                    snr_dir = os.path.join(dir_process, 'snr')
+                    if not os.path.isdir(snr_dir):
+                        os.makedirs(snr_dir)
+
+                    in_file = os.path.join(root, file)
+                    out_file = os.path.join(snr_dir, os.path.splitext(file)[0] + '_snr.tif')
+
+                    try:
+                        statistics('snr', in_file, out_file)
+
+                        msg = 'OK'
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                    except Exception as error:
+                        msg = 'FAIL\nError: While calculating signal-to-noise ratio\n' + error
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                        return msg
+
         return 0
 
     return_code = process()
@@ -231,6 +259,12 @@ def statistics(stat, infile, outfile):
         # calculate the number of valid data used in statistics products in percentage (0-100%),
         # this count the valid data (no nans) across the layers (time axis)
         new_array = (num_layers - np.isnan(raster_stack).sum(axis=2))*100/num_layers
+    # Calculate the signal-to-noise ratio
+    if stat == 'snr':
+        # this signal-to-noise ratio defined as the mean divided by the standard deviation.
+        m = np.nanmean(raster_stack, axis=2)
+        sd = np.nanstd(raster_stack, axis=2, ddof=0)
+        new_array = np.where(sd == 0, 0, m / sd)
 
     #### create the output geo tif
     # Set up the GTiff driver
