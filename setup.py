@@ -22,6 +22,7 @@ setup(
     packages=find_packages(),
     install_requires=['gdal',
                       'numpy',
+                      'scipy',
                       'python-dateutil'],
     scripts=['bin/atd'],
     # extras_require={

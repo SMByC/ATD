@@ -9,6 +9,7 @@ import os
 import numpy as np
 import shutil
 from datetime import datetime
+from scipy.stats import variation
 
 try:  # old
     from osgeo import gdal
@@ -65,7 +66,6 @@ def run(config_run):
 
                     try:
                         statistics('median', in_file, out_file)
-
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -92,7 +92,6 @@ def run(config_run):
 
                     try:
                         statistics('mean', in_file, out_file)
-
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -119,7 +118,6 @@ def run(config_run):
 
                     try:
                         statistics('std', in_file, out_file)
-
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -147,7 +145,6 @@ def run(config_run):
 
                     try:
                         statistics('valid_data', in_file, out_file)
-
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -175,12 +172,38 @@ def run(config_run):
 
                     try:
                         statistics('snr', in_file, out_file)
-
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
                         msg = 'FAIL\nError: While calculating signal-to-noise ratio\n' + error
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                        return msg
+
+                    ##############
+                    # Computes the coefficient of variation, the ratio of the biased standard
+                    # deviation to the mean.
+                    msg = 'Calculating the coefficient of variation for {0}: '.format(file)
+                    config_run.process_logfile.write(msg)
+                    config_run.process_logfile.flush()
+                    print(msg, end='')
+
+                    # coefficient of variation directory
+                    coeff_var_dir = os.path.join(dir_process, 'coeff_var')
+                    if not os.path.isdir(coeff_var_dir):
+                        os.makedirs(coeff_var_dir)
+
+                    in_file = os.path.join(root, file)
+                    out_file = os.path.join(coeff_var_dir, os.path.splitext(file)[0] + '_coeff_var.tif')
+
+                    try:
+                        statistics('coeff_var', in_file, out_file)
+                        msg = 'OK'
+                        config_run.process_logfile.write(msg + '\n')
+                        print(msg)
+                    except Exception as error:
+                        msg = 'FAIL\nError: While calculating coefficient of variation\n' + error
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -265,6 +288,10 @@ def statistics(stat, infile, outfile):
         m = np.nanmean(raster_stack, axis=2)
         sd = np.nanstd(raster_stack, axis=2, ddof=0)
         new_array = np.where(sd == 0, 0, m / sd)
+    # Calculate the coefficient of variation
+    if stat == 'coeff_var':
+        # the ratio of the biased standard deviation to the mean
+        new_array = variation(raster_stack, axis=2, nan_policy='omit')
 
     #### create the output geo tif
     # Set up the GTiff driver
