@@ -27,6 +27,33 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
+    # required prev_rundir only for p3_stats for computes statistics
+    if config_run.prev_rundir:
+        msg = "p3_stats will make some statistics with previous run, located in:\n\t" + \
+              os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory)) + '\n'
+        config_run.process_logfile.write(msg)
+        print(msg)
+        # define and check files in previous run directory
+        previous_p3_stats_dir = os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory), "p3_stats")
+        if not os.path.isdir(previous_p3_stats_dir):
+            msg = '\nError: The directory of previous stats mean run: {0}\n' \
+                  'not exist, please run the previous process before it.\n'.format(previous_p3_stats_dir)
+            config_run.process_logfile.write(msg)
+            print(msg)
+            # save in setting
+            config_run.p3_stats = 'with errors! - ' + datetime_format(datetime.today())
+            config_run.save()
+            return
+    else:
+        msg = "\nError: p3_stats required prev_rundir for computes statistics" \
+              "define this directory with the argument '--prev_rundir DIR'" + '\n'
+        config_run.process_logfile.write(msg)
+        print(msg)
+        # save in setting
+        config_run.p3_stats = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.save()
+        return
+
     source_path = os.path.join(config_run.working_directory, 'p2_reproj')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 

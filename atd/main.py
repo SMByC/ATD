@@ -67,6 +67,9 @@ group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('--email', type=str, help='send email when finnish')
 group_process.add_argument('working_directory', help='working directory to process', action=readable_dir)
+# only for p3_stats for computes statistics
+group_process.add_argument('--prev_rundir', help='directory of the previous run (only for run p3_stats)',
+                           action=readable_dir)
 
 # print help if not pass arguments
 if len(sys.argv) == 1:

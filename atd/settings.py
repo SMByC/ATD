@@ -274,6 +274,9 @@ def get(args):
         elif config_run.source is not None:
             config_run.source = [config_run.source]
 
+        # required prev_rundir only for p3_stats for computes statistics
+        config_run.prev_rundir = args.prev_rundir
+
         config_run.start_date = download_config_run.start_date
         config_run.end_date = download_config_run.end_date
 
