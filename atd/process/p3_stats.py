@@ -9,7 +9,7 @@ import os
 import numpy as np
 import shutil
 from datetime import datetime
-from scipy.stats import variation
+from scipy.stats import variation, ss
 
 try:  # old
     from osgeo import gdal
@@ -27,32 +27,26 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
-    # required prev_rundir only for p3_stats for computes statistics
+    # optional argument prev_rundir only for p3_stats for computes all statistics
     if config_run.prev_rundir:
         msg = "p3_stats will make some statistics with previous run, located in:\n\t" + \
               os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory)) + '\n'
         config_run.process_logfile.write(msg)
         print(msg)
         # define and check files in previous run directory
-        previous_p3_stats_dir = os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory), "p3_stats")
-        if not os.path.isdir(previous_p3_stats_dir):
-            msg = '\nError: The directory of previous stats mean run: {0}\n' \
-                  'not exist, please run the previous process before it.\n'.format(previous_p3_stats_dir)
+        previous_p2_reproj_dir = os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory), "p2_reproj")
+        if not os.path.isdir(previous_p2_reproj_dir):
+            msg = '\nWARNING: The directory of previous p2_reproj run: {0}\n' \
+                  'not exist, please run the previous process before it.\n'\
+                  'continue but some statistics don\'t will processed.\n'.format(previous_p2_reproj_dir)
             config_run.process_logfile.write(msg)
             print(msg)
-            # save in setting
-            config_run.p3_stats = 'with errors! - ' + datetime_format(datetime.today())
-            config_run.save()
-            return
+            config_run.prev_rundir = None
     else:
-        msg = "\nError: p3_stats required prev_rundir for computes statistics" \
-              "define this directory with the argument '--prev_rundir DIR'" + '\n'
+        msg = '\nWARNING: Not defined \'--prev_rundir\' directory of previous run,\n' \
+              'continue but some statistics don\'t will processed.\n'
         config_run.process_logfile.write(msg)
         print(msg)
-        # save in setting
-        config_run.p3_stats = 'with errors! - ' + datetime_format(datetime.today())
-        config_run.save()
-        return
 
     source_path = os.path.join(config_run.working_directory, 'p2_reproj')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
@@ -235,6 +229,34 @@ def run(config_run):
                         print(msg)
                         return msg
 
+                    ##############
+                    # Calculate the Pearson's correlation coefficient between this time series (x)
+                    # with the previous time series (y): pearson_corr = covar(x,y)/(std(x)*std(y))
+                    if config_run.prev_rundir:
+                        msg = 'Calculating the Pearson\'s correlation coefficient for {0}: '.format(file)
+                        config_run.process_logfile.write(msg)
+                        config_run.process_logfile.flush()
+                        print(msg, end='')
+
+                        # Pearson's correlation coefficient directory
+                        pearson_corr_dir = os.path.join(dir_process, 'pearson_corr')
+                        if not os.path.isdir(pearson_corr_dir):
+                            os.makedirs(pearson_corr_dir)
+
+                        in_file = os.path.join(root, file)
+                        out_file = os.path.join(pearson_corr_dir, os.path.splitext(file)[0] + '_pearson_corr.tif')
+
+                        try:
+                            statistics('pearson_corr', in_file, out_file, previous_p2_reproj_dir)
+                            msg = 'OK'
+                            config_run.process_logfile.write(msg + '\n')
+                            print(msg)
+                        except Exception as error:
+                            msg = 'FAIL\nError: While calculating Pearson\'s correlation coefficient\n' + error
+                            config_run.process_logfile.write(msg + '\n')
+                            print(msg)
+                            return msg
+
         return 0
 
     return_code = process()
@@ -266,15 +288,12 @@ def get_geo_info(file_name):
     return no_data_value, xsize, ysize, geo_trans, projection, data_type
 
 
-def statistics(stat, infile, outfile):
-    """Calculate the statistics
+def bands2layerstack(img_file, convert_nd2nan=True):
+    """Convert the bands of image in a numpy 3rd dimension array stack
+    where the z axis are locate the bands
     """
-
     # Open the original file
-    dataset = gdal.Open(infile, gdal.GA_ReadOnly)
-    # get the projection information
-    no_data_value, xsize, ysize, geo_trans, projection, data_type = get_geo_info(infile)
-
+    dataset = gdal.Open(img_file, gdal.GA_ReadOnly)
     # loop thru bands of raster and append each band of data to 'layers'
     layers = []
     num_layers = dataset.RasterCount
@@ -282,14 +301,31 @@ def statistics(stat, infile, outfile):
         raster_band = dataset.GetRasterBand(i).ReadAsArray()
         # raster_band[raster_band == 0] = np.nan
         raster_band = raster_band.astype(float)
-        # convert the no data value to NaN
-        raster_band[raster_band == no_data_value] = np.nan
-        layers.append(raster_band)
+        if convert_nd2nan:
+            # convert the no data value to NaN
+            no_data_value = dataset.GetRasterBand(i).GetNoDataValue()
+            raster_band[raster_band == no_data_value] = np.nan
+            layers.append(raster_band)
 
     # dstack will take a number of n by m in tuple or list and stack them
     # in the 3rd dimension so you end up with raster_stack being n by m by i,
     # where i is the number of bands
     raster_stack = np.dstack(layers)
+    return raster_stack
+
+
+def statistics(stat, infile, outfile, previous_p2_reproj_dir=None):
+    """Calculate the statistics
+    """
+
+    # Open the original file
+    dataset = gdal.Open(infile, gdal.GA_ReadOnly)
+    num_layers = dataset.RasterCount
+    # get the projection information
+    no_data_value, xsize, ysize, geo_trans, projection, data_type = get_geo_info(infile)
+
+    # get the numpy 3rd dimension array stack of the bands of image
+    raster_stack = bands2layerstack(infile)
 
     # call built in numpy statistical functions, with a specified axis. if
     # axis=2 means it will calculate along the 'depth' axis, per pixel.
@@ -319,6 +355,36 @@ def statistics(stat, infile, outfile):
     if stat == 'coeff_var':
         # the ratio of the biased standard deviation to the mean
         new_array = variation(raster_stack, axis=2, nan_policy='omit')
+    # Calculate the Pearson's correlation coefficient
+    if stat == 'pearson_corr':
+        # https://github.com/scipy/scipy/blob/v0.14.0/scipy/stats/stats.py#L2392
+        # get array of the previous mean file
+        previous_dataset_file = os.path.join(previous_p2_reproj_dir,
+                                             os.path.basename(outfile).split('_pearson_corr.tif')[0] + '.tif')
+
+        # get the numpy 3rd dimension array stack of the bands of image
+        previous_raster_stack = bands2layerstack(previous_dataset_file)
+
+        # raster_stack and previous_raster_stack should have same length in all axis
+        if raster_stack.shape != previous_raster_stack.shape:
+            z_rs = raster_stack.shape[2]
+            z_prs = previous_raster_stack.shape[2]
+
+            if z_rs > z_prs:
+                raster_stack = np.delete(raster_stack, np.s_[z_prs-z_rs:], 2)
+            if z_prs > z_rs:
+                previous_raster_stack = np.delete(previous_raster_stack, np.s_[z_rs-z_prs:], 2)
+
+        mean_rs = np.nanmean(raster_stack, axis=2, keepdims=True)
+        mean_prs = np.nanmean(previous_raster_stack, axis=2, keepdims=True)
+        m_rs = np.nan_to_num(raster_stack - mean_rs)
+        m_prs = np.nan_to_num(previous_raster_stack - mean_prs)
+        r_num = np.add.reduce(m_rs * m_prs, axis=2)
+        r_den = np.sqrt(ss(m_rs, axis=2) * ss(m_prs, axis=2))
+        r = r_num / r_den
+
+        # return the r coefficient -1 to 1
+        new_array = r
 
     #### create the output geo tif
     # Set up the GTiff driver
