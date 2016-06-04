@@ -61,7 +61,7 @@ def run(config_run):
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
                 else:
-                    msg = '\nError: Problem with reprojecting in Gdal\n'
+                    msg = '\nError: Problem while reprojecting in Gdal\n'
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
                     break
@@ -73,7 +73,7 @@ def run(config_run):
 
                 # process the mode MXD09A1: adjust pixel size
                 if mode in ['MOD09A1', 'MYD09A1']:
-                    pixel_size = ["500","500"]
+                    pixel_size = ["500", "500"]
                 # process the mode MXD09Q1: adjust pixel size
                 if mode in ['MOD09Q1', 'MYD09Q1']:
                     pixel_size = ["250", "250"]
@@ -87,7 +87,7 @@ def run(config_run):
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
                 else:
-                    msg = '\nError: Problem with reprojecting in Gdal\n'
+                    msg = '\nError: Problem while reprojecting in Gdal\n'
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
                     break
