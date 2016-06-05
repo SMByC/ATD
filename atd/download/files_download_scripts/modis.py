@@ -67,7 +67,7 @@ def download(config_run, name):
                 month=fix_zeros_in_datetime(config_run.target_date.date.month),
                 day=fix_zeros_in_datetime(config_run.target_date.date.day))
 
-    dirs, files, status = dirs_and_files_in_url(url)
+    files, status = dirs_and_files_in_url(url)
     if status != 'ok':
         errors.append(status)
     else:

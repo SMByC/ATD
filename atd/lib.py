@@ -202,27 +202,16 @@ def dirs_and_files_in_url(url):
     import urllib.request, urllib.parse, urllib.error
     import re
 
-    parse_re = re.compile('href="([^"]*)".*(..-...-.... ..:..).*?(\d+[^\s<]*|-)')
+    parse_re = re.compile(r'''(?<=href=["']).*?(?=["'])''', flags=re.UNICODE)
     try:
         html = urllib.request.urlopen(url).read().decode('utf-8')
     except IOError as e:
         status = 'error fetching %s: %s' % (url, e)
         return None, None, status
 
-    if not url.endswith('/'):
-        url += '/'
-    items = parse_re.findall(html)
-    dirs = []
-    files = []
-    for name, date, size in items:
-        # print name
-        if size.strip() == '-':
-            size = 'dir'
-        if name.endswith('/'):
-            dirs.append(name)
-        else:
-            files.append(name)
-    return dirs, files, 'ok'
+    files = parse_re.findall(html)
+
+    return files, 'ok'
 
 
 # print dirs_and_files_in_url("http://aa.com123")
