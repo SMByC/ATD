@@ -19,7 +19,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p0_download')
+    source_path = os.path.join(config_run.working_directory, 'p1_mrt')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -40,7 +40,7 @@ def run(config_run):
     # process the time series (in the whole period) with QC4SD by tile and by mode
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
-            files = [x for x in files if x.endswith(('.hdf', '.HDF'))]
+            files = [x for x in files if x.endswith(('.tif', '.TIF'))]
             if files:
                 tile = os.path.basename(root)
                 mode = os.path.basename(os.path.dirname(root))
