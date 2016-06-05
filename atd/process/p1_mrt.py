@@ -109,8 +109,6 @@ def modis_convert(hdf_file, dest):
             shutil.rmtree(mrt_dir_process)
         return 1, msg
 
-    return 0, msg
-
     ####### unir todas las bandas GeoTiff reproyectadas por cada imagen a GeoTiff multibanda
 
     # buscar todas las bandas dentro del directorio temporal
