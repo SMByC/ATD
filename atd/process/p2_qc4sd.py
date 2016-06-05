@@ -40,7 +40,7 @@ def run(config_run):
     # process the time series (in the whole period) with QC4SD by tile and by mode
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
-            files = [x for x in files if x.endswith(('.tif', '.TIF'))]
+            files = [x for x in files if x.endswith(('.hdf', '.HDF'))]
             if files:
                 tile = os.path.basename(root)
                 mode = os.path.basename(os.path.dirname(root))
