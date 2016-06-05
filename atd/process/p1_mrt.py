@@ -49,11 +49,15 @@ def run(config_run):
                 config_run.process_logfile.flush()
                 print(msg)
 
+                # converting and making the layerstack of mrt tmp process
                 return_code, msg = modis_convert(hdf_file, dest)
-                # if 'was converted successfully' in msg:
-                #    msg = 'was converted successfully'
                 config_run.process_logfile.write(msg + '\n')
                 print(msg)
+
+                # copy the xml
+                xml_from = hdf_file + '.xml'
+                xml_to = os.path.join(dest, os.path.basename(hdf_file).replace('.hdf', '.tif') + '.xml')
+                shutil.copy(xml_from, xml_to)
 
     # finishing the process
     msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
