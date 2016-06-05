@@ -107,7 +107,7 @@ def run(config_run):
     # errors
     if dnld_errors:
         dnld_errors = [x.strftime('%Y-%m-%d') for x in dnld_errors]
-        if config_run.dnld_errors[0] == 'None':
+        if config_run.dnld_errors is None or config_run.dnld_errors[0] == 'None':
             config_run.dnld_errors = dnld_errors
         else:
             config_run.dnld_errors = config_run.dnld_errors + dnld_errors
