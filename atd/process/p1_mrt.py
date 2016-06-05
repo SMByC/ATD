@@ -56,7 +56,7 @@ def run(config_run):
 
                 # copy the xml
                 xml_from = hdf_file + '.xml'
-                xml_to = os.path.join(dest, os.path.basename(hdf_file).replace('.hdf', '.tif') + '.xml')
+                xml_to = os.path.join(dest, os.path.basename(hdf_file) + '.xml')
                 shutil.copy(xml_from, xml_to)
 
     # finishing the process
@@ -75,18 +75,7 @@ def modis_convert(hdf_file, dest):
     if not os.path.isdir(dest):
         os.makedirs(dest)
 
-    # temporal directory for process files with mrt
-    os.chdir(os.path.dirname(dest))
-    mrt_dir_process = '.p1_mrt_tmp'
-    # primero eliminar antes de crearla si existe
-    if os.path.isdir(mrt_dir_process):
-        shutil.rmtree(mrt_dir_process)
-    if not os.path.isdir(mrt_dir_process):
-        os.makedirs(mrt_dir_process)
-
-    tmp_out_file = os.path.join(mrt_dir_process, os.path.basename(hdf_file).replace('.hdf', '.tif'))
-
-    out_file = os.path.join(dest, os.path.basename(hdf_file)).replace('.hdf', '.tif')
+    out_file = os.path.join(dest, os.path.basename(hdf_file))
 
     # opciones del remuestreo de la herramienta MRT
     options = {'subset': '( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )',
@@ -97,7 +86,7 @@ def modis_convert(hdf_file, dest):
                'resampl': 'NEAREST_NEIGHBOR',
                'datum': 'WGS84',
                'utm': '18',
-               'output': tmp_out_file}
+               'output': out_file}
 
     modisParse = parsemodis.parseModis(hdf_file)
     confname = modisParse.confResample(options['subset'], options['res'],
@@ -109,32 +98,6 @@ def modis_convert(hdf_file, dest):
 
     if 'was converted successfully' not in msg:
         # delete tmp dir
-        if os.path.isdir(mrt_dir_process):
-            shutil.rmtree(mrt_dir_process)
         return 1, msg
 
-    ####### unir todas las bandas GeoTiff reproyectadas por cada imagen a GeoTiff multibanda
-
-    # buscar todas las bandas dentro del directorio temporal
-    input_all_band = []
-    for root, dirs, files in os.walk(os.path.dirname(tmp_out_file)):
-        if len(files) != 0:
-            input_all_band = [os.path.join(root, x) for x in files if x[-4::] == '.tif']
-
-    # ordenarlas segun las fechas de las bandas
-    input_all_band = sorted(input_all_band)
-
-    # combinacion de bandas a GeoTiff multibanda usando gdal
-    return_code = call(["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate"] + input_all_band)
-
-    if return_code == 0:  # successfully
-        msg = 'was converted successfully'
-    else:
-        msg = '\nError: Problem generating the output GeoTiff multiband\n' \
-              'with gdal merge tool.'
-
-    # delete tmp dir
-    if os.path.isdir(mrt_dir_process):
-        shutil.rmtree(mrt_dir_process)
-
-    return return_code, msg
+    return 0, msg
