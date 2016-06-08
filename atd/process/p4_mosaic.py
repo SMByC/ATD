@@ -46,9 +46,8 @@ def run(config_run):
         'h11v09',
     ]
 
-    # recorre los archivos tif de la carpeta del proceso anterior (p3_stats)
-    # detecta y reagrupa todas las imagenes de una misma banda y modo, seleccionando
-    # todas las escenas de esta banda para generar y crear el mosaico con Gdal
+    # process file by file detecting the groups of bands and subproducts data
+    # inside directory for make the mosaic based on the name of the directory
     for root, dirs, files in os.walk(source_path):
         if len(files) != 0:
             files = [x for x in files if x[-4::] == '.tif']
@@ -60,41 +59,39 @@ def run(config_run):
 
                 files_temp_list = list(files)
                 while files_temp_list:
-                    # obtener la parte del nombre que se repite por cada variable
-                    # para seleccionar los archivos para el mosaico
+                    # detect the repeat name for each variable for process the group
                     file_group = files_temp_list[0]
                     for group_name in scenes:
                         if group_name in os.path.basename(file_group):
                             scene_group_name = file_group.split(group_name)[1]
 
-                    # seleccionar los archivos para el mosaico
+                    # selecting the file for mosaic
                     mosaic_input_list = []
                     for file in files_temp_list:
                         if scene_group_name in file:
                             mosaic_input_list.append(file)
-                    # nombre de salida del mosaico
+                    # output name file for mosaic
                     scene_group_name = scene_group_name.replace(var, '')
                     scene_group_name = scene_group_name.replace('.tif', '')
                     scene_group_name = scene_group_name[0:-1] if scene_group_name[-1] == '_' else scene_group_name
                     scene_group_name = scene_group_name[1::] if scene_group_name[0] == '_' else scene_group_name
-                    mosaic_name = scene_group_name + '_mosaico_' + var + '.tif'
-                    # ruta del archivo del mosaico
+                    mosaic_name = scene_group_name + '_mosaic_' + var + '.tif'
+                    # mosaic path
                     mosaic_dest = os.path.dirname(
                         os.path.join(dir_process, os.path.join(root, file).split('/p3_stats/')[-1]))
-                    # lista de archivos para el mosaico con ruta absoluta
+                    # list of file for make mosaic
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
 
-                    # Procesar el mosaico
+                    # mosaic process
                     msg = 'Processing mosaic {0}: '.format(mosaic_name)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
                     print(msg)
-                    # generar el mosaico
                     return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name)
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
 
-                    # quitar los archivos procesados en la lista y ordenarlos
+                    # clean process files in list and sorted
                     files_temp_list = sorted(list(set(files_temp_list) - set(mosaic_input_list)))
 
                     if return_code != 0:
@@ -120,7 +117,7 @@ def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
 
     out_file = os.path.join(mosaic_dest, mosaic_name)
 
-    # generar el mosaico con el programa gdalwarp de gdal
+    # make mosaic with gdal
     # gdalwarp salida_h1* m.tif -srcnodata 0 -dstnodata 255
     return_code = call(["gdalwarp"] + mosaic_input_list + [out_file])
 
