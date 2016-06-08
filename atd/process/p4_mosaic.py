@@ -122,7 +122,7 @@ def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
 
     # generar el mosaico con el programa gdalwarp de gdal
     # gdalwarp salida_h1* m.tif -srcnodata 0 -dstnodata 255
-    return_code = call(["gdalwarp"] + mosaic_input_list + [out_file, '-srcnodata', '0', '-dstnodata', '255'])
+    return_code = call(["gdalwarp"] + mosaic_input_list + [out_file])
 
     if return_code == 0:  # successfully
         msg = 'mosaic created successfully'
