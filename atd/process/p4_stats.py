@@ -327,6 +327,9 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     # get the numpy 3rd dimension array stack of the bands of image
     raster_stack = bands2layerstack(infile)
 
+    # define the default output type format
+    output_type = gdal.GDT_Float32
+
     # call built in numpy statistical functions, with a specified axis. if
     # axis=2 means it will calculate along the 'depth' axis, per pixel.
     # with the return being n by m, the shape of each band.
@@ -334,9 +337,11 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     # Calculate the median statistical
     if stat == 'median':
         new_array = np.nanmedian(raster_stack, axis=2)
+        output_type = gdal.GDT_UInt16
     # Calculate the mean statistical
     if stat == 'mean':
         new_array = np.nanmean(raster_stack, axis=2)
+        output_type = gdal.GDT_UInt16
     # Calculate the standard deviation
     if stat == 'std':
         new_array = np.nanstd(raster_stack, axis=2)
@@ -390,7 +395,7 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     # Set up the GTiff driver
     driver = gdal.GetDriverByName('GTiff')
 
-    new_dataset = driver.Create(outfile, xsize, ysize, 1, gdal.GDT_Float32,
+    new_dataset = driver.Create(outfile, xsize, ysize, 1, output_type,
                                 ["COMPRESS=LZW", "PREDICTOR=2", "TILED=YES"])
     # the '1' is for band 1
     new_dataset.SetGeoTransform(geo_trans)
