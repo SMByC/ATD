@@ -72,7 +72,8 @@ def run(config_run):
                 # combinacion de bandas a GeoTiff multibanda usando gdal
                 return_code = call(
                     ["gdal_merge.py", "-o", out_file, "-of", "GTiff", "-separate", "-ps", str(lower_pixel_size),
-                     str(lower_pixel_size)] + input_all_band)
+                     str(lower_pixel_size), "-co", "COMPRESS=LZW", "-co", "PREDICTOR=2", "-co", "TILED=YES"]
+                    + input_all_band)
 
                 if return_code == 0:  # successfully
                     msg = '  was converted successfully'
