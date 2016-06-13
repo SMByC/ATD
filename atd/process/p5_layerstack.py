@@ -19,7 +19,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p4_mosaic')
+    source_path = os.path.join(config_run.working_directory, 'p4_stats')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):

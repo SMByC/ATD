@@ -22,23 +22,23 @@ from atd.lib import datetime_format
 
 
 def run(config_run):
-    if config_run.p3_stats not in [None, 'None']:
+    if config_run.p4_stats not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
 
-    # optional argument prev_rundir only for p3_stats for computes all statistics
+    # optional argument prev_rundir only for p4_stats for computes all statistics
     if config_run.prev_rundir:
-        msg = "p3_stats will make some statistics with previous run, located in:\n\t" + \
+        msg = "p4_stats will make some statistics with previous run, located in:\n\t" + \
               os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory)) + '\n'
         config_run.process_logfile.write(msg)
         print(msg)
         # define and check files in previous run directory
-        previous_p2_qc4sd_dir = os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory), "p2_qc4sd")
-        if not os.path.isdir(previous_p2_qc4sd_dir):
-            msg = '\nWARNING: The directory of previous p2_qc4sd run: {0}\n' \
+        previous_p3_mosaic_dir = os.path.join(config_run.prev_rundir, os.path.basename(config_run.working_directory), "p3_mosaic")
+        if not os.path.isdir(previous_p3_mosaic_dir):
+            msg = '\nWARNING: The directory of previous p3_mosaic run: {0}\n' \
                   'not exist, please run the previous process before it.\n'\
-                  'continue but some statistics don\'t will processed.\n'.format(previous_p2_qc4sd_dir)
+                  'continue but some statistics don\'t will processed.\n'.format(previous_p3_mosaic_dir)
             config_run.process_logfile.write(msg)
             print(msg)
             config_run.prev_rundir = None
@@ -48,7 +48,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p2_qc4sd')
+    source_path = os.path.join(config_run.working_directory, 'p3_mosaic')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -57,7 +57,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p3_stats = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p4_stats = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -247,7 +247,7 @@ def run(config_run):
                         out_file = os.path.join(pearson_corr_dir, os.path.splitext(file)[0] + '_pearson_corr.tif')
 
                         try:
-                            statistics('pearson_corr', in_file, out_file, previous_p2_qc4sd_dir)
+                            statistics('pearson_corr', in_file, out_file, previous_p3_mosaic_dir)
                             msg = 'OK'
                             config_run.process_logfile.write(msg + '\n')
                             print(msg)
@@ -269,7 +269,7 @@ def run(config_run):
     config_run.process_logfile.write(msg + '\n')
     print(msg)
     # save in setting
-    config_run.p3_stats = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
+    config_run.p4_stats = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
     config_run.save()
 
 
@@ -314,7 +314,7 @@ def bands2layerstack(img_file, convert_nd2nan=True):
     return raster_stack
 
 
-def statistics(stat, infile, outfile, previous_p2_qc4sd_dir=None):
+def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     """Calculate the statistics
     """
 
@@ -359,7 +359,7 @@ def statistics(stat, infile, outfile, previous_p2_qc4sd_dir=None):
     if stat == 'pearson_corr':
         # https://github.com/scipy/scipy/blob/v0.14.0/scipy/stats/stats.py#L2392
         # get array of the previous mean file
-        previous_dataset_file = os.path.join(previous_p2_qc4sd_dir,
+        previous_dataset_file = os.path.join(previous_p3_mosaic_dir,
                                              os.path.basename(outfile).split('_pearson_corr.tif')[0] + '.tif')
 
         # get the numpy 3rd dimension array stack of the bands of image

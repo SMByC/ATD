@@ -14,12 +14,12 @@ from atd.lib import datetime_format
 
 
 def run(config_run):
-    if config_run.p4_mosaic not in [None, 'None']:
+    if config_run.p3_mosaic not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p3_stats')
+    source_path = os.path.join(config_run.working_directory, 'p2_qc4sd')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -28,7 +28,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
         # save in setting
-        config_run.p4_mosaic = 'with errors! - ' + datetime_format(datetime.today())
+        config_run.p3_mosaic = 'with errors! - ' + datetime_format(datetime.today())
         config_run.save()
         return
 
@@ -75,10 +75,10 @@ def run(config_run):
                     scene_group_name = scene_group_name.replace('.tif', '')
                     scene_group_name = scene_group_name[0:-1] if scene_group_name[-1] == '_' else scene_group_name
                     scene_group_name = scene_group_name[1::] if scene_group_name[0] == '_' else scene_group_name
-                    mosaic_name = scene_group_name + '_mosaic_' + var + '.tif'
+                    mosaic_name = scene_group_name + '.tif'
                     # mosaic path
                     mosaic_dest = os.path.dirname(
-                        os.path.join(dir_process, os.path.join(root, file).split('/p3_stats/')[-1]))
+                        os.path.join(dir_process, os.path.join(root, file).split('/p2_qc4sd/')[-1]))
                     # list of file for make mosaic
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
 
@@ -107,7 +107,7 @@ def run(config_run):
     config_run.process_logfile.write(msg + '\n')
     print(msg)
     # save in setting
-    config_run.p4_mosaic = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
+    config_run.p3_mosaic = ('with errors! - ' if return_code != 0 else 'done - ') + datetime_format(datetime.today())
     config_run.save()
 
 
