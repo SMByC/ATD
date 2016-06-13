@@ -75,6 +75,8 @@ def run(config_run):
                     scene_group_name = scene_group_name.replace('.tif', '')
                     scene_group_name = scene_group_name[0:-1] if scene_group_name[-1] == '_' else scene_group_name
                     scene_group_name = scene_group_name[1::] if scene_group_name[0] == '_' else scene_group_name
+                    # define file names
+                    mosaic_name_tmp = scene_group_name + '_tmp.tif'
                     mosaic_name = scene_group_name + '.tif'
                     # mosaic path
                     mosaic_dest = os.path.dirname(
@@ -87,18 +89,22 @@ def run(config_run):
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
                     print(msg)
-                    return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name)
+                    return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name_tmp)
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
+                    if return_code != 0: break
+
+                    # clipping Colombia shape
+                    return_code, msg = clipping_colombia(os.path.join(mosaic_dest, mosaic_name_tmp),
+                                                         os.path.join(mosaic_dest, mosaic_name))
+                    print(msg)
+                    if return_code != 0: break
 
                     # clean process files in list and sorted
                     files_temp_list = sorted(list(set(files_temp_list) - set(mosaic_input_list)))
+                    os.remove(os.path.join(mosaic_dest, mosaic_name_tmp))
 
-                    if return_code != 0:
-                        break
-
-                if return_code != 0:
-                    break
+                if return_code != 0: break
 
     # finishing the process
     msg = '\nThe process {0} completed {1}- ({2})'.format(config_run.process_name,
@@ -125,6 +131,23 @@ def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
         msg = 'mosaic created successfully'
     else:
         msg = '\nError: The mosaic can not create for any reason, please check\n' \
+              'error message above, likely the files not were\n' \
+              'processed successfully.'
+
+    return return_code, msg
+
+def clipping_colombia(infile, outfile):
+    base_dir = os.path.dirname(__file__)
+
+    colombia_buffer_shape = os.path.join(base_dir, "shapes", "Colombia", "Colombia_WGS84_Z18_Buffer_1200m.shp")
+
+    return_code = call(["gdalwarp", "-cutline", colombia_buffer_shape, "-crop_to_cutline",
+                        infile, outfile, "-co", "COMPRESS=LZW", "-co", "PREDICTOR=2", "-co", "TILED=YES"])
+
+    if return_code == 0:  # successfully
+        msg = 'clipping with Colombia shape successfully'
+    else:
+        msg = '\nError: The clipping with Colombia shape can not processed for any reason, please check\n' \
               'error message above, likely the files not were\n' \
               'processed successfully.'
 
