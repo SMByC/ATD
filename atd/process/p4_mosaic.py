@@ -119,7 +119,10 @@ def mosaic(mosaic_input_list, mosaic_dest, mosaic_name):
 
     # make mosaic with gdal
     # gdalwarp salida_h1* m.tif -srcnodata 0 -dstnodata 255
-    return_code = call(["gdalwarp"] + mosaic_input_list + [out_file])
+    if 'valid_data' in mosaic_name or 'coeff_var' in mosaic_name:
+        return_code = call(["gdalwarp"] + mosaic_input_list + [out_file, '-srcnodata', '0', '-dstnodata', '0'])
+    else:
+        return_code = call(["gdalwarp"] + mosaic_input_list + [out_file])
 
     if return_code == 0:  # successfully
         msg = 'mosaic created successfully'
