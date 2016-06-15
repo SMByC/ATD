@@ -121,7 +121,7 @@ if args.make == 'process':
     if args.process == 'p3_mosaic':
         p3_mosaic.run(config_run)
 
-    #################################### statistics R process #####################################
+    ##################################### statistics process ######################################
     if args.process == 'p4_stats':
         p4_stats.run(config_run)
 

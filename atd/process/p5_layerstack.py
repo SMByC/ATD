@@ -80,7 +80,7 @@ def run(config_run):
                     config_run.process_logfile.write(msg + '\n')
                     print(msg)
                 else:
-                    msg = '\nError: The R script return a error, please check\n' \
+                    msg = '\nError: Problems in layerstack process, please check\n' \
                           'error message above, likely the files not were\n' \
                           'processed successfully.'
                     config_run.process_logfile.write(msg + '\n')
