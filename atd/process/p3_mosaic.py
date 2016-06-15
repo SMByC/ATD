@@ -19,7 +19,7 @@ def run(config_run):
         config_run.process_logfile.write(msg)
         print(msg)
 
-    source_path = os.path.join(config_run.working_directory, 'p2_qc4sd')
+    source_path = os.path.join(config_run.working_directory, 'p2_reproj')
     dir_process = os.path.join(config_run.working_directory, config_run.process_name)
 
     if not os.path.isdir(source_path):
@@ -80,7 +80,7 @@ def run(config_run):
                     mosaic_name = scene_group_name + '.tif'
                     # mosaic path
                     mosaic_dest = os.path.dirname(
-                        os.path.join(dir_process, os.path.join(root, file).split('/p2_qc4sd/')[-1]))
+                        os.path.join(dir_process, os.path.join(root, file).split('/p2_reproj/')[-1]))
                     # list of file for make mosaic
                     mosaic_input_list_fullpath = [os.path.join(root, f) for f in mosaic_input_list]
 

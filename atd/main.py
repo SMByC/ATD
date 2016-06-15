@@ -15,7 +15,7 @@ from datetime import datetime
 from atd import settings
 from atd.lib import datetime_format
 from atd.download import main as download_main
-from atd.process import p1_qc4sd, p2_reproj, p3_stats, p4_mosaic, p5_layerstack
+from atd.process import p1_qc4sd, p2_reproj, p3_mosaic, p4_stats, p5_layerstack
 
 
 ########################################## arguments ##########################################
@@ -61,14 +61,14 @@ group_download.add_argument('working_directory', help='working directory to proc
                             nargs='?', default=os.getcwd())
 
 # PROCESS
-list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_stats', 'p4_mosaic', 'p5_layerstack']
+list_of_process = ['p1_qc4sd', 'p2_reproj', 'p3_mosaic', 'p4_stats', 'p5_layerstack']
 group_process = subparsers.add_parser('process', help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('process', type=str, choices=list_of_process,
                            help='process {0}'.format(','.join(list_of_process)))
 group_process.add_argument('--email', type=str, help='send email when finnish')
 group_process.add_argument('working_directory', help='working directory to process', action=readable_dir)
-# only for p3_stats for computes statistics
-group_process.add_argument('--prev_rundir', help='directory of the previous run (only for run p3_stats)',
+# only for p4_stats for computes statistics
+group_process.add_argument('--prev_rundir', help='directory of the previous run (only for run p4_stats)',
                            action=readable_dir)
 
 # print help if not pass arguments
@@ -117,13 +117,13 @@ if args.make == 'process':
     if args.process == 'p2_reproj':
         p2_reproj.run(config_run)
 
-    #################################### statistics R process #####################################
-    if args.process == 'p3_stats':
-        p3_stats.run(config_run)
-
     ######################################### make mosaic #########################################
-    if args.process == 'p4_mosaic':
-        p4_mosaic.run(config_run)
+    if args.process == 'p3_mosaic':
+        p3_mosaic.run(config_run)
+
+    ##################################### statistics process ######################################
+    if args.process == 'p4_stats':
+        p4_stats.run(config_run)
 
     ################################### create the layer stack ####################################
     if args.process == 'p5_layerstack':
