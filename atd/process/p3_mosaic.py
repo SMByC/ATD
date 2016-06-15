@@ -141,8 +141,8 @@ def clipping_colombia(infile, outfile):
 
     colombia_buffer_shape = os.path.join(base_dir, "shapes", "Colombia", "Colombia_WGS84_Z18_Buffer_1200m.shp")
 
-    return_code = call(["gdalwarp", "-cutline", colombia_buffer_shape, "-crop_to_cutline",
-                        infile, outfile, "-co", "COMPRESS=LZW", "-co", "PREDICTOR=2", "-co", "TILED=YES"])
+    return_code = call(["gdalwarp", "-cutline", colombia_buffer_shape, infile, outfile,
+                        "-co", "COMPRESS=LZW", "-co", "PREDICTOR=2", "-co", "TILED=YES"])
 
     if return_code == 0:  # successfully
         msg = 'clipping with Colombia shape successfully'
