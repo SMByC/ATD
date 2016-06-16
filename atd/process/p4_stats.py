@@ -380,6 +380,15 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
             if z_prs > z_rs:
                 previous_raster_stack = np.delete(previous_raster_stack, np.s_[z_rs-z_prs:], 2)
 
+        # propagate the nan values across the pair values in the same position for the
+        # two raster in both directions
+        mask1 = np.isnan(raster_stack)
+        mask2 = np.isnan(previous_raster_stack)
+        combined_mask = mask1 | mask2
+        raster_stack = np.where(combined_mask, np.nan, raster_stack)
+        previous_raster_stack = np.where(combined_mask, np.nan, previous_raster_stack)
+        del mask1, mask2, combined_mask
+
         mean_rs = np.nanmean(raster_stack, axis=2, keepdims=True)
         mean_prs = np.nanmean(previous_raster_stack, axis=2, keepdims=True)
         m_rs = np.nan_to_num(raster_stack - mean_rs)
