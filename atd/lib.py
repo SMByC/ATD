@@ -112,12 +112,11 @@ def email_download_complete(config_run, files_attached=[]):
 ###############################################################################
 
 def cksum(file_to_check):  # TODO replace
-    '''
-    This module implements the cksum command found in most UNIXes in pure
+    """This module implements the cksum command found in most UNIXes in pure
     python.
 
     The constants and routine are cribbed from the POSIX man page
-    '''
+    """
 
     crctab = [0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc,
               0x17c56b6b, 0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f,
@@ -195,9 +194,8 @@ def cksum(file_to_check):  # TODO replace
 ###############################################################################
 
 def dirs_and_files_in_url(url):
-    '''
-    Return all files and directories in specific URL
-    '''
+    """Return all files and directories in specific URL
+    """
 
     import urllib.request, urllib.parse, urllib.error
     import re
@@ -219,6 +217,8 @@ def dirs_and_files_in_url(url):
 ###############################################################################
 
 def get_all_start_n_days_of_month(year, month, num_days=8):
+    """Return all days for specific month and year with num_days interval
+    """
     reference_date = date(year, 1, 1)
 
     # if reference_date.year > year:
@@ -240,7 +240,7 @@ def get_all_start_n_days_of_month(year, month, num_days=8):
 
 ###############################################################################
 
-class DateATD():
+class DateATD:
     """
     self.date_orig: original date
     self.date: date adjusted to interval N days
@@ -248,46 +248,49 @@ class DateATD():
     self.is_end_month: True if nd_date end inside interval N days for this month
     """
 
-    def __init__(self, date_str, type=None):
-        self.set(date_str, type)
+    def __init__(self, date_str, date_type=None, freq_time=1):
+        self.set(date_str, date_type)
+        self.freq_time = freq_time
 
     def __str__(self):
         return str(self.date)
 
-    def set(self, date_str, type=None):
+    def set(self, date_str, date_type=None):
         if len(date_str.split('-')) == 3:
             self.date_orig = parse(date_str).date()
         elif len(date_str.split('-')) == 2:
-            days_list = get_all_start_n_days_of_month(int(date_str.split('-')[0]), int(date_str.split('-')[1]))
-            if type == "start":
+            days_list = get_all_start_n_days_of_month(int(date_str.split('-')[0]),
+                                                      int(date_str.split('-')[1]),
+                                                      num_days=self.freq_time)
+            if date_type == "start":
                 self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[0]))
-            if type == "end":
+            if date_type == "end":
                 self.date_orig = date(int(date_str.split('-')[0]), int(date_str.split('-')[1]), int(days_list[-1]))
-            if type is None:
+            if date_type is None:
                 print("For date {0} with only year and month, you must set the type date ('start' or 'end').".format(
                     date_str))
                 exit()
         else:
             print("Date {0} is not a valid date format, e.g. 2009-01-20 or 2009-01".format(date_str))
             exit()
-        days_list = get_all_start_n_days_of_month(self.date_orig.year, self.date_orig.month)
+        days_list = get_all_start_n_days_of_month(self.date_orig.year, self.date_orig.month, num_days=self.freq_time)
         for idx, day in enumerate(days_list):
             if day >= self.date_orig.day:
                 self.date = date(self.date_orig.year, self.date_orig.month, day)
                 break
         if self.date_orig.day > days_list[-1]:
             date_plus1 = self.date_orig + relativedelta(months=1)
-            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month)
+            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month, num_days=self.freq_time)
             self.date = date(date_plus1.year, date_plus1.month, days_list_plus1[0])
 
-        if type == "start":
+        if date_type == "start":
             if self.date_orig < self.date:
                 self.back()
 
         self.start_end_month()
 
     def start_end_month(self):
-        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month, num_days=self.freq_time)
         if self.date.day == days_list[0]:
             self.is_start_month = True
             self.is_end_month = False
@@ -299,20 +302,20 @@ class DateATD():
             self.is_end_month = False
 
     def next(self):
-        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month, num_days=self.freq_time)
         if self.date.day == days_list[-1]:
             date_plus1 = self.date + relativedelta(months=1)
-            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month)
+            days_list_plus1 = get_all_start_n_days_of_month(date_plus1.year, date_plus1.month, num_days=self.freq_time)
             self.date = date(date_plus1.year, date_plus1.month, days_list_plus1[0])
         else:
             self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day) + 1])
         self.start_end_month()
 
     def back(self):
-        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month)
+        days_list = get_all_start_n_days_of_month(self.date.year, self.date.month, num_days=self.freq_time)
         if self.date.day == days_list[0]:
             date_minus1 = self.date + relativedelta(months=-1)
-            days_list_minus1 = get_all_start_n_days_of_month(date_minus1.year, date_minus1.month)
+            days_list_minus1 = get_all_start_n_days_of_month(date_minus1.year, date_minus1.month, num_days=self.freq_time)
             self.date = date(date_minus1.year, date_minus1.month, days_list_minus1[-1])
         else:
             self.date = date(self.date.year, self.date.month, days_list[days_list.index(self.date.day) - 1])
@@ -322,8 +325,7 @@ class DateATD():
 ###############################################################################
 
 def dir_date_name(start, end):
-    """
-    start and end must be instances of DateATD class
+    """start and end must be instances of DateATD class
     """
 
     if start.date.year == end.date.year:
@@ -374,8 +376,7 @@ def update_working_directory(config_run):
 ###############################################################################
 
 def get_pixel_size(raster_file):
-    """
-    Return the pixel size of raster, for square pixel else
+    """Return the pixel size of raster, for square pixel else
     return absolute value of w-e pixel resolution.
     for n-s pixel resolution -> geo_transform[5]
     """
@@ -387,8 +388,7 @@ def get_pixel_size(raster_file):
 ###############################################################################
 
 def get_http_code(url):
-    """
-    Return the HTTP code from specific URL
+    """Return the HTTP code from specific URL
     """
 
     try:
