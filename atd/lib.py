@@ -249,8 +249,8 @@ class DateATD:
     """
 
     def __init__(self, date_str, date_type=None, freq_time=1):
-        self.set(date_str, date_type)
         self.freq_time = freq_time
+        self.set(date_str, date_type)
 
     def __str__(self):
         return str(self.date)
