@@ -52,11 +52,11 @@ def run(config_run):
 
                 files_with_path = [os.path.join(root, file) for file in files]
 
-                # process the mode MXD09A1 for the bands 3,4,5,6 and 7
-                if mode in ['MOD09A1', 'MYD09A1']:
+                # process the mode MXD09A1/GA for the bands 3,4,5,6 and 7
+                if mode in ['MOD09A1', 'MYD09A1'] + ['MOD09GA', 'MYD09GA']:
                     qc4sd.run('default', [3, 4, 5, 6, 7], files_with_path, dir_process)
-                # process the mode MXD09Q1 for the bands 1 and 2
-                if mode in ['MOD09Q1', 'MYD09Q1']:
+                # process the mode MXD09Q1/GQ for the bands 1 and 2
+                if mode in ['MOD09Q1', 'MYD09Q1'] + ['MOD09GQ', 'MYD09GQ']:
                     qc4sd.run('default', [1, 2], files_with_path, dir_process)
 
     # finishing the process
