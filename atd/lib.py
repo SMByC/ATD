@@ -64,7 +64,7 @@ def send_mail(sender, receiver, subject, body, files_attached=None):
     # Send the message via our own SMTP server
     server = smtplib.SMTP("mail.ideam.gov.co", 587)
     # Next, log in to the server
-    server.login("xcorredorl@ideam.gov.co", base64.b64decode("WGNvcnJlZG9yMjAxMA=="))
+    server.login(os.environ.get('ideam_mail_user'), os.environ.get('ideam_mail_pass'))
     server.sendmail(msg["From"], msg["To"].split(","), msg.as_string())
     server.quit()
 
