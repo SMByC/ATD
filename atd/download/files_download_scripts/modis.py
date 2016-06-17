@@ -20,62 +20,13 @@ scenes = [
     'h11v09',
 ]
 
-
 def download(config_run, name):
     global scenes
-    # save any error occur
-    errors = []
 
-    # ==============================================================================
-    # name and datetime
-
-    today = datetime.today()
-    dnld_datetime = "{year}{month}{day}" \
-        .format(year=today.year, month=fix_zeros_in_datetime(today.month),
-                day=fix_zeros_in_datetime(today.day))
-
-    # ==============================================================================
-    # defined files to download
-
-    ### test
-    # urls_files = [
-    #     'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.06/MOD09A1.A2000097.h09v02.005.2008198085600.hdf',
-    #     'http://e4ftl01.cr.usgs.gov/MOLT/MOD09A1.005/2000.04.14/MOD09A1.A2000105.h09v02.005.2006266185153.hdf',
-    # ]
-    # dnld_manager = DownloadManager(num_workers=3)
-    # dnld_manager.dnld_name = name
-    # dnld_manager.dnld_date = dnld_date
-    # #dnld_manager.logs_path = path
-    # dnld_manager.errors = errors
-    # dest_dir = os.path.join(path, name)
-    # dnld_manager.main(urls_files, dest_dir)
-    # dnld_manager.download_status()
-    # del dnld_manager
-    # return DownloadManager.DNLD_ERRORS, os.path.join(dest_dir, name+'_'+dnld_date+"_status.csv")
-    ### test
-
-    # download from terra
-    if config_run.current_source == 'terra':
-        url_source = 'http://e4ftl01.cr.usgs.gov/MOLT'
-    # download from aqua
-    if config_run.current_source == 'aqua':
-        url_source = 'http://e4ftl01.cr.usgs.gov/MOLA'
-
-    urls_files = []
-    url = '{url_source}/{name}.006/{year}.{month}.{day}/' \
-        .format(url_source=url_source, name=name, year=config_run.target_date.date.year,
-                month=fix_zeros_in_datetime(config_run.target_date.date.month),
-                day=fix_zeros_in_datetime(config_run.target_date.date.day))
-
-    files, status = dirs_and_files_in_url(url)
-    if status != 'ok':
-        errors.append(status)
-    else:
-        for scene in scenes:
-            for file in files:
-                if name in file and scene in file and \
-                                "BROWSE" not in file and '.xml' not in file:
-                    urls_files.append(url + file)
+    if name in ['MOD09A1', 'MOD09Q1', 'MYD09A1', 'MYD09Q1']:
+        urls_files, errors = mxd09a1_q1(config_run, name)
+    if name in ['MOD09GA', 'MOD09GQ', 'MYD09GA', 'MYD09GQ']:
+        urls_files, errors = mxd09ga_gq(config_run, name)
 
     # ==============================================================================
     # check before download files
@@ -125,4 +76,92 @@ def download(config_run, name):
     # return number of errors, status file
     return DownloadManager.DNLD_ERRORS, os.path.join(config_run.download_path, name, name + "_status.csv")
 
-# download('MOD09A1', "/home/xavier/Projects/SMDC/ATD/download/files_download_scripts/temp", 2014, 1)
+
+def mxd09a1_q1(config_run, name):
+    """For products modis: MOD09A1, MOD09Q1, MYD09A1, MYD09Q1
+
+    Surface Reflectance 8-Day L3: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+    """
+    global scenes
+    # save any error occur
+    errors = []
+    # ==============================================================================
+    # name and datetime
+
+    today = datetime.today()
+    dnld_datetime = "{year}{month}{day}" \
+        .format(year=today.year, month=fix_zeros_in_datetime(today.month),
+                day=fix_zeros_in_datetime(today.day))
+
+    # ==============================================================================
+    # defined files to download
+
+    # download from terra
+    if config_run.current_source == 'terra':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLT'
+    # download from aqua
+    if config_run.current_source == 'aqua':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLA'
+
+    urls_files = []
+    url = '{url_source}/{name}.006/{year}.{month}.{day}/' \
+        .format(url_source=url_source, name=name, year=config_run.target_date.date.year,
+                month=fix_zeros_in_datetime(config_run.target_date.date.month),
+                day=fix_zeros_in_datetime(config_run.target_date.date.day))
+
+    files, status = dirs_and_files_in_url(url)
+    if status != 'ok':
+        errors.append(status)
+    else:
+        for scene in scenes:
+            for file in files:
+                if name in file and scene in file and \
+                                "BROWSE" not in file and '.xml' not in file:
+                    urls_files.append(url + file)
+
+    return urls_files, errors
+
+
+def mxd09ga_gq(config_run, name):
+    """For products modis: MOD09GA, MOD09GQ, MYD09GA, MYD09GQ
+
+    Surface Reflectance Daily L2G: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+    """
+    global scenes
+    # save any error occur
+    errors = []
+    # ==============================================================================
+    # name and datetime
+
+    today = datetime.today()
+    dnld_datetime = "{year}{month}{day}" \
+        .format(year=today.year, month=fix_zeros_in_datetime(today.month),
+                day=fix_zeros_in_datetime(today.day))
+
+    # ==============================================================================
+    # defined files to download
+
+    # download from terra
+    if config_run.current_source == 'terra':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLT'
+    # download from aqua
+    if config_run.current_source == 'aqua':
+        url_source = 'http://e4ftl01.cr.usgs.gov/MOLA'
+
+    urls_files = []
+    url = '{url_source}/{name}.006/{year}.{month}.{day}/' \
+        .format(url_source=url_source, name=name, year=config_run.target_date.date.year,
+                month=fix_zeros_in_datetime(config_run.target_date.date.month),
+                day=fix_zeros_in_datetime(config_run.target_date.date.day))
+
+    files, status = dirs_and_files_in_url(url)
+    if status != 'ok':
+        errors.append(status)
+    else:
+        for scene in scenes:
+            for file in files:
+                if name in file and scene in file and \
+                                "BROWSE" not in file and '.xml' not in file:
+                    urls_files.append(url + file)
+
+    return urls_files, errors

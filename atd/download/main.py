@@ -59,14 +59,29 @@ def run(config_run):
             config_run.dnld_logfile.write(msg + '\n')
             print(msg)
 
-            # download from terra
-            if config_run.current_source == 'terra':
-                dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09A1')
-                dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09Q1')
-            # download from aqua
-            if config_run.current_source == 'aqua':
-                dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MYD09A1')
-                dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MYD09Q1')
+            # for Modis products: MOD09A1, MOD09Q1, MYD09A1, MYD09Q1
+            # surface Reflectance 8-Day L3: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+            if config_run.modis_type == "mxd09a1_q1":
+                # download from terra
+                if config_run.current_source == 'terra':
+                    dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09A1')
+                    dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09Q1')
+                # download from aqua
+                if config_run.current_source == 'aqua':
+                    dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MYD09A1')
+                    dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MYD09Q1')
+
+            # for Modis products: MOD09GA, MOD09GQ, MYD09GA, MYD09GQ
+            # surface Reflectance Daily L2G: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+            if config_run.modis_type == "mxd09ga_gq":
+                # download from terra
+                if config_run.current_source == 'terra':
+                    dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MOD09GA')
+                    dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MOD09GQ')
+                # download from aqua
+                if config_run.current_source == 'aqua':
+                    dnld_errors_A1, status_file_A1 = modis.download(config_run, 'MYD09GA')
+                    dnld_errors_Q1, status_file_Q1 = modis.download(config_run, 'MYD09GQ')
 
             msg_error = None
             ## check errors from download

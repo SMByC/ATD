@@ -39,6 +39,17 @@ class ConfigRun:
         self.dnld_errors = None
         self.dnld_finished = False
 
+        ## TYPE MODIS TO DOWNLOAD
+        # for Modis products: MOD09A1, MOD09Q1, MYD09A1, MYD09Q1
+        # surface Reflectance 8-Day L3: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+        #self.modis_type = "mxd09a1_q1"
+        #self.freq_time = 8  # 8-days
+
+        # for Modis products: MOD09GA, MOD09GQ, MYD09GA, MYD09GQ
+        # surface Reflectance Daily L2G: http://modis.gsfc.nasa.gov/data/dataprod/mod09.php
+        self.modis_type = "mxd09ga_gq"
+        self.freq_time = 1  # daily
+
         ## variables that not save into settings
         self.set_config_file()
         self.email = None
@@ -167,24 +178,24 @@ def get(args):
 
         ## start date
         if args.from_date is not None:
-            config_run.start_date = DateATD(args.from_date, 'start')
+            config_run.start_date = DateATD(args.from_date, 'start', config_run.freq_time)
         elif config_run.start_date in [None, 'None']:
             today = date.today()
-            config_run.start_date = DateATD(today.strftime('%Y-%m-%d'), 'start')
+            config_run.start_date = DateATD(today.strftime('%Y-%m-%d'), 'start', config_run.freq_time)
         else:
-            config_run.start_date = DateATD(config_run.start_date, 'start')
+            config_run.start_date = DateATD(config_run.start_date, 'start', config_run.freq_time)
 
         ## end date
         if args.to_date is not None:
-            config_run.end_date = DateATD(args.to_date, 'end')
+            config_run.end_date = DateATD(args.to_date, 'end', config_run.freq_time)
         elif isinstance(config_run.end_date, str) and not config_run.end_date in [None, 'None']:
-            config_run.end_date = DateATD(config_run.end_date, 'end')
+            config_run.end_date = DateATD(config_run.end_date, 'end', config_run.freq_time)
 
         ## target date
         if config_run.target_date in [None, 'None']:
             config_run.target_date = deepcopy(config_run.start_date)
         else:
-            config_run.target_date = DateATD(config_run.target_date)
+            config_run.target_date = DateATD(config_run.target_date, config_run.freq_time)
             # test if target date are between the start and end date
             if not (config_run.start_date.date <= config_run.target_date.date):
                 msg = '\nWarning: The start date is bigger than target date, changing\n' \
