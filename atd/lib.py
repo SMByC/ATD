@@ -194,18 +194,18 @@ def cksum(file_to_check):  # TODO replace
 ###############################################################################
 
 def dirs_and_files_in_url(url):
-    """Return all files and directories in specific URL
+    """Return all listed files in specific URL
     """
 
-    import urllib.request, urllib.parse, urllib.error
+    import urllib.request, urllib.error
     import re
 
     parse_re = re.compile(r'''(?<=href=["']).*?(?=["'])''', flags=re.UNICODE)
     try:
         html = urllib.request.urlopen(url).read().decode('utf-8')
     except IOError as e:
-        status = 'error fetching %s: %s' % (url, e)
-        return None, None, status
+        status = 'error fetching {url}: {err}'.format(url=url, err=e)
+        return None, status
 
     files = parse_re.findall(html)
 
