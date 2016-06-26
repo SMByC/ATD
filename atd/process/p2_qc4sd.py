@@ -32,8 +32,10 @@ def run(config_run):
         config_run.save()
         return
 
-    if os.path.isdir(dir_process):
-        shutil.rmtree(dir_process)
+    # not delete the previous qc4sd dir because qc4sd run in
+    # continue mode without overwriting files
+    #if os.path.isdir(dir_process):
+    #    shutil.rmtree(dir_process)
     if not os.path.isdir(dir_process):
         os.makedirs(dir_process)
 
