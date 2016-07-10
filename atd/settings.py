@@ -287,6 +287,7 @@ def get(args):
 
         # required prev_rundir only for p4_stats for computes statistics
         config_run.prev_rundir = args.prev_rundir
+        config_run.number_of_processes = args.number_of_processes
 
         config_run.start_date = download_config_run.start_date
         config_run.end_date = download_config_run.end_date

@@ -56,10 +56,12 @@ def run(config_run):
 
                 # process the mode MXD09A1/GA for the bands 3,4,5,6 and 7
                 if mode in ['MOD09A1', 'MYD09A1'] + ['MOD09GA', 'MYD09GA']:
-                    qc4sd.run('default', [3, 4, 5, 6, 7], files_with_path, dir_process, not_overwrite=True)
+                    qc4sd.run('default', [3, 4, 5, 6, 7], files_with_path, dir_process,
+                              not_overwrite=True, number_of_processes=config_run.number_of_processes)
                 # process the mode MXD09Q1/GQ for the bands 1 and 2
                 if mode in ['MOD09Q1', 'MYD09Q1'] + ['MOD09GQ', 'MYD09GQ']:
-                    qc4sd.run('default', [1, 2], files_with_path, dir_process, not_overwrite=True)
+                    qc4sd.run('default', [1, 2], files_with_path, dir_process,
+                              not_overwrite=True, number_of_processes=config_run.number_of_processes)
 
     # finishing the process
     msg = '\nThe process {0} completed - ({1})'.format(config_run.process_name, datetime_format(datetime.today()))
