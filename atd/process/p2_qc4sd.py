@@ -60,14 +60,6 @@ def run(config_run):
                               not_overwrite=True, number_of_processes=config_run.number_of_processes)
                 # process the mode MXD09Q1/GQ for the bands 1 and 2
                 if mode in ['MOD09Q1', 'MYD09Q1'] + ['MOD09GQ', 'MYD09GQ']:
-                    if mode in ['MOD09GQ', 'MYD09GQ']:
-                        mxd09ga_file = os.path.abspath(files_with_path).replace('D09GQ', 'D09GA')
-                        if not os.path.isfile(mxd09ga_file):
-                            msg = "   File not found {0}. For make the quality control of MXD09GQ "\
-                                  "you need have MXD09GA files. Not be held the QC4SD for this file.".format(mxd09ga_file)
-                            config_run.process_logfile.write(msg + '\n')
-                            print(msg)
-                            continue
                     qc4sd.run('default', [1, 2], files_with_path, dir_process,
                               not_overwrite=True, number_of_processes=config_run.number_of_processes)
 
