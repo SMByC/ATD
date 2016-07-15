@@ -6,8 +6,10 @@
 #  Email: xcorredorl at ideam.gov.co
 
 import os
+import tempfile
 import numpy as np
 import shutil
+from joblib import load, dump
 from datetime import datetime
 from scipy.stats import variation, ss
 
@@ -324,8 +326,16 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     # get the projection information
     no_data_value, xsize, ysize, geo_trans, projection, data_type = get_geo_info(infile)
 
-    # get the numpy 3rd dimension array stack of the bands of image
-    raster_stack = bands2layerstack(infile)
+    # define temp dir and memmap raster to save
+    tmp_folder = tempfile.mkdtemp()
+    mmap_raster = os.path.join(tmp_folder, 'mmap_raster')
+
+    # get the numpy 3rd dimension array stack of the bands of image and
+    # dump the input data raster (for band to process) to disk to free the memory
+    dump(bands2layerstack(infile), mmap_raster, compress=0)
+
+    # load the raster from memmap disk cache
+    raster_stack = load(mmap_raster, mmap_mode='r+')
 
     # define the default output type format
     output_type = gdal.GDT_Float32
@@ -344,7 +354,7 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
         output_type = gdal.GDT_UInt16
     # Calculate the standard deviation
     if stat == 'std':
-        new_array = np.nanstd(raster_stack, axis=2)
+        new_array = np.std(raster_stack, axis=2)  # TODO: use nanstd()
     # Calculate the valid data
     if stat == 'valid_data':
         # calculate the number of valid data used in statistics products in percentage (0-100%),
@@ -354,7 +364,7 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     if stat == 'snr':
         # this signal-to-noise ratio defined as the mean divided by the standard deviation.
         m = np.nanmean(raster_stack, axis=2)
-        sd = np.nanstd(raster_stack, axis=2, ddof=0)
+        sd = np.std(raster_stack, axis=2, ddof=0)  # TODO: use nanstd()
         new_array = np.where(sd == 0, 0, m / sd)
     # Calculate the coefficient of variation
     if stat == 'coeff_var':
@@ -412,3 +422,7 @@ def statistics(stat, infile, outfile, previous_p3_mosaic_dir=None):
     # Write the array
     new_dataset.GetRasterBand(1).WriteArray(new_array)
     new_dataset.GetRasterBand(1).SetNoDataValue(np.nan)
+
+    # clean
+    del raster_stack
+    shutil.rmtree(tmp_folder)
