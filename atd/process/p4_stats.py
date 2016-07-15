@@ -91,7 +91,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating median statistic\n' + error
+                        msg = 'FAIL\nError: While calculating median statistic\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -117,7 +117,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating mean statistic\n' + error
+                        msg = 'FAIL\nError: While calculating mean statistic\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -143,7 +143,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating standard deviation\n' + error
+                        msg = 'FAIL\nError: While calculating standard deviation\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -170,7 +170,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating valid data\n' + error
+                        msg = 'FAIL\nError: While calculating valid data\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -197,7 +197,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating signal-to-noise ratio\n' + error
+                        msg = 'FAIL\nError: While calculating signal-to-noise ratio\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -224,7 +224,7 @@ def run(config_run):
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                     except Exception as error:
-                        msg = 'FAIL\nError: While calculating coefficient of variation\n' + error
+                        msg = 'FAIL\nError: While calculating coefficient of variation\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
                         return msg
@@ -252,7 +252,7 @@ def run(config_run):
                             config_run.process_logfile.write(msg + '\n')
                             print(msg)
                         except Exception as error:
-                            msg = 'FAIL\nError: While calculating Pearson\'s correlation coefficient\n' + error
+                            msg = 'FAIL\nError: While calculating Pearson\'s correlation coefficient\n' + str(error)
                             config_run.process_logfile.write(msg + '\n')
                             print(msg)
                             return msg
