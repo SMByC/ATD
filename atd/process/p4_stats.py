@@ -456,7 +456,7 @@ def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_sta
 
     # Pre-allocate a writeable shared memory map as a container for the
     # results of the parallel computation
-    tmp_folder = tempfile.mkdtemp(dir=tmp_dir)
+    tmp_folder = tempfile.mkdtemp()
     output_file_memmap = os.path.join(tmp_folder, 'output_array')
     output_array = np.memmap(output_file_memmap, dtype=raster_stack[0].dtype,
                              shape=raster_stack[0].shape, mode='w+')
