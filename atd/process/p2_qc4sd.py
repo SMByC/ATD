@@ -50,7 +50,7 @@ def run(config_run):
 
                 msg = 'Making the quality control process (using QC4SD) for {0} in tile {1}:'.format(mode, tile)
                 config_run.process_logfile.write(msg + '\n')
-                print(msg)
+                print(msg, flush=True)
 
                 files_with_path = [os.path.join(root, file) for file in files]
 

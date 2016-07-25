@@ -130,7 +130,7 @@ def run(config_run):
                     msg = 'Calculating the mean statistical for {0}: '.format(file)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg, end='')
+                    print(msg, end='', flush=True)
 
                     # mean directory
                     mean_dir = os.path.join(dir_process, 'mean')
@@ -157,7 +157,7 @@ def run(config_run):
                     msg = 'Calculating the standard deviation for {0}: '.format(file)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg, end='')
+                    print(msg, end='', flush=True)
 
                     # standard deviation directory
                     std_dir = os.path.join(dir_process, 'std')
@@ -185,7 +185,7 @@ def run(config_run):
                     msg = 'Calculating the valid data for {0}: '.format(file)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg, end='')
+                    print(msg, end='', flush=True)
 
                     # valid data directory
                     vd_dir = os.path.join(dir_process, 'valid_data')
@@ -213,7 +213,7 @@ def run(config_run):
                     msg = 'Calculating the signal-to-noise ratio for {0}: '.format(file)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg, end='')
+                    print(msg, end='', flush=True)
 
                     # valid data directory
                     snr_dir = os.path.join(dir_process, 'snr')
@@ -241,7 +241,7 @@ def run(config_run):
                     msg = 'Calculating the coefficient of variation for {0}: '.format(file)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg, end='')
+                    print(msg, end='', flush=True)
 
                     # coefficient of variation directory
                     coeff_var_dir = os.path.join(dir_process, 'coeff_var')
@@ -270,7 +270,7 @@ def run(config_run):
                         msg = 'Calculating the Pearson\'s correlation coefficient for {0}: '.format(file)
                         config_run.process_logfile.write(msg)
                         config_run.process_logfile.flush()
-                        print(msg, end='')
+                        print(msg, end='', flush=True)
 
                         # Pearson's correlation coefficient directory
                         pearson_corr_dir = os.path.join(dir_process, 'pearson_corr')

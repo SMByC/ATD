@@ -47,7 +47,7 @@ def run(config_run):
                 msg = 'Processing file {0} with MRT: '.format(file)
                 config_run.process_logfile.write(msg)
                 config_run.process_logfile.flush()
-                print(msg)
+                print(msg, flush=True)
 
                 # converting and making the layerstack of mrt tmp process
                 return_code, msg = modis_convert(hdf_file, dest)

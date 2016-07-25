@@ -47,7 +47,7 @@ def run(config_run):
                 var = os.path.basename(root)
                 msg = 'Generating layer stack for variable {0}: '.format(var)
                 config_run.process_logfile.write(msg + '\n')
-                print(msg)
+                print(msg, flush=True)
 
                 dest = os.path.join(dir_process, var)
                 if not os.path.isdir(dest):
@@ -64,7 +64,7 @@ def run(config_run):
                 msg = '  calculating the lower pixel size for all bands: ' + str(lower_pixel_size)
                 config_run.process_logfile.write(msg + '\n')
                 config_run.process_logfile.flush()
-                print(msg)
+                print(msg, flush=True)
 
                 # nombre del layer stack
                 out_file = os.path.join(dest, "LayerStack_" + var + ".tif")

@@ -88,16 +88,17 @@ def run(config_run):
                     msg = 'Processing mosaic {0}: '.format(mosaic_name)
                     config_run.process_logfile.write(msg)
                     config_run.process_logfile.flush()
-                    print(msg)
+                    print(msg, flush=True)
                     return_code, msg = mosaic(mosaic_input_list_fullpath, mosaic_dest, mosaic_name_tmp)
                     config_run.process_logfile.write(msg + '\n')
-                    print(msg)
+                    print(msg, flush=True)
                     if return_code != 0: break
 
                     # clipping Colombia shape
                     return_code, msg = clipping_colombia(os.path.join(mosaic_dest, mosaic_name_tmp),
                                                          os.path.join(mosaic_dest, mosaic_name))
-                    print(msg)
+                    config_run.process_logfile.write(msg + '\n')
+                    print(msg, flush=True)
                     if return_code != 0: break
 
                     # clean process files in list and sorted

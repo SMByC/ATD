@@ -107,7 +107,7 @@ if args.make == 'process':
           ' - (' + datetime_format(datetime.today()) + ') ###########' + \
           '\n#### in dir: ' + os.path.basename(config_run.working_directory) + '\n'
     config_run.process_logfile.write(msg + '\n')
-    print(msg)
+    print(msg, flush=True)
 
     config_run.process_name = args.process
 
