@@ -78,7 +78,7 @@ def run(config_run):
                     # load file as a list of bands and saved it in memmap files
                     in_file = os.path.join(root, file)
                     # define temp dir and memmap raster to save
-                    tmp_folder = tempfile.mkdtemp()
+                    tmp_folder = tempfile.mkdtemp(dir=config_run.tmp_dir)
                     # Open the original file
                     dataset = gdal.Open(in_file, gdal.GA_ReadOnly)
                     # loop thru bands of raster and append each band of data to 'layers'
@@ -114,7 +114,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('median', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -141,7 +141,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('mean', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -168,7 +168,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('std', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -196,7 +196,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('valid_data', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -224,7 +224,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('snr', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -252,7 +252,7 @@ def run(config_run):
 
                     try:
                         multiprocess_statistic('coeff_var', in_file, raster_stack, out_file, None,
-                                               config_run.number_of_processes)
+                                               config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
                         print(msg)
@@ -285,7 +285,7 @@ def run(config_run):
                         previous_dataset_file = \
                             os.path.join(previous_p3_mosaic_dir, os.path.basename(out_file).split('_pearson_corr.tif')[0] + '.tif')
                         # define temp dir and memmap raster to save
-                        tmp_folder_prev_rundir = tempfile.mkdtemp()
+                        tmp_folder_prev_rundir = tempfile.mkdtemp(dir=config_run.tmp_dir)
                         # Open the original file
                         dataset = gdal.Open(previous_dataset_file, gdal.GA_ReadOnly)
                         # loop thru bands of raster and append each band of data to 'layers'
@@ -307,7 +307,7 @@ def run(config_run):
 
                         try:
                             multiprocess_statistic('pearson_corr', in_file, raster_stack, out_file, prev_raster_stack,
-                                                   config_run.number_of_processes)
+                                                   config_run.number_of_processes, config_run.tmp_dir)
                             msg = 'OK'
                             config_run.process_logfile.write(msg + '\n')
                             print(msg)
@@ -437,7 +437,7 @@ def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_st
         output_array[np.ix_(y_chunk, x_chunk)] = r
 
 
-def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_stack=None, number_of_processes=4):
+def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_stack=None, number_of_processes=4, tmp_dir=None):
     """Calculate the statistics in multiprocess with chunks of x and y
     """
     # get the projection information
@@ -456,7 +456,7 @@ def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_sta
 
     # Pre-allocate a writeable shared memory map as a container for the
     # results of the parallel computation
-    tmp_folder = tempfile.mkdtemp()
+    tmp_folder = tempfile.mkdtemp(dir=tmp_dir)
     output_file_memmap = os.path.join(tmp_folder, 'output_array')
     output_array = np.memmap(output_file_memmap, dtype=raster_stack[0].dtype,
                              shape=raster_stack[0].shape, mode='w+')

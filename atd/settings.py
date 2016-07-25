@@ -288,6 +288,11 @@ def get(args):
         # required prev_rundir only for p4_stats for computes statistics
         config_run.prev_rundir = args.prev_rundir
         config_run.number_of_processes = args.number_of_processes
+        config_run.tmp_dir = args.tmp_dir
+        if config_run.tmp_dir is not None:
+            config_run.tmp_dir = os.path.abspath(args.tmp_dir)
+            if not os.path.isdir(config_run.tmp_dir):
+                os.mkdir(config_run.tmp_dir)
 
         config_run.start_date = download_config_run.start_date
         config_run.end_date = download_config_run.end_date

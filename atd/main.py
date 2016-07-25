@@ -72,6 +72,8 @@ group_process.add_argument('--prev_rundir', help='directory of the previous run 
                            action=readable_dir)
 group_process.add_argument('--np', dest='number_of_processes', type=int, help='number of processes',
                            required=False)
+group_process.add_argument('--tmp_dir', type=str, default=None,
+                           help='temporal directory for cache', required=False)
 
 # print help if not pass arguments
 if len(sys.argv) == 1:
