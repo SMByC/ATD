@@ -257,7 +257,7 @@ def run(config_run):
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
-                        print(msg)
+                        print(msg, flush=True)
                     except Exception as error:
                         msg = 'FAIL\nError: While calculating coefficient of variation\n' + str(error)
                         config_run.process_logfile.write(msg + '\n')
