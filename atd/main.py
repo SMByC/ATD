@@ -71,7 +71,7 @@ group_process.add_argument('working_directory', help='working directory to proce
 group_process.add_argument('--prev_rundir', help='directory of the previous run (only for run p4_stats)',
                            action=readable_dir)
 group_process.add_argument('--np', dest='number_of_processes', type=int, help='number of processes',
-                           required=False)
+                           default=os.cpu_count()-2, required=False)
 group_process.add_argument('--tmp_dir', type=str, default=None,
                            help='temporal directory for cache', required=False)
 

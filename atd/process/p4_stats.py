@@ -441,7 +441,8 @@ def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_st
         output_array[np.ix_(y_chunk, x_chunk)] = r
 
 
-def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_stack=None, number_of_processes=4, tmp_dir=None):
+def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_stack=None,
+                           number_of_processes=os.cpu_count()-2, tmp_dir=None):
     """Calculate the statistics in multiprocess with chunks of x and y
     """
     # get the projection information
