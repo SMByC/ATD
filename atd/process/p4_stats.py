@@ -444,7 +444,7 @@ def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_sta
     no_data_value, x_size, y_size, geo_trans, projection, data_type = get_geo_info(in_file)
 
     # calculate the number of chunks for X
-    n_chunks = max(1, ceil(x_size / max(number_of_processes, number_of_processes * floor(x_size / 1000))))
+    n_chunks = max(1, ceil(x_size / max(number_of_processes, number_of_processes * floor(x_size / 3000))))
     # divide the rows in n_chunks to process matrix in multiprocess (multi-rows)
     x_chunks = [range(x_size)[i:i + n_chunks] for i in range(0, x_size, n_chunks)]
 
