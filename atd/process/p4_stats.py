@@ -93,9 +93,9 @@ def run(config_run):
                         raster_band[raster_band == no_data_value] = np.nan
                         # dumb
                         raster_band_file = os.path.join(tmp_folder, str(i))
-                        dump(raster_band, raster_band_file, compress=('lzma', 1))  # compress=('lzma', 3)
+                        dump(raster_band, raster_band_file, compress=0)  # compress=('lzma', 3)
                         # load and save the raster from memmap disk cache
-                        raster_stack.append(load(raster_band_file))
+                        raster_stack.append(load(raster_band_file, mmap_mode='r'))
                         del raster_band_file, raster_band
 
                     ##############
@@ -300,9 +300,9 @@ def run(config_run):
                             raster_band[raster_band == no_data_value] = np.nan
                             # dumb
                             raster_band_file = os.path.join(tmp_folder_prev_rundir, str(i))
-                            dump(raster_band, raster_band_file, compress=('lzma', 1))  # compress=('lzma', 3)
+                            dump(raster_band, raster_band_file, compress=0)  # compress=('lzma', 3)
                             # load and save the raster from memmap disk cache
-                            prev_raster_stack.append(load(raster_band_file))
+                            prev_raster_stack.append(load(raster_band_file, mmap_mode='r'))
                             del raster_band_file, raster_band
 
                         try:
