@@ -75,6 +75,7 @@ def run(config_run):
                 files = [x for x in files if x.endswith(('.tif', '.TIF'))]
                 for file in files:
                     ##############
+                    print('Dump and load and  the file to process to disk cache: ', end='', flush=True)
                     # load file as a list of bands and saved it in memmap files
                     in_file = os.path.join(root, file)
                     # define temp dir and memmap raster to save
@@ -97,6 +98,7 @@ def run(config_run):
                         # load and save the raster from memmap disk cache
                         raster_stack.append(load(raster_band_file, mmap_mode='r'))
                         del raster_band_file, raster_band
+                    print('OK')
 
                     ##############
                     # Calculate the median statistical
@@ -282,6 +284,7 @@ def run(config_run):
                         #######
                         # Open and load the previous rundir of mosaic file
                         # get array of the previous mean file
+                        print('Dump and load the previous file to process to disk cache: ', end='', flush=True)
                         previous_dataset_file = \
                             os.path.join(previous_p3_mosaic_dir, os.path.basename(out_file).split('_pearson_corr.tif')[0] + '.tif')
                         # define temp dir and memmap raster to save
@@ -304,6 +307,7 @@ def run(config_run):
                             # load and save the raster from memmap disk cache
                             prev_raster_stack.append(load(raster_band_file, mmap_mode='r'))
                             del raster_band_file, raster_band
+                        print('OK')
 
                         try:
                             multiprocess_statistic('pearson_corr', in_file, raster_stack, out_file, prev_raster_stack,
