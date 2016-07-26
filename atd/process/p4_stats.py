@@ -441,7 +441,7 @@ def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_st
         output_array[np.ix_(y_chunk, x_chunk)] = r
 
 
-def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_stack=None,
+def multiprocess_statistic(stat, in_file, raster_stack, out_file, prev_raster_stack=None,
                            number_of_processes=os.cpu_count()-2, tmp_dir=None):
     """Calculate the statistics in multiprocess with chunks of x and y
     """
@@ -480,7 +480,7 @@ def multiprocess_statistic(stat, in_file, raster_stack, outfile, prev_raster_sta
     # Set up the GTiff driver
     driver = gdal.GetDriverByName('GTiff')
 
-    new_dataset = driver.Create(outfile, x_size, y_size, 1, output_type,
+    new_dataset = driver.Create(out_file, x_size, y_size, 1, output_type,
                                 ["COMPRESS=LZW", "PREDICTOR=2", "TILED=YES"])
     # the '1' is for band 1
     new_dataset.SetGeoTransform(geo_trans)
