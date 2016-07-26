@@ -75,7 +75,7 @@ def run(config_run):
                 files = [x for x in files if x.endswith(('.tif', '.TIF'))]
                 for file in files:
                     ##############
-                    print('Dump and load and the file to process to disk cache: ', end='', flush=True)
+                    print('Dump and load the file to process to disk cache: ', end='', flush=True)
                     # load file as a list of bands and saved it in memmap files
                     in_file = os.path.join(root, file)
                     # define temp dir and memmap raster to save
