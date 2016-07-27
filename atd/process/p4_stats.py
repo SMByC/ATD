@@ -25,6 +25,26 @@ except ImportError:  # new
 from atd.lib import datetime_format
 
 
+def dump_chunk(x_chunk, y_chunk, x_size, y_size, in_file, tmp_folder):
+    # Open the original file in chunks
+    dataset = gdal.Open(in_file, gdal.GA_ReadOnly)
+    num_layers = dataset.RasterCount
+    # get the numpy 3rd dimension array stack of the bands in chunks (x_chunk and y_chunk)
+    raster_layerstack_chunk = np.dstack([dataset.GetRasterBand(band).ReadAsArray(x_chunk[0], y_chunk[0], x_size, y_size)
+                                   for band in range(1, num_layers + 1)])
+    # raster_band[raster_band == 0] = np.nan
+    raster_layerstack_chunk = raster_layerstack_chunk.astype(float)
+    # convert the no data value to NaN
+    no_data_value = dataset.GetRasterBand(1).GetNoDataValue()
+    raster_layerstack_chunk[raster_layerstack_chunk == no_data_value] = np.nan
+
+    # dumb
+    file_dump = os.path.join(tmp_folder, "x({0}-{1})_y({2}-{3})".format(x_chunk[0], x_chunk[-1],
+                                                                        y_chunk[0], y_chunk[-1]))
+    dump(raster_layerstack_chunk, file_dump, compress=0)  # compress=('lzma', 3)
+    return file_dump, x_chunk, y_chunk
+
+
 def run(config_run):
     if config_run.p4_stats not in [None, 'None']:
         msg = 'Warning: The process {0} was executed before\n'.format(config_run.process_name)
@@ -74,30 +94,30 @@ def run(config_run):
             if len(files) != 0:
                 files = [x for x in files if x.endswith(('.tif', '.TIF'))]
                 for file in files:
+                    in_file = os.path.join(root, file)
+                    # get the projection information
+                    no_data_value, x_rsize, y_rsize, geo_trans, projection, data_type = get_geo_info(in_file)
+                    # calculate the number of chunks for X
+                    x_size = max(1, ceil(x_rsize / max(config_run.number_of_processes, config_run.number_of_processes
+                                                       * floor(x_rsize / 3000))))
+                    # divide the rows in n_chunks to process matrix in multiprocess (multi-rows)
+                    x_chunks = [range(x_rsize)[i:i + x_size] for i in range(0, x_rsize, x_size)]
+
+                    # calculate the number of chunks for Y (same len to x_chunks)
+                    len_chunks = len(x_chunks)
+                    y_size = ceil(y_rsize / len_chunks)
+                    # divide the rows in n_chunks to process matrix in multiprocess (multi-rows)
+                    y_chunks = [range(y_rsize)[i:i + y_size] for i in range(0, y_rsize, y_size)]
+
                     ##############
                     print('Dump and load the file to process to disk cache: ', end='', flush=True)
-                    # load file as a list of bands and saved it in memmap files
-                    in_file = os.path.join(root, file)
                     # define temp dir and memmap raster to save
                     tmp_folder = tempfile.mkdtemp(dir=config_run.tmp_dir)
-                    # Open the original file
-                    dataset = gdal.Open(in_file, gdal.GA_ReadOnly)
-                    # loop thru bands of raster and append each band of data to 'layers'
-                    raster_stack = []
-                    num_layers = dataset.RasterCount
-                    for i in range(1, num_layers + 1):
-                        raster_band = dataset.GetRasterBand(i).ReadAsArray()
-                        # raster_band[raster_band == 0] = np.nan
-                        raster_band = raster_band.astype(float)
-                        # convert the no data value to NaN
-                        no_data_value = dataset.GetRasterBand(i).GetNoDataValue()
-                        raster_band[raster_band == no_data_value] = np.nan
-                        # dumb
-                        raster_band_file = os.path.join(tmp_folder, str(i))
-                        dump(raster_band, raster_band_file, compress=0)  # compress=('lzma', 3)
-                        # load and save the raster from memmap disk cache
-                        raster_stack.append(load(raster_band_file, mmap_mode='r'))
-                        del raster_band_file, raster_band
+
+                    # dump the input file in chunks in parallel process
+                    layerstack_chunks = Parallel(n_jobs=config_run.number_of_processes) \
+                        (delayed(dump_chunk)(x_chunk, y_chunk, x_size, y_size, in_file, tmp_folder)
+                         for x_chunk, y_chunk in product(x_chunks, y_chunks))
                     print('OK')
 
                     ##############
@@ -115,7 +135,7 @@ def run(config_run):
                     out_file = os.path.join(median_dir, os.path.splitext(file)[0] + '_median.tif')
 
                     try:
-                        multiprocess_statistic('median', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('median', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -142,7 +162,7 @@ def run(config_run):
                     out_file = os.path.join(mean_dir, os.path.splitext(file)[0] + '_mean.tif')
 
                     try:
-                        multiprocess_statistic('mean', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('mean', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -169,7 +189,7 @@ def run(config_run):
                     out_file = os.path.join(std_dir, os.path.splitext(file)[0] + '_std.tif')
 
                     try:
-                        multiprocess_statistic('std', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('std', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -197,7 +217,7 @@ def run(config_run):
                     out_file = os.path.join(vd_dir, os.path.splitext(file)[0] + '_valid_data.tif')
 
                     try:
-                        multiprocess_statistic('valid_data', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('valid_data', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -225,7 +245,7 @@ def run(config_run):
                     out_file = os.path.join(snr_dir, os.path.splitext(file)[0] + '_snr.tif')
 
                     try:
-                        multiprocess_statistic('snr', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('snr', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -253,7 +273,7 @@ def run(config_run):
                     out_file = os.path.join(coeff_var_dir, os.path.splitext(file)[0] + '_coeff_var.tif')
 
                     try:
-                        multiprocess_statistic('coeff_var', in_file, raster_stack, out_file, None,
+                        multiprocess_statistic('coeff_var', in_file, layerstack_chunks, out_file, None,
                                                config_run.number_of_processes, config_run.tmp_dir)
                         msg = 'OK'
                         config_run.process_logfile.write(msg + '\n')
@@ -292,7 +312,7 @@ def run(config_run):
                         # Open the original file
                         dataset = gdal.Open(previous_dataset_file, gdal.GA_ReadOnly)
                         # loop thru bands of raster and append each band of data to 'layers'
-                        prev_raster_stack = []
+                        prev_layerstack_chunks = []
                         num_layers = dataset.RasterCount
                         for i in range(1, num_layers + 1):
                             raster_band = dataset.GetRasterBand(i).ReadAsArray()
@@ -305,12 +325,12 @@ def run(config_run):
                             raster_band_file = os.path.join(tmp_folder_prev_rundir, str(i))
                             dump(raster_band, raster_band_file, compress=0)  # compress=('lzma', 3)
                             # load and save the raster from memmap disk cache
-                            prev_raster_stack.append(load(raster_band_file, mmap_mode='r'))
+                            prev_layerstack_chunks.append(load(raster_band_file, mmap_mode='r'))
                             del raster_band_file, raster_band
                         print('OK')
 
                         try:
-                            multiprocess_statistic('pearson_corr', in_file, raster_stack, out_file, prev_raster_stack,
+                            multiprocess_statistic('pearson_corr', in_file, layerstack_chunks, out_file, prev_layerstack_chunks,
                                                    config_run.number_of_processes, config_run.tmp_dir)
                             msg = 'OK'
                             config_run.process_logfile.write(msg + '\n')
@@ -323,11 +343,11 @@ def run(config_run):
                             return msg
 
                         # clean
-                        del prev_raster_stack
+                        del prev_layerstack_chunks
                         shutil.rmtree(tmp_folder_prev_rundir)
 
                     # clean
-                    del raster_stack
+                    del layerstack_chunks
                     shutil.rmtree(tmp_folder)
 
         return 0
@@ -360,11 +380,10 @@ def get_geo_info(file_name):
     data_type = gdal.GetDataTypeName(data_type)
     return no_data_value, x_size, y_size, geo_trans, projection, data_type
 
-
-def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_stack=None):
+def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layerstack_chunks=None):
 
     # get the numpy 3rd dimension array stack of the bands in chunks (x_chunk and y_chunk)
-    raster_layerstack = np.dstack([band[np.ix_(y_chunk, x_chunk)] for band in raster_stack])
+    layerstack_chunk = load(layerstack_chunk, mmap_mode='r')
 
     # call built in numpy statistical functions, with a specified axis. if
     # axis=2 means it will calculate along the 'depth' axis, per pixel.
@@ -372,66 +391,68 @@ def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_st
     #
     # Calculate the median statistical
     if stat == 'median':
-        output_array[np.ix_(y_chunk, x_chunk)] = np.nanmedian(raster_layerstack, axis=2)
+        output_array[np.ix_(y_chunk, x_chunk)] = np.nanmedian(layerstack_chunk, axis=2)
         return
     # Calculate the mean statistical
     if stat == 'mean':
-        output_array[np.ix_(y_chunk, x_chunk)] = np.nanmean(raster_layerstack, axis=2)
+        output_array[np.ix_(y_chunk, x_chunk)] = np.nanmean(layerstack_chunk, axis=2)
         return
     # Calculate the standard deviation
     if stat == 'std':
-        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(raster_layerstack, axis=2)
+        layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
+        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(layerstack_chunk, axis=2)
         return
     # Calculate the valid data
     if stat == 'valid_data':
         # calculate the number of valid data used in statistics products in percentage (0-100%),
         # this count the valid data (no nans) across the layers (time axis)
-        num_layers = len(raster_stack)
+        num_layers = len(layerstack_chunk)
         output_array[np.ix_(y_chunk, x_chunk)] = \
-            (num_layers - np.isnan(raster_layerstack).sum(axis=2)) * 100 / num_layers
+            (num_layers - np.isnan(layerstack_chunk).sum(axis=2)) * 100 / num_layers
         return
     # Calculate the signal-to-noise ratio
     if stat == 'snr':
         # this signal-to-noise ratio defined as the mean divided by the standard deviation.
-        m = np.nanmean(raster_layerstack, axis=2)
-        sd = np.nanstd(raster_layerstack, axis=2, ddof=0)
+        layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
+        m = np.nanmean(layerstack_chunk, axis=2)
+        sd = np.nanstd(layerstack_chunk, axis=2, ddof=0)
         output_array[np.ix_(y_chunk, x_chunk)] = np.where(sd == 0, 0, m / sd)
         return
     # Calculate the coefficient of variation
     if stat == 'coeff_var':
         # the ratio of the biased standard deviation to the mean
         output_array[np.ix_(y_chunk, x_chunk)] = \
-            variation(raster_layerstack, axis=2, nan_policy='omit')
+            variation(layerstack_chunk, axis=2, nan_policy='omit')
         return
     # Calculate the Pearson's correlation coefficient
     if stat == 'pearson_corr':
         # https://github.com/scipy/scipy/blob/v0.14.0/scipy/stats/stats.py#L2392
 
         # get the numpy 3rd dimension array stack of the bands in chunks for previous file
-        prev_raster_layerstack = np.dstack([band[np.ix_(y_chunk, x_chunk)] for band in prev_raster_stack])
+        prev_raster_layerstack = np.dstack([band[np.ix_(y_chunk, x_chunk)] for band in prev_layerstack_chunks])
 
-        # raster_stack and prev_raster_layerstack should have same length in all axis
-        if raster_layerstack.shape != prev_raster_layerstack.shape:
-            z_rs = raster_layerstack.shape[2]
+        # layerstack_chunks and prev_raster_layerstack should have same length in all axis
+        if layerstack_chunk.shape != prev_raster_layerstack.shape:
+            z_rs = layerstack_chunk.shape[2]
             z_prs = prev_raster_layerstack.shape[2]
 
             if z_rs > z_prs:
-                raster_layerstack = np.delete(raster_layerstack, np.s_[z_prs - z_rs:], 2)
+                layerstack_chunk = np.delete(layerstack_chunk, np.s_[z_prs - z_rs:], 2)
             if z_prs > z_rs:
                 prev_raster_layerstack = np.delete(prev_raster_layerstack, np.s_[z_rs - z_prs:], 2)
 
         # propagate the nan values across the pair values in the same position for the
         # two raster in both directions
-        mask1 = np.isnan(raster_layerstack)
+        mask1 = np.isnan(layerstack_chunk)
         mask2 = np.isnan(prev_raster_layerstack)
         combined_mask = mask1 | mask2
-        raster_layerstack = np.where(combined_mask, np.nan, raster_layerstack)
+        layerstack_chunk = np.where(combined_mask, np.nan, layerstack_chunk)
         prev_raster_layerstack = np.where(combined_mask, np.nan, prev_raster_layerstack)
         del mask1, mask2, combined_mask
 
-        mean_rs = np.nanmean(raster_layerstack, axis=2, keepdims=True)
+        mean_rs = np.nanmean(layerstack_chunk, axis=2, keepdims=True)
         mean_prs = np.nanmean(prev_raster_layerstack, axis=2, keepdims=True)
-        m_rs = np.nan_to_num(raster_layerstack - mean_rs)
+        m_rs = np.nan_to_num(layerstack_chunk - mean_rs)
         m_prs = np.nan_to_num(prev_raster_layerstack - mean_prs)
         r_num = np.add.reduce(m_rs * m_prs, axis=2)
         r_den = np.sqrt(ss(m_rs, axis=2) * ss(m_prs, axis=2))
@@ -441,35 +462,24 @@ def statistic(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_st
         output_array[np.ix_(y_chunk, x_chunk)] = r
 
 
-def multiprocess_statistic(stat, in_file, raster_stack, out_file, prev_raster_stack=None,
+def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_layerstack_chunks=None,
                            number_of_processes=os.cpu_count()-2, tmp_dir=None):
     """Calculate the statistics in multiprocess with chunks of x and y
     """
     # get the projection information
     no_data_value, x_size, y_size, geo_trans, projection, data_type = get_geo_info(in_file)
 
-    # calculate the number of chunks for X
-    n_chunks = max(1, ceil(x_size / max(number_of_processes, number_of_processes * floor(x_size / 3000))))
-    # divide the rows in n_chunks to process matrix in multiprocess (multi-rows)
-    x_chunks = [range(x_size)[i:i + n_chunks] for i in range(0, x_size, n_chunks)]
-
-    # calculate the number of chunks for Y (same len to x_chunks)
-    len_chunks = len(x_chunks)
-    n_chunks = ceil(y_size / len_chunks)
-    # divide the rows in n_chunks to process matrix in multiprocess (multi-rows)
-    y_chunks = [range(y_size)[i:i + n_chunks] for i in range(0, y_size, n_chunks)]
-
     # Pre-allocate a writeable shared memory map as a container for the
     # results of the parallel computation
     tmp_folder = tempfile.mkdtemp()
     output_file_memmap = os.path.join(tmp_folder, 'output_array')
-    output_array = np.memmap(output_file_memmap, dtype=raster_stack[0].dtype,
-                             shape=raster_stack[0].shape, mode='w+')
+    output_array = np.memmap(output_file_memmap, dtype=data_type,
+                             shape=(y_size, x_size), mode='w+')
 
     # make statistics in parallel processes with joblib + memmap
     Parallel(n_jobs=number_of_processes) \
-        (delayed(statistic)(stat, raster_stack, output_array, x_chunk, y_chunk, prev_raster_stack)
-         for x_chunk, y_chunk in product(x_chunks, y_chunks))
+        (delayed(statistic)(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layerstack_chunks)
+         for layerstack_chunk, x_chunk, y_chunk in layerstack_chunks)
 
     # define the default output type format
     output_type = gdal.GDT_Float32
