@@ -25,13 +25,14 @@ except ImportError:  # new
 from atd.lib import datetime_format
 
 
-def dump_chunk(x_chunk, y_chunk, x_size, y_size, in_file, tmp_folder):
+def dump_chunk(x_chunk, y_chunk, in_file, tmp_folder):
     # Open the original file in chunks
     dataset = gdal.Open(in_file, gdal.GA_ReadOnly)
     num_layers = dataset.RasterCount
     # get the numpy 3rd dimension array stack of the bands in chunks (x_chunk and y_chunk)
-    raster_layerstack_chunk = np.dstack([dataset.GetRasterBand(band).ReadAsArray(x_chunk[0], y_chunk[0], x_size, y_size)
-                                   for band in range(1, num_layers + 1)])
+    raster_layerstack_chunk = np.dstack(
+        [dataset.GetRasterBand(band).ReadAsArray(x_chunk[0], y_chunk[0], len(x_chunk), len(y_chunk))
+         for band in range(1, num_layers + 1)])
     # raster_band[raster_band == 0] = np.nan
     raster_layerstack_chunk = raster_layerstack_chunk.astype(float)
     # convert the no data value to NaN
@@ -116,7 +117,7 @@ def run(config_run):
 
                     # dump the input file in chunks in parallel process
                     layerstack_chunks = Parallel(n_jobs=config_run.number_of_processes) \
-                        (delayed(dump_chunk)(x_chunk, y_chunk, x_size, y_size, in_file, tmp_folder)
+                        (delayed(dump_chunk)(x_chunk, y_chunk, in_file, tmp_folder)
                          for x_chunk, y_chunk in product(x_chunks, y_chunks))
                     print('OK')
 
@@ -308,7 +309,7 @@ def run(config_run):
 
                         # dump the previous run input file in chunks in parallel process
                         prev_layerstack_chunks = Parallel(n_jobs=config_run.number_of_processes) \
-                            (delayed(dump_chunk)(x_chunk, y_chunk, x_size, y_size, prev_in_file, prev_tmp_folder)
+                            (delayed(dump_chunk)(x_chunk, y_chunk, prev_in_file, prev_tmp_folder)
                              for x_chunk, y_chunk in product(x_chunks, y_chunks))
                         print('OK')
 
