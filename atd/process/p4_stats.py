@@ -289,10 +289,6 @@ def run(config_run):
                     # Calculate the Pearson's correlation coefficient between this time series (x)
                     # with the previous time series (y): pearson_corr = covar(x,y)/(std(x)*std(y))
                     if config_run.prev_rundir:
-                        msg = 'Calculating the Pearson\'s correlation coefficient for {0}: '.format(file)
-                        config_run.process_logfile.write(msg)
-                        config_run.process_logfile.flush()
-                        print(msg, end='', flush=True)
 
                         # Pearson's correlation coefficient directory
                         pearson_corr_dir = os.path.join(dir_process, 'pearson_corr')
@@ -305,29 +301,21 @@ def run(config_run):
                         # Open and load the previous rundir of mosaic file
                         # get array of the previous mean file
                         print('Dump and load the previous file to process to disk cache: ', end='', flush=True)
-                        previous_dataset_file = \
-                            os.path.join(previous_p3_mosaic_dir, os.path.basename(out_file).split('_pearson_corr.tif')[0] + '.tif')
+                        prev_in_file = os.path.join(previous_p3_mosaic_dir,
+                                                    os.path.basename(out_file).split('_pearson_corr.tif')[0] + '.tif')
                         # define temp dir and memmap raster to save
-                        tmp_folder_prev_rundir = tempfile.mkdtemp(dir=config_run.tmp_dir)
-                        # Open the original file
-                        dataset = gdal.Open(previous_dataset_file, gdal.GA_ReadOnly)
-                        # loop thru bands of raster and append each band of data to 'layers'
-                        prev_layerstack_chunks = []
-                        num_layers = dataset.RasterCount
-                        for i in range(1, num_layers + 1):
-                            raster_band = dataset.GetRasterBand(i).ReadAsArray()
-                            # raster_band[raster_band == 0] = np.nan
-                            raster_band = raster_band.astype(float)
-                            # convert the no data value to NaN
-                            no_data_value = dataset.GetRasterBand(i).GetNoDataValue()
-                            raster_band[raster_band == no_data_value] = np.nan
-                            # dumb
-                            raster_band_file = os.path.join(tmp_folder_prev_rundir, str(i))
-                            dump(raster_band, raster_band_file, compress=0)  # compress=('lzma', 3)
-                            # load and save the raster from memmap disk cache
-                            prev_layerstack_chunks.append(load(raster_band_file, mmap_mode='r'))
-                            del raster_band_file, raster_band
+                        prev_tmp_folder = tempfile.mkdtemp(dir=config_run.tmp_dir)
+
+                        # dump the previous run input file in chunks in parallel process
+                        prev_layerstack_chunks = Parallel(n_jobs=config_run.number_of_processes) \
+                            (delayed(dump_chunk)(x_chunk, y_chunk, x_size, y_size, prev_in_file, prev_tmp_folder)
+                             for x_chunk, y_chunk in product(x_chunks, y_chunks))
                         print('OK')
+
+                        msg = 'Calculating the Pearson\'s correlation coefficient for {0}: '.format(file)
+                        config_run.process_logfile.write(msg)
+                        config_run.process_logfile.flush()
+                        print(msg, end='', flush=True)
 
                         try:
                             multiprocess_statistic('pearson_corr', in_file, layerstack_chunks, out_file, prev_layerstack_chunks,
@@ -344,7 +332,7 @@ def run(config_run):
 
                         # clean
                         del prev_layerstack_chunks
-                        shutil.rmtree(tmp_folder_prev_rundir)
+                        shutil.rmtree(prev_tmp_folder)
 
                     # clean
                     del layerstack_chunks
@@ -428,32 +416,34 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
     if stat == 'pearson_corr':
         # https://github.com/scipy/scipy/blob/v0.14.0/scipy/stats/stats.py#L2392
 
+        # get the respective chunk file based on x_chunk and y_chunk of layerstack_chunk
+        prev_layerstack_chunk = [item[0] for item in prev_layerstack_chunks if item[1:3] == (x_chunk, y_chunk)][0]
         # get the numpy 3rd dimension array stack of the bands in chunks for previous file
-        prev_raster_layerstack = np.dstack([band[np.ix_(y_chunk, x_chunk)] for band in prev_layerstack_chunks])
+        prev_layerstack_chunk = load(prev_layerstack_chunk, mmap_mode='r')
 
-        # layerstack_chunks and prev_raster_layerstack should have same length in all axis
-        if layerstack_chunk.shape != prev_raster_layerstack.shape:
+        # layerstack_chunks and prev_layerstack_chunk should have same length in all axis
+        if layerstack_chunk.shape != prev_layerstack_chunk.shape:
             z_rs = layerstack_chunk.shape[2]
-            z_prs = prev_raster_layerstack.shape[2]
+            z_prs = prev_layerstack_chunk.shape[2]
 
             if z_rs > z_prs:
                 layerstack_chunk = np.delete(layerstack_chunk, np.s_[z_prs - z_rs:], 2)
             if z_prs > z_rs:
-                prev_raster_layerstack = np.delete(prev_raster_layerstack, np.s_[z_rs - z_prs:], 2)
+                prev_layerstack_chunk = np.delete(prev_layerstack_chunk, np.s_[z_rs - z_prs:], 2)
 
         # propagate the nan values across the pair values in the same position for the
         # two raster in both directions
         mask1 = np.isnan(layerstack_chunk)
-        mask2 = np.isnan(prev_raster_layerstack)
+        mask2 = np.isnan(prev_layerstack_chunk)
         combined_mask = mask1 | mask2
         layerstack_chunk = np.where(combined_mask, np.nan, layerstack_chunk)
-        prev_raster_layerstack = np.where(combined_mask, np.nan, prev_raster_layerstack)
+        prev_layerstack_chunk = np.where(combined_mask, np.nan, prev_layerstack_chunk)
         del mask1, mask2, combined_mask
 
         mean_rs = np.nanmean(layerstack_chunk, axis=2, keepdims=True)
-        mean_prs = np.nanmean(prev_raster_layerstack, axis=2, keepdims=True)
+        mean_prs = np.nanmean(prev_layerstack_chunk, axis=2, keepdims=True)
         m_rs = np.nan_to_num(layerstack_chunk - mean_rs)
-        m_prs = np.nan_to_num(prev_raster_layerstack - mean_prs)
+        m_prs = np.nan_to_num(prev_layerstack_chunk - mean_prs)
         r_num = np.add.reduce(m_rs * m_prs, axis=2)
         r_den = np.sqrt(ss(m_rs, axis=2) * ss(m_prs, axis=2))
         r = r_num / r_den
