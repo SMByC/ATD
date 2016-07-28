@@ -462,7 +462,7 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
 
     # Pre-allocate a writeable shared memory map as a container for the
     # results of the parallel computation
-    tmp_folder = tempfile.mkdtemp()
+    tmp_folder = tempfile.mkdtemp(dir=tmp_dir)
     output_file_memmap = os.path.join(tmp_folder, 'output_array')
     output_array = np.memmap(output_file_memmap, dtype=np.float16,
                              shape=(y_size, x_size), mode='w+')
