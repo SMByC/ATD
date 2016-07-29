@@ -369,6 +369,20 @@ def get_geo_info(file_name):
     data_type = gdal.GetDataTypeName(data_type)
     return no_data_value, x_size, y_size, geo_trans, projection, data_type
 
+
+def clean_nans_keepdims(z):
+    """Clean all nans but keeps dimension for 1D array
+
+    Example:
+        input  [ nan   5.  nan  nan  nan   2.   3.]
+        output [  5.   2.   3.  nan  nan  nan  nan]
+    """
+    z_clean = z[~np.isnan(z)]
+    base = np.empty((len(z) - len(z_clean)))
+    base.fill(np.nan)
+    return np.concatenate((z_clean, base))
+
+
 def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layerstack_chunks=None):
 
     # get the numpy 3rd dimension array stack of the bands in chunks (x_chunk and y_chunk)
@@ -421,6 +435,18 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
         prev_layerstack_chunk = [item[0] for item in prev_layerstack_chunks if item[1:3] == (x_chunk, y_chunk)][0]
         # get the numpy 3rd dimension array stack of the bands in chunks for previous file
         prev_layerstack_chunk = load(prev_layerstack_chunk, mmap_mode='r')
+
+        # convert to numpy array
+        layerstack_chunk = np.array(layerstack_chunk)
+        prev_layerstack_chunk = np.array(prev_layerstack_chunk)
+
+        # clean all nans but keeps dimension for Z axis (time)
+        #layerstack_chunk = np.apply_along_axis(clean_nans_keepdims, 2, layerstack_chunk)
+        for x, y in product(range(layerstack_chunk.shape[0]), range(layerstack_chunk.shape[1])):
+            layerstack_chunk[x][y] = clean_nans_keepdims(layerstack_chunk[x][y])
+        #prev_layerstack_chunk = np.apply_along_axis(clean_nans_keepdims, 2, prev_layerstack_chunk)
+        for x, y in product(range(prev_layerstack_chunk.shape[0]), range(prev_layerstack_chunk.shape[1])):
+            prev_layerstack_chunk[x][y] = clean_nans_keepdims(prev_layerstack_chunk[x][y])
 
         # layerstack_chunks and prev_layerstack_chunk should have same length in all axis
         if layerstack_chunk.shape != prev_layerstack_chunk.shape:
