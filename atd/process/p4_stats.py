@@ -400,10 +400,10 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
     if stat == 'mean':
         output_array[np.ix_(y_chunk, x_chunk)] = np.nanmean(layerstack_chunk, axis=2)
         return
-    # Calculate the standard deviation
+    # Calculate the standard deviation (the result is integer  x10000)
     if stat == 'std':
         layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
-        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(layerstack_chunk, axis=2)
+        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(layerstack_chunk, axis=2) * 10000
         return
     # Calculate the valid data
     if stat == 'valid_data':
@@ -413,21 +413,21 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
         output_array[np.ix_(y_chunk, x_chunk)] = \
             (num_layers - np.isnan(layerstack_chunk).sum(axis=2)) * 100 / num_layers
         return
-    # Calculate the signal-to-noise ratio
+    # Calculate the signal-to-noise ratio (the result is integer  x10000)
     if stat == 'snr':
         # this signal-to-noise ratio defined as the mean divided by the standard deviation.
         layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
         m = np.nanmean(layerstack_chunk, axis=2)
         sd = np.nanstd(layerstack_chunk, axis=2, ddof=0)
-        output_array[np.ix_(y_chunk, x_chunk)] = np.where(sd == 0, 0, m / sd)
+        output_array[np.ix_(y_chunk, x_chunk)] = np.where(sd == 0, 0, m / sd) * 10000
         return
-    # Calculate the coefficient of variation
+    # Calculate the coefficient of variation (the result is integer  x10000)
     if stat == 'coeff_var':
         # the ratio of the biased standard deviation to the mean
         output_array[np.ix_(y_chunk, x_chunk)] = \
-            variation(layerstack_chunk, axis=2, nan_policy='omit')
+            variation(layerstack_chunk, axis=2, nan_policy='omit') * 10000
         return
-    # Calculate the Pearson's correlation coefficient
+    # Calculate the Pearson's correlation coefficient (the result is integer  x10000)
     if stat == 'pearson_corr':
         # https://github.com/scipy/scipy/blob/v0.14.0/scipy/stats/stats.py#L2392
 
@@ -476,7 +476,7 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
         r = r_num / r_den
 
         # write the chunk result r coefficient -1 to 1
-        output_array[np.ix_(y_chunk, x_chunk)] = r
+        output_array[np.ix_(y_chunk, x_chunk)] = r * 10000
 
 
 def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_layerstack_chunks=None,
@@ -499,9 +499,10 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
          for layerstack_chunk, x_chunk, y_chunk in layerstack_chunks)
 
     # define the default output type format
-    output_type = gdal.GDT_Float32
-    if stat in ['median', 'mean']:
+    if stat in ['median', 'mean', 'valid_data']:
         output_type = gdal.GDT_UInt16
+    else:
+        output_type = gdal.GDT_Int16
 
     #### create the output geo tif
     # Set up the GTiff driver
