@@ -403,7 +403,7 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
     # Calculate the standard deviation (the result is integer  x10000)
     if stat == 'std':
         layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
-        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(layerstack_chunk, axis=2) * 10000
+        output_array[np.ix_(y_chunk, x_chunk)] = np.nanstd(layerstack_chunk, axis=2)
         return
     # Calculate the valid data
     if stat == 'valid_data':
@@ -419,13 +419,13 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
         layerstack_chunk = np.array(layerstack_chunk)  # TODO: delete when memmap work with nanstd
         m = np.nanmean(layerstack_chunk, axis=2)
         sd = np.nanstd(layerstack_chunk, axis=2, ddof=0)
-        output_array[np.ix_(y_chunk, x_chunk)] = np.where(sd == 0, 0, m / sd) * 10000
+        output_array[np.ix_(y_chunk, x_chunk)] = np.where(sd == 0, 0, m / sd)
         return
     # Calculate the coefficient of variation (the result is integer  x10000)
     if stat == 'coeff_var':
         # the ratio of the biased standard deviation to the mean
         output_array[np.ix_(y_chunk, x_chunk)] = \
-            variation(layerstack_chunk, axis=2, nan_policy='omit') * 10000
+            variation(layerstack_chunk, axis=2, nan_policy='omit')
         return
     # Calculate the Pearson's correlation coefficient (the result is integer  x10000)
     if stat == 'pearson_corr':
@@ -476,7 +476,7 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
         r = r_num / r_den
 
         # write the chunk result r coefficient -1 to 1
-        output_array[np.ix_(y_chunk, x_chunk)] = r * 10000
+        output_array[np.ix_(y_chunk, x_chunk)] = r
 
 
 def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_layerstack_chunks=None,
@@ -490,7 +490,7 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
     # results of the parallel computation
     tmp_folder = tempfile.mkdtemp(dir=tmp_dir)
     output_file_memmap = os.path.join(tmp_folder, 'output_array')
-    output_array = np.memmap(output_file_memmap, dtype=np.float16,
+    output_array = np.memmap(output_file_memmap, dtype='float32',
                              shape=(y_size, x_size), mode='w+')
 
     # make statistics in parallel processes with joblib + memmap
@@ -498,11 +498,16 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
         (delayed(statistic)(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layerstack_chunks)
          for layerstack_chunk, x_chunk, y_chunk in layerstack_chunks)
 
+    # convert these statistics to integer values and multiply x10000
+    # for keep 4 decimal precision. WARNING: keep dimension to correct
+    # convert from the original array, i.e. float32 to int32 or uint32
+    if stat in ['std', 'snr', 'coeff_var', 'pearson_corr']:
+        output_array = np.memmap.dot(output_array, 10000)
+        output_type = gdal.GDT_Int32
+
     # define the default output type format
     if stat in ['median', 'mean', 'valid_data']:
         output_type = gdal.GDT_UInt16
-    else:
-        output_type = gdal.GDT_Int16
 
     #### create the output geo tif
     # Set up the GTiff driver
