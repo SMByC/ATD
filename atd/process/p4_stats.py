@@ -34,7 +34,7 @@ def dump_chunk(x_chunk, y_chunk, in_file, tmp_folder):
         [dataset.GetRasterBand(band).ReadAsArray(x_chunk[0], y_chunk[0], len(x_chunk), len(y_chunk))
          for band in range(1, num_layers + 1)])
     # raster_band[raster_band == 0] = np.nan
-    raster_layerstack_chunk = raster_layerstack_chunk.astype(float)
+    raster_layerstack_chunk = raster_layerstack_chunk.astype(np.float32)
     # convert the no data value to NaN
     no_data_value = dataset.GetRasterBand(1).GetNoDataValue()
     raster_layerstack_chunk[raster_layerstack_chunk == no_data_value] = np.nan
