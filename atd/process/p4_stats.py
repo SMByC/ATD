@@ -505,9 +505,10 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
         output_array = np.memmap.dot(output_array, 10000)
         output_type = gdal.GDT_Int32
 
-    # define the default output type format
+    # define the default output type format. WARNING: keep dimension to
+    # correct convert from the original array, i.e. float32 to int32 or uint32
     if stat in ['median', 'mean', 'valid_data']:
-        output_type = gdal.GDT_UInt16
+        output_type = gdal.GDT_UInt32
 
     #### create the output geo tif
     # Set up the GTiff driver
