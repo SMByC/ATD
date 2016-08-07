@@ -409,7 +409,7 @@ def statistic(stat, layerstack_chunk, output_array, x_chunk, y_chunk, prev_layer
     if stat == 'valid_data':
         # calculate the number of valid data used in statistics products in percentage (0-100%),
         # this count the valid data (no nans) across the layers (time axis)
-        num_layers = len(layerstack_chunk)
+        num_layers = layerstack_chunk.shape[2]
         output_array[np.ix_(y_chunk, x_chunk)] = \
             (num_layers - np.isnan(layerstack_chunk).sum(axis=2)) * 100 / num_layers
         return
