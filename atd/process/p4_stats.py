@@ -187,7 +187,7 @@ def run(config_run):
                     if not os.path.isdir(std_dir):
                         os.makedirs(std_dir)
 
-                    out_file = os.path.join(std_dir, os.path.splitext(file)[0] + '_std.tif')
+                    out_file = os.path.join(std_dir, os.path.splitext(file)[0] + '_std_x100.tif')
 
                     try:
                         multiprocess_statistic('std', in_file, layerstack_chunks, out_file, None,
@@ -243,7 +243,7 @@ def run(config_run):
                     if not os.path.isdir(snr_dir):
                         os.makedirs(snr_dir)
 
-                    out_file = os.path.join(snr_dir, os.path.splitext(file)[0] + '_snr.tif')
+                    out_file = os.path.join(snr_dir, os.path.splitext(file)[0] + '_snr_x100.tif')
 
                     try:
                         multiprocess_statistic('snr', in_file, layerstack_chunks, out_file, None,
@@ -271,7 +271,7 @@ def run(config_run):
                     if not os.path.isdir(coeff_var_dir):
                         os.makedirs(coeff_var_dir)
 
-                    out_file = os.path.join(coeff_var_dir, os.path.splitext(file)[0] + '_coeff_var.tif')
+                    out_file = os.path.join(coeff_var_dir, os.path.splitext(file)[0] + '_coeff_var_x1000.tif')
 
                     try:
                         multiprocess_statistic('coeff_var', in_file, layerstack_chunks, out_file, None,
@@ -296,7 +296,7 @@ def run(config_run):
                         if not os.path.isdir(pearson_corr_dir):
                             os.makedirs(pearson_corr_dir)
 
-                        out_file = os.path.join(pearson_corr_dir, os.path.splitext(file)[0] + '_pearson_corr.tif')
+                        out_file = os.path.join(pearson_corr_dir, os.path.splitext(file)[0] + '_pearson_corr_x1000.tif')
 
                         #######
                         # Open and load the previous rundir of mosaic file
