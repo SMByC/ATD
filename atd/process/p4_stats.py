@@ -499,16 +499,19 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
          for layerstack_chunk, x_chunk, y_chunk in layerstack_chunks)
 
     # convert these statistics to integer values and multiply x10000
-    # for keep 4 decimal precision. WARNING: keep dimension to correct
-    # convert from the original array, i.e. float32 to int32 or uint32
-    if stat in ['std', 'snr', 'coeff_var', 'pearson_corr']:
-        output_array = np.memmap.dot(output_array, 10000)
-        output_type = gdal.GDT_Int32
-
-    # define the default output type format. WARNING: keep dimension to
-    # correct convert from the original array, i.e. float32 to int32 or uint32
+    # for keep 4 decimal precision. Int16 range is -32768 to 32767
+    if stat in [ 'coeff_var', 'pearson_corr']:
+        output_array = np.memmap.dot(output_array, 1000)
+        output_type = gdal.GDT_Int16
+    # convert snr statistic to integer values and multiply x100
+    # Int16 range is -32768 to 32767
+    if stat in ['std', 'snr']:
+        output_array = np.memmap.dot(output_array, 100)
+        output_type = gdal.GDT_Int16
+    # define the default output type format.
+    # UInt16 range is 0 to 65535
     if stat in ['median', 'mean', 'valid_data']:
-        output_type = gdal.GDT_UInt32
+        output_type = gdal.GDT_UInt16
 
     #### create the output geo tif
     # Set up the GTiff driver
