@@ -303,7 +303,7 @@ def run(config_run):
                         # get array of the previous mean file
                         print('Dump and load the previous file to process to disk cache: ', end='', flush=True)
                         prev_in_file = os.path.join(previous_p3_mosaic_dir,
-                                                    os.path.basename(out_file).split('_pearson_corr.tif')[0] + '.tif')
+                                                    os.path.basename(out_file).split('_pearson_corr_x1000.tif')[0] + '.tif')
                         # define temp dir and memmap raster to save
                         prev_tmp_folder = tempfile.mkdtemp(dir=config_run.tmp_dir)
 
