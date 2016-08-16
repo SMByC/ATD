@@ -66,8 +66,14 @@ def run(config_run):
                 config_run.process_logfile.flush()
                 print(msg, flush=True)
 
+                # get name file multiply factor
+                if "_x" in files[0]:
+                    multiply_factor = "_" + files[0].split("_")[-1].split(".")[0]
+                else:
+                    multiply_factor = ""
+
                 # nombre del layer stack
-                out_file = os.path.join(dest, "LayerStack_" + var + ".tif")
+                out_file = os.path.join(dest, "LayerStack_" + var + multiply_factor + ".tif")
 
                 # combinacion de bandas a GeoTiff multibanda usando gdal
                 return_code = call(
