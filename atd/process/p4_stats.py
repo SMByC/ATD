@@ -500,7 +500,7 @@ def multiprocess_statistic(stat, in_file, layerstack_chunks, out_file, prev_laye
 
     # convert these statistics to integer values and multiply x10000
     # for keep 4 decimal precision. Int16 range is -32768 to 32767
-    if stat in [ 'coeff_var', 'pearson_corr']:
+    if stat in ['coeff_var', 'pearson_corr']:
         output_array = np.memmap.dot(output_array, 1000)
         output_type = gdal.GDT_Int16
     # convert snr statistic to integer values and multiply x100
