@@ -35,9 +35,10 @@ def dump_chunk(x_chunk, y_chunk, in_file, tmp_folder):
          for band in range(1, num_layers + 1)])
     # raster_band[raster_band == 0] = np.nan
     raster_layerstack_chunk = raster_layerstack_chunk.astype(np.float32)
-    # convert the no data value to NaN
+    # convert the no data value and zero to NaN
     no_data_value = dataset.GetRasterBand(1).GetNoDataValue()
     raster_layerstack_chunk[raster_layerstack_chunk == no_data_value] = np.nan
+    raster_layerstack_chunk[raster_layerstack_chunk == 0] = np.nan
 
     # dumb
     file_dump = os.path.join(tmp_folder, "x({0}-{1})_y({2}-{3})".format(x_chunk[0], x_chunk[-1],
