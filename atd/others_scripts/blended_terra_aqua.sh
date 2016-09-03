@@ -4,6 +4,9 @@
 #  Authors: Xavier Corredor Llano
 #  Email: xcorredorl at ideam.gov.co
 
+########################
+# Blended for trimonthly
+
 bands1=79
 bands2=88
 
@@ -28,3 +31,53 @@ do
     rm -rf blended_tmp
 done
 
+########################
+# Blended for semester based on trimonthly
+
+## extract terra
+bands1=79
+bands2=88
+
+for file1 in p3_mosaic1/*.tif
+do
+    echo ${file1}
+
+    file1_name=$(echo ${file1} | sed 's|p3_mosaic1/||g')
+    file1_name=$(echo ${file1_name} | sed 's|.tif||g')
+    dir=blended_terra/${file1_name}
+    mkdir -p ${dir}
+
+    for band in $(seq 1 ${bands1}); do
+        gdal_translate -b ${band} ${file1} ${dir}/${band}_1t.tif
+    done
+
+    file2=$(echo ${file1} | sed 's/p3_mosaic1/p3_mosaic2/g')
+    for band in $(seq 1 ${bands2}); do
+        gdal_translate -b ${band} ${file2} ${dir}/$((bands1+band))_1t.tif
+    done
+
+done
+
+## extract aqua
+bands1=88
+bands2=81
+
+for file1 in p3_mosaic1/*.tif
+do
+    echo ${file1}
+
+    file1_name=$(echo ${file1} | sed 's|p3_mosaic1/||g')
+    file1_name=$(echo ${file1_name} | sed 's|.tif||g')
+    dir=blended_aqua/${file1_name}
+    mkdir -p ${dir}
+
+    for band in $(seq 1 ${bands1}); do
+        gdal_translate -b ${band} ${file1} ${dir}/${band}_2a.tif
+    done
+
+    file2=$(echo ${file1} | sed 's/p3_mosaic1/p3_mosaic2/g')
+    for band in $(seq 1 ${bands2}); do
+        gdal_translate -b ${band} ${file2} ${dir}/$((bands1+band))_2a.tif
+    done
+
+done
