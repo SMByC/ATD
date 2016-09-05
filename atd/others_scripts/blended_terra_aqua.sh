@@ -81,3 +81,15 @@ do
     done
 
 done
+
+## blended in a layerstack
+# after extract you need to merge files terra and aqua
+
+for dir in `ls -d *`
+do
+    cd ${dir}
+    file_out=${dir}.tif
+    gdal_merge.py -a_nodata '-28672' -co COMPRESS=LZW -co PREDICTOR=2 \
+      -co TILED=YES -co BIGTIFF=YES -o ${file_out} -separate `ls -v`
+    cd ..
+done
