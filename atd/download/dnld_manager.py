@@ -287,7 +287,8 @@ class DownloadManager:
         for attempt in range(self.NUM_ATTEMPT_DAEMON):
             url_file_to_test = urls_files[randint(0, len(urls_files) - 1)]  # take a random file
             # check if file exists or exists but is corrupt (200 and 508 respectively)
-            if get_http_code(url_file_to_test) in [200, 508]:
+            # 302 redirect link when test with authentication but the file exist
+            if get_http_code(url_file_to_test) in [200, 508, 302]:
                 self.dnld_logfile.write('ready to download ' + datetime_format(datetime.today()) + '\n')
                 self.dnld_logfile.flush()
                 return True

@@ -390,9 +390,22 @@ def get_pixel_size(raster_file):
 def get_http_code(url):
     """Return the HTTP code from specific URL
     """
+    # get/set user and password for FTP
+    ftp_username = os.environ.get("ftp_username", "")
+    ftp_password = os.environ.get("ftp_password", "")
 
     try:
+        if not ftp_username == "" and not ftp_password == "":
+            auth_handler = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+            auth_handler.add_password(None,
+                                      uri='https://urs.earthdata.nasa.gov',
+                                      user=ftp_username,
+                                      passwd=ftp_password)
+            opener = urllib.request.build_opener(urllib.request.HTTPBasicAuthHandler(auth_handler))
+            urllib.request.install_opener(opener)
+
         conn = urllib.request.urlopen(url)
+
     except urllib.error.HTTPError as e:
         # Return code error (e.g. 404, 501, ...)
         return e.code
