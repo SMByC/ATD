@@ -144,7 +144,7 @@ class DownloadManager:
         ftp_username = os.environ.get("ftp_username", "")
         ftp_password = os.environ.get("ftp_password", "")
         if not ftp_username == "" and not ftp_password == "":
-            self.WGET += ["--user", ftp_username, "--password", ftp_password]
+            self.WGET += ["--user="+ftp_username, "--password="+ftp_password]
 
         # is destination was defined
         if self.DEST:
