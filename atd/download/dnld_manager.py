@@ -92,7 +92,8 @@ class DownloadManager:
     WAIT_TIME_DAEMON = 300
 
     # Default wget options to use for downloading each file
-    WGET = ["wget", "-q", "-nd", "-np", "-c"]  # "r" for recursive
+    #WGET = ["wget", "-q", "-nd", "-np", "-c"]  # "r" for recursive
+    WGET = ["wget", "-q", "-c", "--tries=75", "--no-dns-cache", "--random-wait"]  # "r" for recursive
     # path to save files, if is None then download in the same run directory
     DEST = None
 
