@@ -141,17 +141,17 @@ class DownloadManager:
         self.dnld_logfile.write(msg + '\n')
         print(msg)
 
-        # get/set user and password for FTP
-        ftp_username = os.environ.get("ftp_username", "")
-        ftp_password = os.environ.get("ftp_password", "")
-        if not ftp_username == "" and not ftp_password == "":
-            self.WGET += ["--user="+ftp_username, "--password="+ftp_password]
-
         # is destination was defined
         if self.DEST:
             self.wget_cmd = self.WGET + ["-P", self.DEST]
         else:  # save in the same directory of run
             self.wget_cmd = self.WGET
+
+        # get/set user and password for FTP
+        ftp_username = os.environ.get("ftp_username", "")
+        ftp_password = os.environ.get("ftp_password", "")
+        if not ftp_username == "" and not ftp_password == "":
+            self.wget_cmd += ["--user="+ftp_username, "--password="+ftp_password]
 
         # start daemon request for check available files
         self.daemon_request(urls_files)
