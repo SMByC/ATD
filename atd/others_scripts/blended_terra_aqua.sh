@@ -5,7 +5,7 @@
 #  Email: xcorredorl at ideam.gov.co
 
 ########################
-# Blended for trimonthly
+# Blended not sort for trimonthly (terra+aqua)
 
 bands1=79
 bands2=88
@@ -20,6 +20,8 @@ do
     done
 
     file2=$(echo $file1 | sed 's/p3_mosaic1/p3_mosaic2/g')
+    file2=$(echo $file2 | sed 's/MOD09/MYD09/g')
+    
     for band in $(seq 1 $bands2); do
         gdal_translate -b ${band} $file2 blended_tmp/$((bands1+band)).tif
     done
@@ -35,7 +37,7 @@ done
 # Blended for semester based on trimonthly
 
 ## extract terra
-bands1=79
+bands1=92
 bands2=88
 
 for file1 in p3_mosaic1/*.tif
