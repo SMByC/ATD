@@ -211,8 +211,9 @@ def get(args):
                   config_run.working_directory
             print(msg)
         elif os.path.basename(config_run.working_directory) != dir_date_name(config_run.start_date, config_run.target_date):
-            old_working_directory = os.path.basename(config_run.working_directory)
-            config_run.working_directory = os.path.abspath(dir_date_name(config_run.start_date, config_run.target_date))
+            old_working_directory = config_run.working_directory
+            config_run.working_directory = os.path.join(os.path.dirname(config_run.working_directory),
+                                                        dir_date_name(config_run.start_date, config_run.target_date))
             msg = '\nWarning: The current working directory not match with the start \n' \
                   'and target date parameters, renaming the working directory to:\n\n\t' + \
                   os.path.basename(old_working_directory) + '  -->  ' + os.path.basename(config_run.working_directory)
