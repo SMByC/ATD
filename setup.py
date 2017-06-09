@@ -17,7 +17,7 @@ setup(
     long_description=README,
     author='Xavier Corredor Llano, SMBYC-IDEAM',
     author_email='xcorredorl@ideam.gov.co, smbyc@ideam.gov.co',
-    url='https://bitbucket.org/SMBYC/atd',
+    url='https://bitbucket.org/smbyc/atd',
     license='GPLv3',
     packages=find_packages(),
     install_requires=['gdal',
